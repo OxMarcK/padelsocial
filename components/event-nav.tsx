@@ -1,38 +1,94 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-const ITEMS = [
-  { key: "event", label: "Event" },
-  { key: "standen", label: "Standen" },
-  { key: "teams", label: "Teams" },
-  { key: "tv", label: "TV-modus" },
-] as const;
-
-/**
- * Fixed bottom tab bar, shared across the event, standen and teams pages so
- * you can always get between them. TV mode is a fixed spectator display and
- * doesn't render this itself. Pages using this need bottom padding (see
- * EVENT_NAV_SPACER_CLASS) so the fixed bar never covers page content.
- */
-export function EventNav({ slug, active }: { slug: string; active: "event" | "standen" | "teams" }) {
+function HomeIcon({ className }: { className?: string }) {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-flood-white/10 bg-court-night/95 backdrop-blur">
-      <div className="mx-auto flex max-w-2xl">
-        {ITEMS.map((item) => (
-          <Link
-            key={item.key}
-            href={item.key === "event" ? `/${slug}` : `/${slug}/${item.key}`}
-            className={`flex-1 py-3 text-center font-display text-xs font-bold uppercase tracking-wide ${
-              active === item.key ? "text-lime-serve" : "text-ink-muted"
-            }`}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </div>
-      <div className="h-[env(safe-area-inset-bottom)]" />
-    </nav>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M4 11.5 12 4l8 7.5" />
+      <path d="M6 10v9h12v-9" />
+    </svg>
   );
 }
 
-/** Add to the bottom of any <main> that renders EventNav, so content can scroll clear of the fixed bar. */
-export const EVENT_NAV_SPACER_CLASS = "pb-20";
+function ChartIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M5 20V12" />
+      <path d="M12 20V4" />
+      <path d="M19 20v-7" />
+    </svg>
+  );
+}
+
+function UsersIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
+      <circle cx="17" cy="9" r="2.5" />
+      <path d="M15.5 14c2.4.3 4.3 2.3 4.5 5.5" />
+    </svg>
+  );
+}
+
+function TvIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="3" y="6" width="18" height="12" rx="2" />
+      <path d="M9 21h6" />
+      <path d="M12 18v3" />
+    </svg>
+  );
+}
+
+const ITEMS = [
+  { key: "event", label: "Event", Icon: HomeIcon },
+  { key: "standen", label: "Standen", Icon: ChartIcon },
+  { key: "teams", label: "Teams", Icon: UsersIcon },
+  { key: "tv", label: "TV-modus", Icon: TvIcon },
+] as const;
+
+/**
+ * Floating icon-only bottom bar (Instagram-style), shared across the event,
+ * standen and teams pages. Shrinks a touch once you scroll past the top so
+ * it stays out of the way of the content. TV mode is a fixed spectator
+ * display and doesn't render this itself.
+ */
+export function EventNav({ slug, active }: { slug: string; active: "event" | "standen" | "teams" }) {
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setCompact(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <nav
+        className={`pointer-events-auto flex items-center rounded-full border border-flood-white/10 bg-court-night/90 shadow-lg backdrop-blur-md transition-all duration-200 ${
+          compact ? "gap-0.5 px-2 py-1.5" : "gap-1.5 px-3 py-2.5"
+        }`}
+      >
+        {ITEMS.map(({ key, label, Icon }) => {
+          const isActive = active === key;
+          return (
+            <Link
+              key={key}
+              href={key === "event" ? `/${slug}` : `/${slug}/${key}`}
+              aria-label={label}
+              className={`flex items-center justify-center rounded-full transition-all duration-200 ${
+                compact ? "h-9 w-9" : "h-12 w-12"
+              } ${isActive ? "text-lime-serve" : "text-ink-muted"}`}
+            >
+              <Icon className={`transition-all duration-200 ${compact ? "h-4 w-4" : "h-5 w-5"}`} />
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
+  );
+}

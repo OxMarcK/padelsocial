@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { repo } from "@/lib/data";
 import { Logo } from "@/components/logo";
-import { EventNav, EVENT_NAV_SPACER_CLASS } from "@/components/event-nav";
+import { EventNav } from "@/components/event-nav";
+import { EVENT_NAV_SPACER_CLASS } from "@/lib/event-nav-spacer";
 import { TeamSearchGrid } from "./team-search-grid";
 
 export default async function TeamsPage({ params }: { params: { slug: string } }) {
