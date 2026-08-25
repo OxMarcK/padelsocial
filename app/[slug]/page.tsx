@@ -168,13 +168,13 @@ export default async function EventPage({ params }: { params: { slug: string } }
       ) : null}
 
       <nav className="flex gap-3 text-sm">
-        <Link href={`/e/${event.slug}/standen`} className="underline">
+        <Link href={`/${event.slug}/standen`} className="underline">
           Standen
         </Link>
-        <Link href={`/e/${event.slug}/teams`} className="underline">
+        <Link href={`/${event.slug}/teams`} className="underline">
           Teams
         </Link>
-        <Link href={`/e/${event.slug}/tv`} className="underline">
+        <Link href={`/${event.slug}/tv`} className="underline">
           TV-modus
         </Link>
       </nav>
@@ -208,7 +208,7 @@ function RankingList({
             </div>
           );
           return slug ? (
-            <Link key={r.teamId} href={`/e/${slug}/teams/${r.teamId}`}>
+            <Link key={r.teamId} href={`/${slug}/teams/${r.teamId}`}>
               {row}
             </Link>
           ) : (

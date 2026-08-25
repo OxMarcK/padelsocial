@@ -85,7 +85,7 @@ export interface PhaseIndicatorData {
   progress?: number;
 }
 
-/** Shared by /e/[slug] and /e/[slug]/tv so both read the same clock. */
+/** Shared by /[slug] and /[slug]/tv so both read the same clock. */
 export function phaseIndicatorData(event: PadelEvent, pouleRoundsCount: number, now: Date = new Date()): PhaseIndicatorData {
   const windows = computeSchedule(event, pouleRoundsCount);
   const idx = PHASE_ORDER.indexOf(event.status);

@@ -35,7 +35,7 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
 
   const host = headers().get("host");
   const proto = process.env.NODE_ENV === "development" ? "http" : "https";
-  const shareUrl = host ? `${proto}://${host}/e/${event.slug}/teams/${team.id}` : `/e/${event.slug}/teams/${team.id}`;
+  const shareUrl = host ? `${proto}://${host}/${event.slug}/teams/${team.id}` : `/${event.slug}/teams/${team.id}`;
 
   const teamNameById = Object.fromEntries(teams.map((t) => [t.id, t.name]));
   const pouleMatches = matches.filter((m) => m.phase === "poule" && (m.teamAId === team.id || m.teamBId === team.id));
@@ -52,7 +52,7 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col gap-6 px-5 py-8">
       <Logo />
-      <Link href={`/e/${event.slug}`} className="text-sm underline">
+      <Link href={`/${event.slug}`} className="text-sm underline">
         &larr; Terug naar {event.name}
       </Link>
       <TeamResultCard

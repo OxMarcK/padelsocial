@@ -7,15 +7,22 @@ import { Button } from "@/components/ui/button";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { PHASE_META } from "@/lib/phases";
 
+// Public events live at /[slug] — these top-level segments are already taken by the app itself.
+const RESERVED_SLUGS = new Set(["admin", "auth"]);
+
 async function createEvent(formData: FormData) {
   "use server";
   await requireAdmin();
+  const slug = String(formData.get("slug") ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-");
+  if (RESERVED_SLUGS.has(slug)) {
+    throw new Error(`"${slug}" is een gereserveerd pad en kan niet als slug gebruikt worden.`);
+  }
   const event = await repo.createEvent({
     name: String(formData.get("name") ?? ""),
-    slug: String(formData.get("slug") ?? "")
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9-]+/g, "-"),
+    slug,
     date: String(formData.get("date") ?? ""),
     startTime: String(formData.get("startTime") ?? "10:30"),
     location: String(formData.get("location") ?? ""),

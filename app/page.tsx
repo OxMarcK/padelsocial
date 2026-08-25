@@ -21,7 +21,7 @@ export default async function LandingPage() {
           <p className="text-sm text-flood-white/85">
             {upcoming.date} · {upcoming.startTime} · {upcoming.location}
           </p>
-          <Link href={`/e/${upcoming.slug}`}>
+          <Link href={`/${upcoming.slug}`}>
             <Button>Bekijk event</Button>
           </Link>
         </section>
@@ -35,7 +35,7 @@ export default async function LandingPage() {
           {past.map((e) => (
             <Link
               key={e.id}
-              href={`/e/${e.slug}`}
+              href={`/${e.slug}`}
               className="flex items-center justify-between rounded-2xl border border-flood-white/10 bg-surface px-4 py-3 hover:bg-flood-white/5"
             >
               <span className="font-medium">{e.name}</span>

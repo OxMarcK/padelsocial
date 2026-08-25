@@ -17,7 +17,7 @@ export function supabaseAdmin() {
   return createClient(url, key, {
     auth: { persistSession: false },
     // Next.js patches the global fetch to cache indefinitely by default on
-    // routes with no dynamic APIs in use (e.g. the public /e/[slug] pages,
+    // routes with no dynamic APIs in use (e.g. the public /[slug] pages,
     // which read no cookies/headers). This app has no use for that — every
     // read here should reflect the current DB state, since the whole "live"
     // experience (poll-refreshed public pages, TV mode) depends on it.

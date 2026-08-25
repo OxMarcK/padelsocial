@@ -25,7 +25,7 @@ export function TeamSearchGrid({
         {filtered.map((t) => (
           <Link
             key={t.id}
-            href={`/e/${slug}/teams/${t.id}`}
+            href={`/${slug}/teams/${t.id}`}
             className="flex flex-col gap-1 rounded-xl border border-flood-white/10 bg-surface px-3 py-3 hover:bg-flood-white/5"
           >
             {t.pouleLabel ? (

@@ -47,7 +47,7 @@ export default async function StandenPage({
 
       <div className="flex gap-2 rounded-xl border border-flood-white/10 bg-surface p-1">
         <Link
-          href={`/e/${event.slug}/standen?tab=poules`}
+          href={`/${event.slug}/standen?tab=poules`}
           className={`flex-1 rounded-lg py-2 text-center font-display text-sm font-bold uppercase tracking-wide ${
             tab === "poules" ? "bg-glass-blue text-flood-white" : "text-ink-muted"
           }`}
@@ -55,7 +55,7 @@ export default async function StandenPage({
           Groepsfase
         </Link>
         <Link
-          href={`/e/${event.slug}/standen?tab=bracket`}
+          href={`/${event.slug}/standen?tab=bracket`}
           className={`flex-1 rounded-lg py-2 text-center font-display text-sm font-bold uppercase tracking-wide ${
             tab === "bracket" ? "bg-glass-blue text-flood-white" : "text-ink-muted"
           }`}

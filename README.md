@@ -112,12 +112,12 @@ on 5 courts.
   real Postgres (`supabase/migrations/0001_init.sql`), including the
   `players`-table privacy boundary (public pages never see email/phone; see
   the `public_team_players` view and its RLS policies).
-- **Public pages**: marketing landing (`/`), adaptive event page (`/e/[slug]`
+- **Public pages**: marketing landing (`/`), adaptive event page (`/[slug]`
   — live scoreboard / prijsuitreiking / results depending on status), TV mode
-  (`/e/[slug]/tv`), team lookup (`/e/[slug]/teams`), a team detail + share
-  page (`/e/[slug]/teams/[teamId]` — added beyond the spec's route list since
+  (`/[slug]/tv`), team lookup (`/[slug]/teams`), a team detail + share
+  page (`/[slug]/teams/[teamId]` — added beyond the spec's route list since
   the spec's own "tap a team, share the card" requirement needs a stable
-  per-team URL), and standings (`/e/[slug]/standen`, poule tables + bracket
+  per-team URL), and standings (`/[slug]/standen`, poule tables + bracket
   tabs).
 - **Admin control room** (`/admin`, `/admin/e/[id]`): magic-link login, event
   creation, bulk team add, manual/random poule draw (poule count is just
