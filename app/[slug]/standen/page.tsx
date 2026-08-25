@@ -6,6 +6,7 @@ import { resolveBracketMatches, resolveTop8, type PouleStandingsInput } from "@/
 import { PoulesTab } from "./poules-tab";
 import { BracketTab } from "./bracket-tab";
 import { Logo } from "@/components/logo";
+import { EventNav, EVENT_NAV_SPACER_CLASS } from "@/components/event-nav";
 import { LivePoll } from "@/components/live-poll";
 
 export default async function StandenPage({
@@ -40,7 +41,7 @@ export default async function StandenPage({
   const resolvedBracket = top8State ? resolveBracketMatches(top8State.top8, bracketResults) : [];
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-5 py-8">
+    <main className={`mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-5 py-8 ${EVENT_NAV_SPACER_CLASS}`}>
       <LivePoll />
       <Logo />
       <h1 className="font-display text-4xl font-bold uppercase tracking-wide">Standen</h1>
@@ -74,6 +75,7 @@ export default async function StandenPage({
           moment dat de organisator publiceert.
         </div>
       )}
+      <EventNav slug={event.slug} active="standen" />
     </main>
   );
 }
