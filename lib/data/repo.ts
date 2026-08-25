@@ -43,6 +43,8 @@ export interface DataRepo {
 
   listTeams(eventId: string): Promise<Team[]>;
   bulkAddTeams(eventId: string, teams: NewTeamInput[]): Promise<Team[]>;
+  updateTeam(eventId: string, teamId: string, name: string): Promise<Team>;
+  deleteTeam(eventId: string, teamId: string): Promise<void>;
 
   listPoules(eventId: string): Promise<Poule[]>;
   savePoules(eventId: string, assignment: Record<PouleLabel, string[]>): Promise<Poule[]>;

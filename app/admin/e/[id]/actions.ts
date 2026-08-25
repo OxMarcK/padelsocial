@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import type { NewTeamInput } from "@/lib/data/repo";
@@ -28,6 +29,38 @@ export async function addTeamsBulk(eventId: string, formData: FormData) {
 
   if (teams.length > 0) await repo.bulkAddTeams(eventId, teams);
   revalidatePath(path(eventId));
+}
+
+export async function renameTeam(eventId: string, teamId: string, formData: FormData) {
+  await requireAdmin();
+  const name = String(formData.get("name") ?? "").trim();
+  if (name) await repo.updateTeam(eventId, teamId, name);
+  revalidatePath(path(eventId));
+}
+
+export async function deleteTeam(eventId: string, teamId: string) {
+  await requireAdmin();
+  await repo.deleteTeam(eventId, teamId);
+  revalidatePath(path(eventId));
+}
+
+export async function updateEventDetails(eventId: string, formData: FormData) {
+  await requireAdmin();
+  await repo.updateEvent(eventId, {
+    name: String(formData.get("name") ?? ""),
+    date: String(formData.get("date") ?? ""),
+    startTime: String(formData.get("startTime") ?? ""),
+    location: String(formData.get("location") ?? ""),
+    courts: Number(formData.get("courts") ?? 5),
+    description: String(formData.get("description") ?? ""),
+  });
+  revalidatePath(path(eventId));
+}
+
+export async function deleteEvent(eventId: string) {
+  await requireAdmin();
+  await repo.deleteEvent(eventId);
+  redirect("/admin");
 }
 
 export async function randomizePoules(eventId: string, formData: FormData) {

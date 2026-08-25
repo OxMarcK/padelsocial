@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import { Button } from "@/components/ui/button";
-import { ConfirmButton } from "@/components/admin/confirm-button";
+import { Field } from "@/components/ui/field";
 import { PHASE_META } from "@/lib/phases";
 
 // Public events live at /[slug] — these top-level segments are already taken by the app itself.
@@ -33,13 +32,6 @@ async function createEvent(formData: FormData) {
   redirect(`/admin/e/${event.id}`);
 }
 
-async function deleteEvent(eventId: string) {
-  "use server";
-  await requireAdmin();
-  await repo.deleteEvent(eventId);
-  revalidatePath("/admin");
-}
-
 export default async function AdminHomePage() {
   await requireAdmin();
   const events = await repo.listEvents();
@@ -53,31 +45,21 @@ export default async function AdminHomePage() {
           <p className="text-sm text-ink-muted">Nog geen events. Maak er hieronder een aan.</p>
         ) : (
           events.map((e) => (
-            <div
+            <Link
               key={e.id}
-              className="flex flex-wrap items-center gap-3 rounded-2xl border border-flood-white/10 bg-surface px-4 py-3"
+              href={`/admin/e/${e.id}`}
+              className="flex items-center justify-between rounded-2xl border border-flood-white/10 bg-surface px-4 py-3 hover:bg-flood-white/5"
             >
-              <Link
-                href={`/admin/e/${e.id}`}
-                className="flex min-w-[240px] flex-1 items-center justify-between hover:opacity-80"
-              >
-                <div>
-                  <div className="font-semibold">{e.name}</div>
-                  <div className="text-xs text-ink-muted">
-                    {e.date} · {e.location}
-                  </div>
+              <div>
+                <div className="font-semibold">{e.name}</div>
+                <div className="text-xs text-ink-muted">
+                  {e.date} · {e.location}
                 </div>
-                <span className="font-display text-xs font-bold uppercase tracking-wider text-lime-serve">
-                  {PHASE_META[e.status].label}
-                </span>
-              </Link>
-              <ConfirmButton
-                label="Verwijderen"
-                confirmText={`"${e.name}" permanent verwijderen? Alle teams, poules en wedstrijden gaan verloren.`}
-                action={deleteEvent.bind(null, e.id)}
-                variant="danger"
-              />
-            </div>
+              </div>
+              <span className="font-display text-xs font-bold uppercase tracking-wider text-lime-serve">
+                {PHASE_META[e.status].label}
+              </span>
+            </Link>
           ))
         )}
       </div>
@@ -109,35 +91,5 @@ export default async function AdminHomePage() {
         </form>
       </details>
     </main>
-  );
-}
-
-function Field({
-  label,
-  name,
-  type = "text",
-  required,
-  placeholder,
-  defaultValue,
-}: {
-  label: string;
-  name: string;
-  type?: string;
-  required?: boolean;
-  placeholder?: string;
-  defaultValue?: string | number;
-}) {
-  return (
-    <label className="flex flex-col gap-1 text-sm">
-      <span className="text-ink-muted">{label}</span>
-      <input
-        name={name}
-        type={type}
-        required={required}
-        placeholder={placeholder}
-        defaultValue={defaultValue}
-        className="h-11 rounded-xl border border-flood-white/15 bg-court-night px-3 text-flood-white placeholder:text-ink-muted"
-      />
-    </label>
   );
 }
