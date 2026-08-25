@@ -7,6 +7,7 @@ import { generatePouleSchedule } from "@/lib/poule-scheduler";
 import { top8RankingFromMatches, placementRankingFromMatches } from "@/lib/ranking-from-matches";
 import type { Match, PadelEvent, Team } from "@/lib/types";
 import { Logo } from "@/components/logo";
+import { EventNav, EVENT_NAV_SPACER_CLASS } from "@/components/event-nav";
 import { PhaseIndicator } from "@/components/phase-indicator";
 import { PhaseTimeline } from "@/components/phase-timeline";
 import { CourtCard } from "@/components/court-card";
@@ -68,6 +69,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
         ) : (
           <p className="text-ink-muted">Dit event wordt nog opgezet.</p>
         )}
+        <EventNav slug={event.slug} active="event" />
       </Shell>
     );
   }
@@ -166,18 +168,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
           />
         </div>
       ) : null}
-
-      <nav className="flex gap-3 text-sm">
-        <Link href={`/${event.slug}/standen`} className="underline">
-          Standen
-        </Link>
-        <Link href={`/${event.slug}/teams`} className="underline">
-          Teams
-        </Link>
-        <Link href={`/${event.slug}/tv`} className="underline">
-          TV-modus
-        </Link>
-      </nav>
+      <EventNav slug={event.slug} active="event" />
     </Shell>
   );
 }
@@ -221,7 +212,7 @@ function RankingList({
 
 function Shell({ children, event }: { children: React.ReactNode; event?: PadelEvent }) {
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-5 py-8">
+    <main className={`mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-5 py-8 ${EVENT_NAV_SPACER_CLASS}`}>
       <div className="flex items-center justify-between gap-3">
         <Logo />
         {event ? (
@@ -252,7 +243,7 @@ async function ResultsView({
   const rest = byRank.filter((p) => (p.finalRank ?? 99) > 8);
 
   return (
-    <Shell>
+    <Shell event={event}>
       <div>
         <h1 className="font-display text-4xl font-bold uppercase tracking-wide">Eindstand</h1>
         <p className="text-sm text-ink-muted">
@@ -298,6 +289,7 @@ async function ResultsView({
           </div>
         )}
       </Section>
+      <EventNav slug={event.slug} active="event" />
     </Shell>
   );
 }
