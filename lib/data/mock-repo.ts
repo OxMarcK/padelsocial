@@ -264,6 +264,26 @@ export const mockRepo: DataRepo = {
     return created;
   },
 
+  async updateTeam(_eventId, teamId, name) {
+    const team = store.teams.get(teamId);
+    if (!team) throw new Error(`Team not found: ${teamId}`);
+    const updated = { ...team, name };
+    store.teams.set(teamId, updated);
+    return updated;
+  },
+
+  async deleteTeam(eventId, teamId) {
+    store.teams.delete(teamId);
+    for (const [id, m] of store.pouleMatches) {
+      if (m.eventId === eventId && (m.teamAId === teamId || m.teamBId === teamId)) store.pouleMatches.delete(id);
+    }
+    for (const [id, poule] of store.poules) {
+      if (poule.eventId === eventId && poule.teamIds.includes(teamId)) {
+        store.poules.set(id, { ...poule, teamIds: poule.teamIds.filter((tid) => tid !== teamId) });
+      }
+    }
+  },
+
   async listPoules(eventId) {
     return poulesForEvent(eventId);
   },

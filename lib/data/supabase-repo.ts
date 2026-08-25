@@ -330,6 +330,48 @@ export const supabaseRepo: DataRepo = {
     return created;
   },
 
+  async updateTeam(eventId, teamId, name) {
+    const client = supabaseAdmin();
+    const { data, error } = await client
+      .from("teams")
+      .update({ name })
+      .eq("id", teamId)
+      .eq("event_id", eventId)
+      .select("*, player1:players!teams_player1_id_fkey(name), player2:players!teams_player2_id_fkey(name)")
+      .single();
+    if (error) raise(error);
+    return mapTeam({ ...data, player1_name: data.player1?.name, player2_name: data.player2?.name });
+  },
+
+  async deleteTeam(eventId, teamId) {
+    const client = supabaseAdmin();
+    const { data: team, error: fetchError } = await client
+      .from("teams")
+      .select("player1_id, player2_id")
+      .eq("id", teamId)
+      .eq("event_id", eventId)
+      .single();
+    if (fetchError) raise(fetchError);
+
+    // Matches reference team_a_id/team_b_id with no cascade — clear any matches
+    // involving this team first, same "matches are disposable" pattern as savePoules.
+    const { error: delMatchesError } = await client
+      .from("matches")
+      .delete()
+      .eq("event_id", eventId)
+      .or(`team_a_id.eq.${teamId},team_b_id.eq.${teamId}`);
+    if (delMatchesError) raise(delMatchesError);
+
+    const { error: delTeamError } = await client.from("teams").delete().eq("id", teamId).eq("event_id", eventId);
+    if (delTeamError) raise(delTeamError);
+
+    const playerIds = [team.player1_id, team.player2_id].filter(Boolean);
+    if (playerIds.length > 0) {
+      const { error: delPlayersError } = await client.from("players").delete().in("id", playerIds);
+      if (delPlayersError) raise(delPlayersError);
+    }
+  },
+
   async listPoules(eventId) {
     const client = supabaseAdmin();
     return fetchPoules(client, eventId);

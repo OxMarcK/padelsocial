@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
-import { computeStandings } from "@/lib/standings";
 import { PHASE_META, bracketRoundForStatus, nextStatus } from "@/lib/phases";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { MatchBoard } from "@/components/admin/match-board";
 import {
@@ -12,18 +13,34 @@ import {
   advancePhase,
   advancePouleRound,
   attachVideo,
+  deleteEvent,
+  deleteTeam,
   finishEvent,
   publishPouleMatches,
   publishTop8Override,
   randomizePoules,
   recordScore,
+  renameTeam,
   savePoulesManual,
+  updateEventDetails,
   updatePoints,
 } from "./actions";
 
 const POULE_LABEL_OPTIONS = Array.from({ length: 8 }, (_, i) => String.fromCharCode(65 + i)); // A..H
+const TABS = [
+  { key: "teams", label: "Teams" },
+  { key: "poules", label: "Poules" },
+  { key: "scores", label: "Scores" },
+] as const;
+type TabKey = (typeof TABS)[number]["key"];
 
-export default async function AdminEventPage({ params }: { params: { id: string } }) {
+export default async function AdminEventPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { tab?: string };
+}) {
   await requireAdmin();
   const event = await repo.getEvent(params.id);
   if (!event) notFound();
@@ -53,6 +70,11 @@ export default async function AdminEventPage({ params }: { params: { id: string 
 
   const recordScoreBound = recordScore.bind(null, event.id);
 
+  const defaultTab: TabKey = pouleMatches.length > 0 ? "scores" : poules.length > 0 ? "poules" : "teams";
+  const requestedTab = searchParams.tab;
+  const tab: TabKey = TABS.some((t) => t.key === requestedTab) ? (requestedTab as TabKey) : defaultTab;
+  const tabHref = (key: TabKey) => `/admin/e/${event.id}?tab=${key}`;
+
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-8 px-6 py-10">
       <div>
@@ -71,158 +93,240 @@ export default async function AdminEventPage({ params }: { params: { id: string 
         />
       ) : null}
 
-      <Section title="Teams" subtitle={`${teams.length} teams`}>
-        <form action={addTeamsBulk.bind(null, event.id)} className="flex flex-col gap-2">
-          <textarea
-            name="bulk"
-            rows={4}
-            placeholder={"Team naam | Speler 1 | Speler 2\nSanne & Joep | Sanne | Joep"}
-            className="rounded-xl border border-flood-white/15 bg-court-night px-3 py-2 text-sm text-flood-white placeholder:text-ink-muted"
-          />
-          <Button type="submit" variant="secondary">
-            Teams toevoegen
-          </Button>
-        </form>
-        {teams.length > 0 ? (
-          <div className="mt-3 flex flex-col gap-1.5">
-            {teams.map((t) => (
-              <div key={t.id} className="flex items-center gap-2 rounded-xl bg-flood-white/5 px-3 py-2 text-sm">
-                <span className="flex-1 truncate">{t.name}</span>
-              </div>
-            ))}
+      <details className="rounded-2xl border border-flood-white/10 bg-court-night p-4">
+        <summary className="cursor-pointer font-display text-lg font-bold uppercase tracking-wide">
+          Event bewerken
+        </summary>
+        <form action={updateEventDetails.bind(null, event.id)} className="mt-4 flex flex-col gap-3">
+          <Field label="Naam" name="name" defaultValue={event.name} required />
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Datum" name="date" type="date" defaultValue={event.date} required />
+            <Field label="Starttijd" name="startTime" type="time" defaultValue={event.startTime} required />
           </div>
-        ) : null}
-      </Section>
-
-      <Section title="Poules" subtitle="Verdeel de teams over poules — 5 teams per poule, zoveel poules als je nodig hebt">
-        <form action={savePoulesManual.bind(null, event.id)} className="flex flex-col gap-2">
-          {teams.map((t) => {
-            const current = poules.find((p) => p.teamIds.includes(t.id))?.label ?? "";
-            return (
-              <div key={t.id} className="flex items-center gap-2 text-sm">
-                <span className="flex-1 truncate">{t.name}</span>
-                <select
-                  key={current}
-                  name={`poule_${t.id}`}
-                  defaultValue={current}
-                  className="h-9 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
-                >
-                  <option value="">–</option>
-                  {POULE_LABEL_OPTIONS.map((label) => (
-                    <option key={label} value={label}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            );
-          })}
-          <div className="mt-2 flex gap-2">
-            <Button type="submit" variant="secondary">
-              Opslaan verdeling
-            </Button>
-          </div>
-        </form>
-        <form action={randomizePoules.bind(null, event.id)} className="mt-2 flex items-end gap-2">
-          <label className="flex flex-col gap-1 text-xs">
-            <span className="text-ink-muted">Aantal poules</span>
-            <input
-              type="number"
-              name="pouleCount"
-              min={1}
-              defaultValue={Math.max(1, Math.round(teams.length / 5) || 1)}
-              className="h-9 w-20 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
+          <Field label="Locatie" name="location" defaultValue={event.location} required />
+          <Field label="Aantal banen" name="courts" type="number" defaultValue={event.courts} required />
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-ink-muted">Omschrijving</span>
+            <textarea
+              name="description"
+              rows={3}
+              defaultValue={event.description}
+              className="rounded-xl border border-flood-white/15 bg-court-night px-3 py-2 text-flood-white"
             />
           </label>
-          <Button type="submit" variant="ghost">
-            Willekeurig verdelen (5 per poule)
+          <Button type="submit" variant="secondary">
+            Opslaan
           </Button>
         </form>
-      </Section>
+      </details>
 
-      <Section title="Poulewedstrijden" subtitle="Configureer punten en genereer het schema">
-        <form action={updatePoints.bind(null, event.id)} className="mb-3 flex items-end gap-2">
-          <PointField label="Winst" name="win" defaultValue={event.points.win} />
-          <PointField label="Gelijk" name="draw" defaultValue={event.points.draw} />
-          <PointField label="Verlies" name="loss" defaultValue={event.points.loss} />
-          <Button type="submit" variant="ghost">
-            Punten opslaan
-          </Button>
-        </form>
+      <div className="flex gap-2 rounded-xl border border-flood-white/10 bg-surface p-1">
+        {TABS.map((t) => (
+          <Link
+            key={t.key}
+            href={tabHref(t.key)}
+            className={`flex-1 rounded-lg py-2 text-center font-display text-sm font-bold uppercase tracking-wide ${
+              tab === t.key ? "bg-glass-blue text-flood-white" : "text-ink-muted"
+            }`}
+          >
+            {t.label}
+          </Link>
+        ))}
+      </div>
 
-        {schedulePreview ? (
-          <p className="mb-2 text-xs text-ink-muted">
-            {schedulePreview.matches.length} wedstrijden over {schedulePreview.roundsCount} rondes (5 banen elke
-            ronde vol — zie lib/poule-scheduler.ts voor waarom dit er {schedulePreview.roundsCount} zijn, niet 5).
-          </p>
-        ) : (
-          <p className="mb-2 text-xs text-ink-muted">Verdeel eerst de teams over de poules.</p>
-        )}
-
-        <form action={publishPouleMatches.bind(null, event.id)}>
-          <Button type="submit" disabled={!schedulePreview}>
-            {pouleMatches.length > 0 ? "Opnieuw genereren" : "Genereer poulewedstrijden"}
-          </Button>
-        </form>
-      </Section>
-
-      {meta.showCourts && event.status === "poulefase" && pouleMatches.length > 0 ? (
-        <Section title="Scores invoeren" subtitle={`Ronde ${event.currentPouleRound} van ${schedulePreview?.roundsCount ?? "?"}`}>
-          <MatchBoard matches={currentRoundMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
-          <form action={advancePouleRound.bind(null, event.id)} className="mt-3">
-            <Button type="submit" variant="ghost">
-              Volgende ronde binnen poulefase
+      {tab === "teams" ? (
+        <Section title="Teams" subtitle={`${teams.length} teams`}>
+          <form action={addTeamsBulk.bind(null, event.id)} className="flex flex-col gap-2">
+            <textarea
+              name="bulk"
+              rows={4}
+              placeholder={"Team naam | Speler 1 | Speler 2\nSanne & Joep | Sanne | Joep"}
+              className="rounded-xl border border-flood-white/15 bg-court-night px-3 py-2 text-sm text-flood-white placeholder:text-ink-muted"
+            />
+            <Button type="submit" variant="secondary">
+              Teams toevoegen
             </Button>
           </form>
-        </Section>
-      ) : null}
-
-      {event.status === "pauze_1" ? (
-        <Section title="Top 8 & plaatsingsgroep" subtitle="Controleer de seeding voordat je publiceert">
-          <Top8Editor eventId={event.id} teamNameById={teamNameById} published={top8} />
-        </Section>
-      ) : null}
-
-      {bracketRound && currentBracketMatches.length > 0 ? (
-        <Section title="Scores invoeren" subtitle={meta.label}>
-          <MatchBoard matches={currentBracketMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
-        </Section>
-      ) : null}
-
-      {matches.some((m) => m.scoreA !== null) ? (
-        <Section title="Video's koppelen" subtitle="Plak een YouTube-link per wedstrijd">
-          <div className="flex flex-col gap-2">
-            {matches
-              .filter((m) => m.scoreA !== null && m.scoreB !== null)
-              .map((m) => (
-                <form key={m.id} action={attachVideo.bind(null, event.id)} className="flex items-center gap-2 text-sm">
-                  <input type="hidden" name="matchId" value={m.id} />
-                  <span className="w-40 flex-none truncate text-ink-muted">{m.label}</span>
-                  <input
-                    type="url"
-                    name="videoUrl"
-                    defaultValue={m.videoUrl ?? ""}
-                    placeholder="https://youtube.com/…"
-                    className="h-9 flex-1 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white placeholder:text-ink-muted"
+          {teams.length > 0 ? (
+            <div className="mt-3 flex flex-col gap-1.5">
+              {teams.map((t) => (
+                <div key={t.id} className="flex items-center gap-2 rounded-xl bg-flood-white/5 px-3 py-2 text-sm">
+                  <form action={renameTeam.bind(null, event.id, t.id)} className="flex flex-1 items-center gap-2">
+                    <input
+                      name="name"
+                      defaultValue={t.name}
+                      className="h-9 min-w-0 flex-1 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
+                    />
+                    <Button type="submit" variant="ghost" size="sm">
+                      Opslaan
+                    </Button>
+                  </form>
+                  <ConfirmButton
+                    label="Verwijderen"
+                    confirmText={`"${t.name}" verwijderen?`}
+                    action={deleteTeam.bind(null, event.id, t.id)}
+                    variant="danger"
+                    size="sm"
                   />
-                  <Button type="submit" variant="ghost">
-                    Opslaan
-                  </Button>
-                </form>
+                </div>
               ))}
-          </div>
+            </div>
+          ) : null}
         </Section>
       ) : null}
 
-      {event.status === "prijsuitreiking" ? (
-        <Section title="Afronden">
-          <ConfirmButton
-            label="Evenement afronden"
-            confirmText="Eindstand vastzetten en de resultatenpagina publiceren?"
-            action={finishEvent.bind(null, event.id)}
-          />
-        </Section>
+      {tab === "poules" ? (
+        <>
+          <Section title="Poules" subtitle="Verdeel de teams over poules — 5 teams per poule, zoveel poules als je nodig hebt">
+            <form action={savePoulesManual.bind(null, event.id)} className="flex flex-col gap-2">
+              {teams.map((t) => {
+                const current = poules.find((p) => p.teamIds.includes(t.id))?.label ?? "";
+                return (
+                  <div key={t.id} className="flex items-center gap-2 text-sm">
+                    <span className="flex-1 truncate">{t.name}</span>
+                    <select
+                      key={current}
+                      name={`poule_${t.id}`}
+                      defaultValue={current}
+                      className="h-9 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
+                    >
+                      <option value="">–</option>
+                      {POULE_LABEL_OPTIONS.map((label) => (
+                        <option key={label} value={label}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              })}
+              <div className="mt-2 flex gap-2">
+                <Button type="submit" variant="secondary">
+                  Opslaan verdeling
+                </Button>
+              </div>
+            </form>
+            <form action={randomizePoules.bind(null, event.id)} className="mt-2 flex items-end gap-2">
+              <label className="flex flex-col gap-1 text-xs">
+                <span className="text-ink-muted">Aantal poules</span>
+                <input
+                  type="number"
+                  name="pouleCount"
+                  min={1}
+                  defaultValue={Math.max(1, Math.round(teams.length / 5) || 1)}
+                  className="h-9 w-20 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
+                />
+              </label>
+              <Button type="submit" variant="ghost">
+                Willekeurig verdelen (5 per poule)
+              </Button>
+            </form>
+          </Section>
+
+          <Section title="Poulewedstrijden" subtitle="Configureer punten en genereer het schema">
+            <form action={updatePoints.bind(null, event.id)} className="mb-3 flex items-end gap-2">
+              <PointField label="Winst" name="win" defaultValue={event.points.win} />
+              <PointField label="Gelijk" name="draw" defaultValue={event.points.draw} />
+              <PointField label="Verlies" name="loss" defaultValue={event.points.loss} />
+              <Button type="submit" variant="ghost">
+                Punten opslaan
+              </Button>
+            </form>
+
+            {schedulePreview ? (
+              <p className="mb-2 text-xs text-ink-muted">
+                {schedulePreview.matches.length} wedstrijden over {schedulePreview.roundsCount} rondes (5 banen elke
+                ronde vol — zie lib/poule-scheduler.ts voor waarom dit er {schedulePreview.roundsCount} zijn, niet 5).
+              </p>
+            ) : (
+              <p className="mb-2 text-xs text-ink-muted">Verdeel eerst de teams over de poules.</p>
+            )}
+
+            <form action={publishPouleMatches.bind(null, event.id)}>
+              <Button type="submit" disabled={!schedulePreview}>
+                {pouleMatches.length > 0 ? "Opnieuw genereren" : "Genereer poulewedstrijden"}
+              </Button>
+            </form>
+          </Section>
+        </>
       ) : null}
+
+      {tab === "scores" ? (
+        <>
+          {meta.showCourts && event.status === "poulefase" && pouleMatches.length > 0 ? (
+            <Section title="Scores invoeren" subtitle={`Ronde ${event.currentPouleRound} van ${schedulePreview?.roundsCount ?? "?"}`}>
+              <MatchBoard matches={currentRoundMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
+              <form action={advancePouleRound.bind(null, event.id)} className="mt-3">
+                <Button type="submit" variant="ghost">
+                  Volgende ronde binnen poulefase
+                </Button>
+              </form>
+            </Section>
+          ) : null}
+
+          {event.status === "pauze_1" ? (
+            <Section title="Top 8 & plaatsingsgroep" subtitle="Controleer de seeding voordat je publiceert">
+              <Top8Editor eventId={event.id} teamNameById={teamNameById} published={top8} />
+            </Section>
+          ) : null}
+
+          {bracketRound && currentBracketMatches.length > 0 ? (
+            <Section title="Scores invoeren" subtitle={meta.label}>
+              <MatchBoard matches={currentBracketMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
+            </Section>
+          ) : null}
+
+          {matches.some((m) => m.scoreA !== null) ? (
+            <Section title="Video's koppelen" subtitle="Plak een YouTube-link per wedstrijd">
+              <div className="flex flex-col gap-2">
+                {matches
+                  .filter((m) => m.scoreA !== null && m.scoreB !== null)
+                  .map((m) => (
+                    <form
+                      key={m.id}
+                      action={attachVideo.bind(null, event.id)}
+                      className="flex flex-col gap-1.5 rounded-xl bg-flood-white/5 p-3 text-sm"
+                    >
+                      <input type="hidden" name="matchId" value={m.id} />
+                      <span className="truncate text-ink-muted">{m.label}</span>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="url"
+                          name="videoUrl"
+                          defaultValue={m.videoUrl ?? ""}
+                          placeholder="https://youtube.com/…"
+                          className="h-9 min-w-0 flex-1 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white placeholder:text-ink-muted"
+                        />
+                        <Button type="submit" variant="ghost" size="sm">
+                          Opslaan
+                        </Button>
+                      </div>
+                    </form>
+                  ))}
+              </div>
+            </Section>
+          ) : null}
+
+          {event.status === "prijsuitreiking" ? (
+            <Section title="Afronden">
+              <ConfirmButton
+                label="Evenement afronden"
+                confirmText="Eindstand vastzetten en de resultatenpagina publiceren?"
+                action={finishEvent.bind(null, event.id)}
+              />
+            </Section>
+          ) : null}
+        </>
+      ) : null}
+
+      <Section title="Gevarenzone">
+        <ConfirmButton
+          label="Event verwijderen"
+          confirmText={`"${event.name}" permanent verwijderen? Alle teams, poules en wedstrijden gaan verloren.`}
+          action={deleteEvent.bind(null, event.id)}
+          variant="danger"
+        />
+      </Section>
     </main>
   );
 }

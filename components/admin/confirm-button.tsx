@@ -8,18 +8,20 @@ export function ConfirmButton({
   confirmText,
   action,
   variant = "primary",
+  size = "md",
 }: {
   label: string;
   confirmText: string;
   action: () => Promise<void>;
   variant?: "primary" | "secondary" | "danger";
+  size?: "md" | "sm";
 }) {
   const [confirming, setConfirming] = useState(false);
   const [pending, startTransition] = useTransition();
 
   if (!confirming) {
     return (
-      <Button type="button" variant={variant} onClick={() => setConfirming(true)}>
+      <Button type="button" variant={variant} size={size} onClick={() => setConfirming(true)}>
         {label}
       </Button>
     );
@@ -29,12 +31,13 @@ export function ConfirmButton({
     variant === "danger" ? "border-clay-orange bg-clay-orange/10" : "border-lime-serve bg-lime-serve/10";
 
   return (
-    <div className={`flex flex-col gap-3 rounded-2xl border p-4 ${boxClasses}`}>
+    <div className={`flex flex-col gap-3 rounded-2xl border ${size === "sm" ? "p-3" : "p-4"} ${boxClasses}`}>
       <p className="text-sm text-flood-white">{confirmText}</p>
       <div className="flex gap-2">
         <Button
           type="button"
           variant={variant}
+          size={size}
           disabled={pending}
           onClick={() => startTransition(async () => {
             await action();
@@ -43,7 +46,7 @@ export function ConfirmButton({
         >
           {pending ? "Bezig…" : "Bevestigen"}
         </Button>
-        <Button type="button" variant="ghost" disabled={pending} onClick={() => setConfirming(false)}>
+        <Button type="button" variant="ghost" size={size} disabled={pending} onClick={() => setConfirming(false)}>
           Annuleren
         </Button>
       </div>
