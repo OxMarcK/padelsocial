@@ -6,7 +6,8 @@ import { resolveBracketMatches, resolveTop8, type PouleStandingsInput } from "@/
 import { PoulesTab } from "./poules-tab";
 import { BracketTab } from "./bracket-tab";
 import { Logo } from "@/components/logo";
-import { EventNav, EVENT_NAV_SPACER_CLASS } from "@/components/event-nav";
+import { EventNav } from "@/components/event-nav";
+import { EVENT_NAV_SPACER_CLASS } from "@/lib/event-nav-spacer";
 import { LivePoll } from "@/components/live-poll";
 
 export default async function StandenPage({
