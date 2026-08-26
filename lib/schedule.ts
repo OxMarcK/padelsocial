@@ -65,6 +65,14 @@ export function computeSchedule(event: PadelEvent, pouleRoundsCount: number): Ph
   return windows;
 }
 
+/** Estimated wall-clock window for a single poule round, given when the poulefase itself starts. */
+export function pouleRoundWindow(pouleStartsAt: Date, round: number): { startsAt: Date; endsAt: Date } {
+  const offsetMinutes = Math.max(round - 1, 0) * (POULE_ROUND_MINUTES + POULE_CHANGEOVER_MINUTES);
+  const startsAt = new Date(pouleStartsAt.getTime() + offsetMinutes * 60_000);
+  const endsAt = new Date(startsAt.getTime() + POULE_ROUND_MINUTES * 60_000);
+  return { startsAt, endsAt };
+}
+
 export function fmtTime(d: Date): string {
   return d.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
 }

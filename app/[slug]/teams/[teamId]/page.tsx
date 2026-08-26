@@ -4,6 +4,7 @@ import Link from "next/link";
 import { repo } from "@/lib/data";
 import { groupStandingsByPoule } from "@/lib/standings";
 import { top8RankingFromMatches, placementRankingFromMatches } from "@/lib/ranking-from-matches";
+import { computeSchedule, fmtTime, pouleRoundWindow } from "@/lib/schedule";
 import { TeamResultCard } from "@/components/team-result-card";
 import { Logo } from "@/components/logo";
 
@@ -38,8 +39,11 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
   const shareUrl = host ? `${proto}://${host}/${event.slug}/teams/${team.id}` : `/${event.slug}/teams/${team.id}`;
 
   const teamNameById = Object.fromEntries(teams.map((t) => [t.id, t.name]));
-  const pouleMatches = matches.filter((m) => m.phase === "poule" && (m.teamAId === team.id || m.teamBId === team.id));
+  const pouleMatches = matches
+    .filter((m) => m.phase === "poule" && (m.teamAId === team.id || m.teamBId === team.id))
+    .sort((a, b) => a.roundNumber - b.roundNumber);
   const bracketMatches = matches.filter((m) => m.phase !== "poule" && (m.teamAId === team.id || m.teamBId === team.id));
+  const pouleWindow = computeSchedule(event, 1).find((w) => w.status === "poulefase")!;
 
   const summaryParts: string[] = [];
   if (poule && myRow) summaryParts.push(`Poule ${poule.label}: ${myRow.won}-${myRow.drawn}-${myRow.lost}, ${myRow.points} punten.`);
@@ -67,17 +71,23 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
         shareUrl={shareUrl}
       />
 
-      {pouleMatches.length > 0 ? (
+      {pouleMatches.length > 0 && event.status !== "finished" ? (
         <section className="flex flex-col gap-2">
-          <h2 className="font-display text-lg font-bold uppercase tracking-wide">Poulewedstrijden</h2>
+          <h2 className="font-display text-lg font-bold uppercase tracking-wide">Poule Schema</h2>
           <div className="flex flex-col gap-1.5">
             {pouleMatches.map((m) => {
               const opp = m.teamAId === team.id ? m.teamBId : m.teamAId;
               const myScore = m.teamAId === team.id ? m.scoreA : m.scoreB;
               const oppScore = m.teamAId === team.id ? m.scoreB : m.scoreA;
+              const { startsAt, endsAt } = pouleRoundWindow(pouleWindow.startsAt, m.roundNumber);
               return (
                 <div key={m.id} className="flex items-center justify-between rounded-xl bg-surface px-3 py-2 text-sm">
-                  <span className="truncate">{opp ? teamNameById[opp] ?? "?" : "?"}</span>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-ink-muted">
+                      Ronde {m.roundNumber} · Baan {m.courtNumber} · {fmtTime(startsAt)}–{fmtTime(endsAt)}
+                    </span>
+                    <span className="truncate">{opp ? teamNameById[opp] ?? "?" : "?"}</span>
+                  </div>
                   <span className="tabular-nums text-ink-muted">{myScore !== null ? `${myScore}-${oppScore}` : "–"}</span>
                 </div>
               );
