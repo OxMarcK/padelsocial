@@ -140,7 +140,16 @@ export async function advancePhase(eventId: string) {
       await repo.publishTop8(eventId, preview);
     }
   }
-  await repo.advancePhase(eventId);
+  // Leaving prijsuitreiking must go through finishEvent — it computes and
+  // stores the final placements. A plain repo.advancePhase() here would just
+  // flip the status to "finished" with nobody ever ranked (see page.tsx: the
+  // generic top-of-page advance button uses this action for every transition,
+  // including this last one, so it has to do the right thing on its own).
+  if (event?.status === "prijsuitreiking") {
+    await repo.finishEvent(eventId);
+  } else {
+    await repo.advancePhase(eventId);
+  }
   revalidatePath(path(eventId));
   revalidatePath(`/e`);
 }
@@ -154,11 +163,4 @@ export async function publishTop8Override(eventId: string, formData: FormData) {
     .filter(Boolean);
   await repo.publishTop8(eventId, { top8: { seeds }, placementSeeds });
   revalidatePath(path(eventId));
-}
-
-export async function finishEvent(eventId: string) {
-  await requireAdmin();
-  await repo.finishEvent(eventId);
-  revalidatePath(path(eventId));
-  revalidatePath(`/e`);
 }
