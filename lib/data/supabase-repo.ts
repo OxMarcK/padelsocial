@@ -1,15 +1,9 @@
 import "server-only";
 import { generatePouleSchedule } from "../poule-scheduler";
-import {
-  resolveBracketMatches,
-  resolvePlacementTrack,
-  resolveTop8,
-  computeTop8Ranking,
-  type MatchResult,
-} from "../bracket-engine";
+import { resolveBracketMatches, resolveTop8, computeTop8Ranking, type MatchResult } from "../bracket-engine";
 import { computeStandings } from "../standings";
 import { nextStatus } from "../phases";
-import type { Match, MatchPhase, PadelEvent, Placement, Poule, PouleLabel, Team } from "../types";
+import type { Match, PadelEvent, Placement, Poule, PouleLabel, Team } from "../types";
 import type { CreateEventInput, DataRepo, NewTeamInput, Top8State } from "./repo";
 import { supabaseAdmin } from "./supabase/admin";
 import { supabaseServerClient } from "./supabase/server";
@@ -118,14 +112,6 @@ async function fetchBracketResults(client: ReturnType<typeof supabaseAdmin>, eve
   return results;
 }
 
-async function fetchPlacementResults(client: ReturnType<typeof supabaseAdmin>, eventId: string) {
-  const { data, error } = await client.from("placement_results").select("*").eq("event_id", eventId);
-  if (error) raise(error);
-  const results: Partial<Record<"R1" | "R2" | "R3", MatchResult>> = {};
-  for (const row of data ?? []) results[row.match_def_id as "R1" | "R2" | "R3"] = { scoreA: row.score_a, scoreB: row.score_b };
-  return results;
-}
-
 async function fetchTop8(client: ReturnType<typeof supabaseAdmin>, eventId: string): Promise<Top8State | null> {
   const { data, error } = await client.from("bracket_state").select("*").eq("event_id", eventId).maybeSingle();
   if (error) raise(error);
@@ -140,7 +126,7 @@ async function fetchVideoUrls(client: ReturnType<typeof supabaseAdmin>, matchIds
   return new Map((data ?? []).map((r: any) => [r.match_id, r.video_url as string | null]));
 }
 
-async function synthesizeBracketAndPlacementMatches(client: ReturnType<typeof supabaseAdmin>, eventId: string): Promise<Match[]> {
+async function synthesizeBracketMatches(client: ReturnType<typeof supabaseAdmin>, eventId: string): Promise<Match[]> {
   const top8 = await fetchTop8(client, eventId);
   if (!top8) return [];
 
@@ -161,33 +147,15 @@ async function synthesizeBracketAndPlacementMatches(client: ReturnType<typeof su
     bracketMatchId: m.id,
   }));
 
-  const placementResults = await fetchPlacementResults(client, eventId);
-  const { matches: placementMatches } = resolvePlacementTrack(top8.placementSeeds, placementResults);
-  const placementRows = placementMatches.map((m) => ({
-    id: `${eventId}:placement:${m.id}`,
-    eventId,
-    phase: "plaatsingswedstrijd" as MatchPhase,
-    roundNumber: m.round,
-    courtNumber: 5,
-    label: m.label,
-    teamAId: m.teamAId,
-    teamBId: m.teamBId,
-    scoreA: m.teamAId && m.teamBId ? placementResults[m.id]?.scoreA ?? null : null,
-    scoreB: m.teamAId && m.teamBId ? placementResults[m.id]?.scoreB ?? null : null,
-    videoUrl: null as string | null,
-    bracketMatchId: m.id,
-  }));
-
-  const all = [...bracketMatches, ...placementRows];
-  const videoUrls = await fetchVideoUrls(client, all.map((m) => m.id));
-  return all.map((m) => ({ ...m, videoUrl: videoUrls.get(m.id) ?? null }));
+  const videoUrls = await fetchVideoUrls(client, bracketMatches.map((m) => m.id));
+  return bracketMatches.map((m) => ({ ...m, videoUrl: videoUrls.get(m.id) ?? null }));
 }
 
-function parseSyntheticId(matchId: string): { eventId: string; kind: "bracket" | "placement"; defId: string } | null {
+function parseSyntheticId(matchId: string): { eventId: string; kind: "bracket"; defId: string } | null {
   const parts = matchId.split(":");
   if (parts.length !== 3) return null;
   const [eventId, kind, defId] = parts;
-  if (kind !== "bracket" && kind !== "placement") return null;
+  if (kind !== "bracket") return null;
   return { eventId: eventId!, kind, defId: defId! };
 }
 
@@ -285,11 +253,11 @@ export const supabaseRepo: DataRepo = {
       const bracketResults = await fetchBracketResults(client, eventId);
       const resolved = resolveBracketMatches(top8.top8, bracketResults);
       const rows: { event_id: string; team_id: string; final_rank: number }[] = [];
-      for (const r of computeTop8Ranking(resolved)) rows.push({ event_id: eventId, team_id: r.teamId, final_rank: r.rank });
+      for (const r of computeTop8Ranking(resolved, top8.top8)) rows.push({ event_id: eventId, team_id: r.teamId, final_rank: r.rank });
 
-      const placementResults = await fetchPlacementResults(client, eventId);
-      const { ranking } = resolvePlacementTrack(top8.placementSeeds, placementResults);
-      for (const r of ranking) rows.push({ event_id: eventId, team_id: r.teamId, final_rank: r.rank });
+      top8.placementSeeds.forEach((teamId, i) => {
+        rows.push({ event_id: eventId, team_id: teamId, final_rank: 9 + i });
+      });
 
       if (rows.length > 0) {
         const { error } = await client.from("placements").upsert(rows, { onConflict: "event_id,team_id" });
@@ -469,7 +437,7 @@ export const supabaseRepo: DataRepo = {
     const client = supabaseAdmin();
     const [poule, synthetic] = await Promise.all([
       fetchPouleMatches(client, eventId),
-      synthesizeBracketAndPlacementMatches(client, eventId),
+      synthesizeBracketMatches(client, eventId),
     ]);
     return [...poule, ...synthetic].sort((a, b) => a.roundNumber - b.roundNumber || a.courtNumber - b.courtNumber);
   },
@@ -478,9 +446,8 @@ export const supabaseRepo: DataRepo = {
     const client = supabaseAdmin();
     const synthetic = parseSyntheticId(matchId);
     if (synthetic) {
-      const table = synthetic.kind === "bracket" ? "bracket_results" : "placement_results";
       const { error } = await client
-        .from(table)
+        .from("bracket_results")
         .upsert({ event_id: synthetic.eventId, match_def_id: synthetic.defId, score_a: scoreA, score_b: scoreB }, { onConflict: "event_id,match_def_id" });
       if (error) raise(error);
       const all = await supabaseRepo.listMatches(synthetic.eventId);

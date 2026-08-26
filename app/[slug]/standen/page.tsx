@@ -35,7 +35,7 @@ export default async function StandenPage({
   const suggestedTop8 = resolveTop8(pouleStandings as PouleStandingsInput[]);
   const bracketResults: Record<string, { scoreA: number; scoreB: number }> = {};
   for (const m of matches) {
-    if (m.bracketMatchId && m.phase !== "plaatsingswedstrijd" && m.scoreA !== null && m.scoreB !== null) {
+    if (m.bracketMatchId && m.scoreA !== null && m.scoreB !== null) {
       bracketResults[m.bracketMatchId] = { scoreA: m.scoreA, scoreB: m.scoreB };
     }
   }

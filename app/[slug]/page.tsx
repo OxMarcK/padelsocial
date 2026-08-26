@@ -4,7 +4,8 @@ import { repo } from "@/lib/data";
 import { groupStandingsByPoule } from "@/lib/standings";
 import { computeSchedule, phaseIndicatorData } from "@/lib/schedule";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
-import { top8RankingFromMatches, placementRankingFromMatches } from "@/lib/ranking-from-matches";
+import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
+import { freePlayCourts } from "@/lib/bracket-engine";
 import type { Match, PadelEvent, Team } from "@/lib/types";
 import { Logo } from "@/components/logo";
 import { EventNav } from "@/components/event-nav";
@@ -76,11 +77,13 @@ export default async function EventPage({ params }: { params: { slug: string } }
   }
 
   const showCourts = event.status === "poulefase" || event.status.startsWith("finale_ronde_");
+  const bracketRound = event.status.startsWith("finale_ronde_") ? (Number(event.status.slice(-1)) as 1 | 2 | 3) : null;
   const currentMatches = showCourts
     ? event.status === "poulefase"
       ? matches.filter((m) => m.phase === "poule" && m.roundNumber === event.currentPouleRound)
-      : matches.filter((m) => m.phase !== "poule" && m.roundNumber === Number(event.status.slice(-1)))
+      : matches.filter((m) => m.phase !== "poule" && m.roundNumber === bracketRound)
     : [];
+  const freeCourts = bracketRound ? freePlayCourts(bracketRound, event.courts) : [];
   const restingTeamIds =
     event.status === "poulefase" ? poules.flatMap((p) => schedule.restingTeamIds(event.currentPouleRound, p.label)) : [];
 
@@ -93,9 +96,9 @@ export default async function EventPage({ params }: { params: { slug: string } }
     .sort((a, b) => b.points - a.points || b.saldo - a.saldo || b.gamesFor - a.gamesFor);
 
   const showPodium = event.status === "prijsuitreiking";
-  const top8 = showPodium ? top8RankingFromMatches(matches) : [];
   const top8State = showPodium ? await repo.getTop8(event.id) : null;
-  const placementRanking = showPodium && top8State ? placementRankingFromMatches(matches, top8State.placementSeeds) : [];
+  const top8 = top8State ? top8RankingFromMatches(matches, top8State.top8.seeds) : [];
+  const placementRanking = top8State ? top8State.placementSeeds.map((teamId, i) => ({ teamId, rank: 9 + i })) : [];
 
   return (
     <Shell event={event}>
@@ -137,6 +140,9 @@ export default async function EventPage({ params }: { params: { slug: string } }
                 teamB={{ name: m.teamBId ? teamNameById[m.teamBId] ?? "?" : "?", score: m.scoreB, winning: won(m, "B") }}
               />
             ))}
+          {freeCourts.map((court) => (
+            <CourtCard key={`free-${court}`} courtNumber={court} freePlay />
+          ))}
         </div>
       ) : null}
 

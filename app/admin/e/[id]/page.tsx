@@ -458,7 +458,9 @@ async function Top8Editor({
         </div>
       ))}
       <label className="flex flex-col gap-1">
-        <span className="text-ink-muted">Plaatsingsgroep, beste naar slechtste (team-id&apos;s, komma-gescheiden)</span>
+        <span className="text-ink-muted">
+          Overige teams (plek 9+), beste naar slechtste — bepaalt direct de eindstand (team-id&apos;s, komma-gescheiden)
+        </span>
         <input
           name="placementSeeds"
           defaultValue={state.placementSeeds.join(",")}

@@ -11,28 +11,35 @@ function winnerLoser(byDefId: Map<string, Match>, defId: string): { winner: stri
   return m.scoreA > m.scoreB ? { winner: m.teamAId, loser: m.teamBId } : { winner: m.teamBId, loser: m.teamAId };
 }
 
-/** Reads final placement 1-8 straight off the already-fetched, publicly-shaped Match[] (bracketMatchId tags the synthesized bracket rows). */
-export function top8RankingFromMatches(matches: Match[]): RankRow[] {
+/**
+ * Reads final placement 1-8 straight off the already-fetched, publicly-shaped
+ * Match[] (bracketMatchId tags the synthesized bracket rows). Ranks 1-2 come
+ * from the grote finale; 3-4 and 5-8 have no decisive match (see
+ * lib/bracket-engine.ts) so they're ordered by `seeds` (the published top-8
+ * seed order) instead, and only once every match in that tier is decided.
+ */
+export function top8RankingFromMatches(matches: Match[], seeds: string[]): RankRow[] {
   const byDefId = new Map(matches.filter((m) => m.bracketMatchId).map((m) => [m.bracketMatchId!, m]));
+  const seedIndex = new Map(seeds.map((id, i) => [id, i]));
+  const bySeed = (a: string, b: string) => (seedIndex.get(a) ?? Infinity) - (seedIndex.get(b) ?? Infinity);
   const ranks: RankRow[] = [];
-  const push = (defId: string, hi: number, lo: number) => {
-    const r = winnerLoser(byDefId, defId);
-    if (r) ranks.push({ teamId: r.winner, rank: hi }, { teamId: r.loser, rank: lo });
-  };
-  push("GRAND", 1, 2);
-  push("BRONZE", 3, 4);
-  push("PLACE_5_6", 5, 6);
-  push("PLACE_7_8", 7, 8);
-  return ranks;
-}
 
-/** Same idea for the 7-team placement gauntlet (ranks 9+, best-effort per lib/bracket-engine.ts). */
-export function placementRankingFromMatches(matches: Match[], placementSeeds: string[]): RankRow[] {
-  const byDefId = new Map(matches.filter((m) => m.bracketMatchId).map((m) => [m.bracketMatchId!, m]));
-  const r1 = winnerLoser(byDefId, "R1");
-  const r2 = winnerLoser(byDefId, "R2");
-  const r3 = winnerLoser(byDefId, "R3");
-  const decided = [r1?.winner, r2?.winner, r3?.winner, r3?.loser].filter((id): id is string => !!id);
-  const remaining = placementSeeds.filter((id) => !decided.includes(id));
-  return [...decided, ...remaining].map((teamId, i) => ({ teamId, rank: 9 + i }));
+  const grand = winnerLoser(byDefId, "GRAND");
+  if (grand) ranks.push({ teamId: grand.winner, rank: 1 }, { teamId: grand.loser, rank: 2 });
+
+  const hf1 = winnerLoser(byDefId, "HF1");
+  const hf2 = winnerLoser(byDefId, "HF2");
+  if (hf1 && hf2) {
+    [hf1.loser, hf2.loser].sort(bySeed).forEach((teamId, i) => ranks.push({ teamId, rank: 3 + i }));
+  }
+
+  const kf = ["KF1", "KF2", "KF3", "KF4"].map((id) => winnerLoser(byDefId, id));
+  if (kf.every((r): r is { winner: string; loser: string } => !!r)) {
+    kf
+      .map((r) => r!.loser)
+      .sort(bySeed)
+      .forEach((teamId, i) => ranks.push({ teamId, rank: 5 + i }));
+  }
+
+  return ranks;
 }

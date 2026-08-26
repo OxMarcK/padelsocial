@@ -3,8 +3,8 @@ import type { ResolvedBracketMatch } from "@/lib/bracket-engine";
 
 const GROUPS: Array<{ title: string; ids: string[]; note: string }> = [
   { title: "Kwartfinales", ids: ["KF1", "KF2", "KF3", "KF4"], note: "Top 8 na de poulefase." },
-  { title: "Halve finales & 5e-8e", ids: ["HF1", "HF2", "VR1", "VR2"], note: "Winnaars kwartfinales / verliezersronde." },
-  { title: "Finales", ids: ["GRAND", "BRONZE", "PLACE_5_6", "PLACE_7_8"], note: "Beslist de eindstand 1 t/m 8." },
+  { title: "Halve finales", ids: ["HF1", "HF2"], note: "Winnaars kwartfinales." },
+  { title: "Grote finale", ids: ["GRAND"], note: "Beslist plek 1 en 2." },
 ];
 
 export function BracketTab({
@@ -43,7 +43,8 @@ export function BracketTab({
         </div>
       ))}
       <div className="rounded-2xl border border-dashed border-net-grey/60 p-3.5 text-xs text-ink">
-        Plaatsingsgroep (7 teams) speelt op baan 5 door voor plek 9 en verder — zelfde tijden, eigen finale.
+        Overige banen zijn vrij te spelen. Plek 3 t/m 8 wordt bepaald door de seeding van het verliezende team, plek
+        9 en verder door de poulestand.
       </div>
     </div>
   );
