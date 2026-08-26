@@ -31,7 +31,7 @@ export function CourtCard({ courtNumber, eyebrow, teamA, teamB, highlight, size 
         <div className="absolute inset-y-0 left-[78%] w-[2px] bg-flood-white/40" />
         <div className="absolute left-0 top-1/2 h-[2px] w-[22%] bg-flood-white/40" />
         <div className="absolute right-0 top-1/2 h-[2px] w-[22%] bg-flood-white/40" />
-        <div className="absolute inset-x-0 top-2 text-center font-display text-sm font-bold uppercase tracking-[0.18em] text-flood-white/90">
+        <div className="absolute left-1/2 top-0 w-[24%] -translate-x-1/2 rounded-b-[5px] bg-flood-white py-1 text-center font-display text-sm font-bold uppercase tracking-wider text-court-night">
           Baan {courtNumber}
         </div>
         <div className="absolute inset-0 grid grid-cols-2">
