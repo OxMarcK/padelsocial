@@ -15,15 +15,13 @@ function parseStart(event: PadelEvent): Date {
 }
 
 /**
- * The 5-minute changeover between poule rounds is informational only (see
- * the `nextLine` copy below) — it doesn't add to the clock. The naive spec
- * model (5 rounds, no changeover) and the real court-packing scheduler (6
- * rounds for the 3-poule/5-court case, see lib/poule-scheduler.ts) land on
- * the same total by coincidence: the changeover time the naive model would
- * need is roughly what the packing algorithm's extra round already costs.
+ * The changeover between poule rounds is real time on the clock — the venue's
+ * actual 3-hour court booking (10:30–13:30 for the reference 15-team/3-poule
+ * event) was worked out to exactly fit 6 full poule rounds + changeovers +
+ * the knockout stage, so it has to count, not just be flavor text.
  */
-const POULE_ROUND_MINUTES = 20;
-const POULE_CHANGEOVER_MINUTES = 5;
+const POULE_ROUND_MINUTES = 18;
+const POULE_CHANGEOVER_MINUTES = 2;
 /** Fixed lead-in shown as the "voor de start" window before the official start time. */
 const DRAFT_LEAD_MINUTES = 30;
 
@@ -31,9 +29,10 @@ const DRAFT_LEAD_MINUTES = 30;
  * Advisory schedule assuming every phase runs exactly on time — used only
  * for the phase-indicator's clock/progress bar text. Actual transitions
  * stay admin-triggered (spec §2.3.A): nothing here auto-advances anything.
- * Poulefase duration is `pouleRoundsCount * 20 min`, not a hardcoded 100 —
- * see the doc comment on lib/poule-scheduler.ts for why that can be more
- * than the spec's flavor-text 5 rounds.
+ * Poulefase duration is `pouleRoundsCount * 18 min + (pouleRoundsCount - 1) *
+ * 2 min changeover`, not a hardcoded total — see the doc comment on
+ * lib/poule-scheduler.ts for why the round count can be more than the
+ * spec's flavor-text 5 rounds.
  */
 export function computeSchedule(event: PadelEvent, pouleRoundsCount: number): PhaseWindow[] {
   const start = parseStart(event);
@@ -47,7 +46,9 @@ export function computeSchedule(event: PadelEvent, pouleRoundsCount: number): Ph
       continue; // cursor stays at the official start time — poulefase still starts on time
     }
     if (status === "poulefase") {
-      const endsAt = new Date(cursor.getTime() + Math.max(pouleRoundsCount, 1) * POULE_ROUND_MINUTES * 60_000);
+      const rounds = Math.max(pouleRoundsCount, 1);
+      const minutes = rounds * POULE_ROUND_MINUTES + (rounds - 1) * POULE_CHANGEOVER_MINUTES;
+      const endsAt = new Date(cursor.getTime() + minutes * 60_000);
       windows.push({ status, startsAt: cursor, endsAt });
       cursor = endsAt;
       continue;
