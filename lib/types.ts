@@ -59,7 +59,7 @@ export interface Poule {
   teamIds: string[];
 }
 
-export type MatchPhase = "poule" | "kwartfinale" | "halve_finale" | "grote_finale";
+export type MatchPhase = "poule" | "kwartfinale" | "halve_finale" | "grote_finale" | "troostfinale";
 
 export interface Match {
   id: string;

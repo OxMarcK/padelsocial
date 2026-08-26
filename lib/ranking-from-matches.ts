@@ -13,10 +13,10 @@ function winnerLoser(byDefId: Map<string, Match>, defId: string): { winner: stri
 
 /**
  * Reads final placement 1-8 straight off the already-fetched, publicly-shaped
- * Match[] (bracketMatchId tags the synthesized bracket rows). Ranks 1-2 come
- * from the grote finale; 3-4 and 5-8 have no decisive match (see
+ * Match[] (bracketMatchId tags the synthesized bracket rows). Ranks 1-4 come
+ * from the grote finale / troostfinale; 5-8 have no decisive match (see
  * lib/bracket-engine.ts) so they're ordered by `seeds` (the published top-8
- * seed order) instead, and only once every match in that tier is decided.
+ * seed order) instead, and only once every kwartfinale is decided.
  */
 export function top8RankingFromMatches(matches: Match[], seeds: string[]): RankRow[] {
   const byDefId = new Map(matches.filter((m) => m.bracketMatchId).map((m) => [m.bracketMatchId!, m]));
@@ -27,11 +27,8 @@ export function top8RankingFromMatches(matches: Match[], seeds: string[]): RankR
   const grand = winnerLoser(byDefId, "GRAND");
   if (grand) ranks.push({ teamId: grand.winner, rank: 1 }, { teamId: grand.loser, rank: 2 });
 
-  const hf1 = winnerLoser(byDefId, "HF1");
-  const hf2 = winnerLoser(byDefId, "HF2");
-  if (hf1 && hf2) {
-    [hf1.loser, hf2.loser].sort(bySeed).forEach((teamId, i) => ranks.push({ teamId, rank: 3 + i }));
-  }
+  const bronze = winnerLoser(byDefId, "BRONZE");
+  if (bronze) ranks.push({ teamId: bronze.winner, rank: 3 }, { teamId: bronze.loser, rank: 4 });
 
   const kf = ["KF1", "KF2", "KF3", "KF4"].map((id) => winnerLoser(byDefId, id));
   if (kf.every((r): r is { winner: string; loser: string } => !!r)) {

@@ -4,7 +4,7 @@ import type { ResolvedBracketMatch } from "@/lib/bracket-engine";
 const GROUPS: Array<{ title: string; ids: string[]; note: string }> = [
   { title: "Kwartfinales", ids: ["KF1", "KF2", "KF3", "KF4"], note: "Top 8 na de poulefase." },
   { title: "Halve finales", ids: ["HF1", "HF2"], note: "Winnaars kwartfinales." },
-  { title: "Grote finale", ids: ["GRAND"], note: "Beslist plek 1 en 2." },
+  { title: "Finales", ids: ["GRAND", "BRONZE"], note: "Beslist plek 1 t/m 4." },
 ];
 
 export function BracketTab({
@@ -43,7 +43,7 @@ export function BracketTab({
         </div>
       ))}
       <div className="rounded-2xl border border-dashed border-net-grey/60 p-3.5 text-xs text-ink">
-        Overige banen zijn vrij te spelen. Plek 3 t/m 8 wordt bepaald door de seeding van het verliezende team, plek
+        Overige banen zijn vrij te spelen. Plek 5 t/m 8 wordt bepaald door de seeding van het verliezende team, plek
         9 en verder door de poulestand.
       </div>
     </div>

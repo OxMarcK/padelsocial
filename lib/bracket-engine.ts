@@ -8,13 +8,16 @@
  * into the kwartfinales with the standard single-elimination pattern
  * (1v8, 4v5, 2v7, 3v6), which keeps the top 2 seeds apart until the final.
  * Halve finales take the KF winners; the grote finale takes the halve-finale
- * winners. There is no consolation/placement bracket — the courts a losing
- * team would otherwise have played on become free play (see the calling
- * pages for the "Vrij te spelen" placeholder), and final ranks 3-8 are
- * assigned by each loser's original top-8 seed rather than an extra match
- * (see computeTop8Ranking) — this trades a small amount of ranking
- * precision for far fewer matches to register and fewer chances to record
- * a wrong score under time pressure.
+ * winners and the troostfinale (3e/4e) takes the halve-finale losers, so
+ * every podium place is decided by an actual match. There is no wider
+ * consolation/placement bracket beyond that — the courts a losing
+ * kwartfinale team would otherwise have played on become free play (see the
+ * calling pages for the "Vrij te spelen" placeholder), and final ranks 5-8
+ * are assigned by each kwartfinale loser's original top-8 seed rather than
+ * an extra match (see computeTop8Ranking) — this trades a small amount of
+ * ranking precision for fewer matches to register and fewer chances to
+ * record a wrong score under time pressure, while keeping the one match
+ * (troostfinale) that actually matters for the prijsuitreiking podium.
  */
 
 import type { MatchPhase, PouleLabel, PouleStandingRow, Top8Resolution } from "./types";
@@ -47,13 +50,14 @@ export const BRACKET_DEFINITION: BracketMatchDef[] = [
   { id: "HF1", round: 2, court: 1, label: "Halve Finale 1", phase: "halve_finale", teamA: { type: "winnerOf", matchId: "KF1" }, teamB: { type: "winnerOf", matchId: "KF2" } },
   { id: "HF2", round: 2, court: 2, label: "Halve Finale 2", phase: "halve_finale", teamA: { type: "winnerOf", matchId: "KF3" }, teamB: { type: "winnerOf", matchId: "KF4" } },
   { id: "GRAND", round: 3, court: 1, label: "Grote Finale · 1e/2e", phase: "grote_finale", teamA: { type: "winnerOf", matchId: "HF1" }, teamB: { type: "winnerOf", matchId: "HF2" } },
+  { id: "BRONZE", round: 3, court: 2, label: "Troostfinale · 3e/4e", phase: "troostfinale", teamA: { type: "loserOf", matchId: "HF1" }, teamB: { type: "loserOf", matchId: "HF2" } },
 ];
 
 /** Courts a bracket round actually plays a tracked match on — every other court up to `event.courts` is free play. */
 export const BRACKET_ROUND_COURTS: Record<1 | 2 | 3, number[]> = {
   1: [1, 2, 3, 4],
   2: [1, 2],
-  3: [1],
+  3: [1, 2],
 };
 
 /** The courts in a bracket round with no tracked match — for rendering "Vrij te spelen" placeholders. */
@@ -124,17 +128,15 @@ export interface RankedTeam {
 }
 
 /**
- * Ranks 1-2 come straight off the grote finale. Ranks 3-4 (halve-finale
- * losers) and 5-8 (kwartfinale losers) have no decisive match anymore, so
- * they're ordered by each team's original top-8 seed instead — only once
- * *every* match in that tier is decided, since a partial tier has no stable
- * ordering to show yet.
+ * Ranks 1-2 come off the grote finale, ranks 3-4 off the troostfinale — the
+ * whole podium is match-decided. Ranks 5-8 (kwartfinale losers) have no
+ * decisive match, so they're ordered by each team's original top-8 seed
+ * instead, once all four kwartfinales are in.
  */
 export function computeTop8Ranking(resolved: ResolvedBracketMatch[], seeds: Top8Resolution): RankedTeam[] {
   const byId = new Map(resolved.map((m) => [m.id, m]));
   const grand = byId.get("GRAND");
-  const hf1 = byId.get("HF1");
-  const hf2 = byId.get("HF2");
+  const bronze = byId.get("BRONZE");
   const kf = ["KF1", "KF2", "KF3", "KF4"].map((id) => byId.get(id));
 
   const seedIndex = new Map(seeds.seeds.map((teamId, i) => [teamId, i]));
@@ -143,10 +145,8 @@ export function computeTop8Ranking(resolved: ResolvedBracketMatch[], seeds: Top8
   const ranks: RankedTeam[] = [];
   if (grand?.winnerId) ranks.push({ teamId: grand.winnerId, rank: 1 });
   if (grand?.loserId) ranks.push({ teamId: grand.loserId, rank: 2 });
-
-  if (hf1?.loserId && hf2?.loserId) {
-    [hf1.loserId, hf2.loserId].sort(bySeed).forEach((teamId, i) => ranks.push({ teamId, rank: 3 + i }));
-  }
+  if (bronze?.winnerId) ranks.push({ teamId: bronze.winnerId, rank: 3 });
+  if (bronze?.loserId) ranks.push({ teamId: bronze.loserId, rank: 4 });
 
   if (kf.every((m): m is ResolvedBracketMatch => !!m?.loserId)) {
     kf

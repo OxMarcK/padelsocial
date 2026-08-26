@@ -60,3 +60,19 @@ const BRACKET_ROUND_PHASE: Partial<Record<EventStatus, 1 | 2 | 3>> = {
 export function bracketRoundForStatus(status: EventStatus): 1 | 2 | 3 | null {
   return BRACKET_ROUND_PHASE[status] ?? null;
 }
+
+/**
+ * The highest bracket round whose phase the event has already reached (started),
+ * regardless of whether it's the live round right now or a pauze/prijsuitreiking
+ * after it. 0 before finale_ronde_1 has even begun (draft/poulefase/pauze_1) —
+ * used to tell "this round hasn't started yet" apart from "this round already
+ * finished without being scored", which both otherwise look like "not the
+ * current bracket round".
+ */
+export function highestStartedBracketRound(status: EventStatus): 0 | 1 | 2 | 3 {
+  const idx = PHASE_ORDER.indexOf(status);
+  if (idx >= PHASE_ORDER.indexOf("finale_ronde_3")) return 3;
+  if (idx >= PHASE_ORDER.indexOf("finale_ronde_2")) return 2;
+  if (idx >= PHASE_ORDER.indexOf("finale_ronde_1")) return 1;
+  return 0;
+}

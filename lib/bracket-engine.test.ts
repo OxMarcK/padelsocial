@@ -37,7 +37,7 @@ describe("resolveBracketMatches — winner/loser propagation through every round
     expect([byId.HF2!.teamAId, byId.HF2!.teamBId]).toEqual(["seed2", "seed6"]);
   });
 
-  it("propagates HF winners into the grote finale once round 2 is played", () => {
+  it("propagates HF winners into the grote finale and HF losers into the troostfinale once round 2 is played", () => {
     const round2Results = {
       ...results,
       HF1: { scoreA: 10, scoreB: 8 }, // seed1 beats seed4
@@ -47,11 +47,12 @@ describe("resolveBracketMatches — winner/loser propagation through every round
     const r2ById = Object.fromEntries(r2.map((m) => [m.id, m]));
 
     expect([r2ById.GRAND!.teamAId, r2ById.GRAND!.teamBId]).toEqual(["seed1", "seed2"]);
+    expect([r2ById.BRONZE!.teamAId, r2ById.BRONZE!.teamBId]).toEqual(["seed4", "seed6"]);
   });
 });
 
 describe("computeTop8Ranking", () => {
-  it("ranks 1-2 off the grote finale, 3-4/5-8 by each loser's original seed once their tier is fully decided", () => {
+  it("ranks 1-2 off the grote finale, 3-4 off the troostfinale, 5-8 by each kwartfinale loser's original seed", () => {
     const results = {
       KF1: { scoreA: 9, scoreB: 6 }, // seed1 beats seed8
       KF2: { scoreA: 8, scoreB: 7 }, // seed4 beats seed5
@@ -60,6 +61,7 @@ describe("computeTop8Ranking", () => {
       HF1: { scoreA: 10, scoreB: 8 }, // seed1 beats seed4
       HF2: { scoreA: 9, scoreB: 7 }, // seed2 beats seed6
       GRAND: { scoreA: 12, scoreB: 10 }, // seed1 beats seed2
+      BRONZE: { scoreA: 11, scoreB: 9 }, // seed4 beats seed6
     };
     const resolved = resolveBracketMatches(seeds, results);
     const ranking = computeTop8Ranking(resolved, seeds);
@@ -67,8 +69,8 @@ describe("computeTop8Ranking", () => {
     const byRank = Object.fromEntries(ranking.map((r) => [r.rank, r.teamId]));
     expect(byRank[1]).toBe("seed1"); // grote finale winner
     expect(byRank[2]).toBe("seed2"); // grote finale loser
-    expect(byRank[3]).toBe("seed4"); // halve-finale loser, better seed
-    expect(byRank[4]).toBe("seed6"); // halve-finale loser, worse seed
+    expect(byRank[3]).toBe("seed4"); // troostfinale winner
+    expect(byRank[4]).toBe("seed6"); // troostfinale loser
     expect(byRank[5]).toBe("seed3"); // kwartfinale loser, best remaining seed
     expect(byRank[6]).toBe("seed5");
     expect(byRank[7]).toBe("seed7");
@@ -96,6 +98,26 @@ describe("computeTop8Ranking", () => {
     expect(byRank[6]).toBe("seed5");
     expect(byRank[7]).toBe("seed7");
     expect(byRank[8]).toBe("seed8");
+  });
+
+  it("withholds ranks 3-4 until the troostfinale is scored, even once the grote finale is decided", () => {
+    const results = {
+      KF1: { scoreA: 9, scoreB: 6 },
+      KF2: { scoreA: 8, scoreB: 7 },
+      KF3: { scoreA: 10, scoreB: 6 },
+      KF4: { scoreA: 6, scoreB: 9 },
+      HF1: { scoreA: 10, scoreB: 8 },
+      HF2: { scoreA: 9, scoreB: 7 },
+      GRAND: { scoreA: 12, scoreB: 10 },
+      // BRONZE not yet scored
+    };
+    const resolved = resolveBracketMatches(seeds, results);
+    const ranking = computeTop8Ranking(resolved, seeds);
+    const byRank = Object.fromEntries(ranking.map((r) => [r.rank, r.teamId]));
+    expect(byRank[1]).toBe("seed1");
+    expect(byRank[2]).toBe("seed2");
+    expect(byRank[3]).toBeUndefined();
+    expect(byRank[4]).toBeUndefined();
   });
 });
 
