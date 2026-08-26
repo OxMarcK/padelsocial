@@ -15,6 +15,7 @@ interface TvCourt {
   bName: string;
   aScore: number | null;
   bScore: number | null;
+  freePlay?: boolean;
 }
 
 export function TvView({
@@ -119,16 +120,20 @@ export function TvView({
           <div className="flex flex-col gap-6">
             <div className="font-display text-5xl font-bold uppercase tracking-wide">Nu op de baan</div>
             <div className="grid grid-cols-3 gap-6">
-              {courts.map((c) => (
-                <CourtCard
-                  key={c.n}
-                  courtNumber={c.n}
-                  eyebrow={c.eyebrow}
-                  size="lg"
-                  teamA={{ name: c.aName, score: c.aScore, winning: won(c.aScore, c.bScore) }}
-                  teamB={{ name: c.bName, score: c.bScore, winning: won(c.bScore, c.aScore) }}
-                />
-              ))}
+              {courts.map((c) =>
+                c.freePlay ? (
+                  <CourtCard key={c.n} courtNumber={c.n} size="lg" freePlay />
+                ) : (
+                  <CourtCard
+                    key={c.n}
+                    courtNumber={c.n}
+                    eyebrow={c.eyebrow}
+                    size="lg"
+                    teamA={{ name: c.aName, score: c.aScore, winning: won(c.aScore, c.bScore) }}
+                    teamB={{ name: c.bName, score: c.bScore, winning: won(c.bScore, c.aScore) }}
+                  />
+                )
+              )}
               {restingTeamNames.length > 0 ? (
                 <div className="flex flex-col gap-1 rounded-2xl border-2 border-dashed border-net-grey/40 p-4">
                   <div className="text-sm text-ink-muted">Rust deze ronde</div>

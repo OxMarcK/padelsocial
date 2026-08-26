@@ -1,5 +1,5 @@
 /**
- * Top-8 knockout + placement track. Zero framework imports.
+ * Top-8 knockout. Zero framework imports.
  *
  * Knock-out is always top-8 regardless of how many poules fed into it (the
  * organizer picks poule count via team count — every poule is 5 teams — but
@@ -7,10 +7,17 @@
  * best-to-worst across *all* poules combined (see resolveTop8) and seeded
  * into the kwartfinales with the standard single-elimination pattern
  * (1v8, 4v5, 2v7, 3v6), which keeps the top 2 seeds apart until the final.
- * Halve finales take the KF winners, verliezersronde takes the KF losers
- * (VR1 = loser KF1 vs loser KF2, VR2 = loser KF3 vs loser KF4); grote
- * finale/troostfinale take the halve-finale winners/losers; the two
- * plaatsingsfinales (5e/6e, 7e/8e) take the verliezersronde winners/losers.
+ * Halve finales take the KF winners; the grote finale takes the halve-finale
+ * winners and the troostfinale (3e/4e) takes the halve-finale losers, so
+ * every podium place is decided by an actual match. There is no wider
+ * consolation/placement bracket beyond that — the courts a losing
+ * kwartfinale team would otherwise have played on become free play (see the
+ * calling pages for the "Vrij te spelen" placeholder), and final ranks 5-8
+ * are assigned by each kwartfinale loser's original top-8 seed rather than
+ * an extra match (see computeTop8Ranking) — this trades a small amount of
+ * ranking precision for fewer matches to register and fewer chances to
+ * record a wrong score under time pressure, while keeping the one match
+ * (troostfinale) that actually matters for the prijsuitreiking podium.
  */
 
 import type { MatchPhase, PouleLabel, PouleStandingRow, Top8Resolution } from "./types";
@@ -42,13 +49,22 @@ export const BRACKET_DEFINITION: BracketMatchDef[] = [
   { id: "KF4", round: 1, court: 4, label: "Kwartfinale 4", phase: "kwartfinale", teamA: seed(2), teamB: seed(5) },
   { id: "HF1", round: 2, court: 1, label: "Halve Finale 1", phase: "halve_finale", teamA: { type: "winnerOf", matchId: "KF1" }, teamB: { type: "winnerOf", matchId: "KF2" } },
   { id: "HF2", round: 2, court: 2, label: "Halve Finale 2", phase: "halve_finale", teamA: { type: "winnerOf", matchId: "KF3" }, teamB: { type: "winnerOf", matchId: "KF4" } },
-  { id: "VR1", round: 2, court: 3, label: "Verliezersronde · 5e-8e", phase: "verliezersronde", teamA: { type: "loserOf", matchId: "KF1" }, teamB: { type: "loserOf", matchId: "KF2" } },
-  { id: "VR2", round: 2, court: 4, label: "Verliezersronde · 5e-8e", phase: "verliezersronde", teamA: { type: "loserOf", matchId: "KF3" }, teamB: { type: "loserOf", matchId: "KF4" } },
   { id: "GRAND", round: 3, court: 1, label: "Grote Finale · 1e/2e", phase: "grote_finale", teamA: { type: "winnerOf", matchId: "HF1" }, teamB: { type: "winnerOf", matchId: "HF2" } },
   { id: "BRONZE", round: 3, court: 2, label: "Troostfinale · 3e/4e", phase: "troostfinale", teamA: { type: "loserOf", matchId: "HF1" }, teamB: { type: "loserOf", matchId: "HF2" } },
-  { id: "PLACE_5_6", round: 3, court: 3, label: "Plaatsingsfinale · 5e/6e", phase: "plaatsingsfinale", teamA: { type: "winnerOf", matchId: "VR1" }, teamB: { type: "winnerOf", matchId: "VR2" } },
-  { id: "PLACE_7_8", round: 3, court: 4, label: "Plaatsingsfinale · 7e/8e", phase: "plaatsingsfinale", teamA: { type: "loserOf", matchId: "VR1" }, teamB: { type: "loserOf", matchId: "VR2" } },
 ];
+
+/** Courts a bracket round actually plays a tracked match on — every other court up to `event.courts` is free play. */
+export const BRACKET_ROUND_COURTS: Record<1 | 2 | 3, number[]> = {
+  1: [1, 2, 3, 4],
+  2: [1, 2],
+  3: [1, 2],
+};
+
+/** The courts in a bracket round with no tracked match — for rendering "Vrij te spelen" placeholders. */
+export function freePlayCourts(round: 1 | 2 | 3, totalCourts: number): number[] {
+  const tracked = new Set(BRACKET_ROUND_COURTS[round]);
+  return Array.from({ length: totalCourts }, (_, i) => i + 1).filter((c) => !tracked.has(c));
+}
 
 export interface MatchResult {
   scoreA: number;
@@ -111,23 +127,34 @@ export interface RankedTeam {
   rank: number;
 }
 
-/** Only returns ranks whose deciding match has a recorded winner/loser. */
-export function computeTop8Ranking(resolved: ResolvedBracketMatch[]): RankedTeam[] {
+/**
+ * Ranks 1-2 come off the grote finale, ranks 3-4 off the troostfinale — the
+ * whole podium is match-decided. Ranks 5-8 (kwartfinale losers) have no
+ * decisive match, so they're ordered by each team's original top-8 seed
+ * instead, once all four kwartfinales are in.
+ */
+export function computeTop8Ranking(resolved: ResolvedBracketMatch[], seeds: Top8Resolution): RankedTeam[] {
   const byId = new Map(resolved.map((m) => [m.id, m]));
   const grand = byId.get("GRAND");
   const bronze = byId.get("BRONZE");
-  const p56 = byId.get("PLACE_5_6");
-  const p78 = byId.get("PLACE_7_8");
+  const kf = ["KF1", "KF2", "KF3", "KF4"].map((id) => byId.get(id));
+
+  const seedIndex = new Map(seeds.seeds.map((teamId, i) => [teamId, i]));
+  const bySeed = (a: string, b: string) => (seedIndex.get(a) ?? Infinity) - (seedIndex.get(b) ?? Infinity);
 
   const ranks: RankedTeam[] = [];
   if (grand?.winnerId) ranks.push({ teamId: grand.winnerId, rank: 1 });
   if (grand?.loserId) ranks.push({ teamId: grand.loserId, rank: 2 });
   if (bronze?.winnerId) ranks.push({ teamId: bronze.winnerId, rank: 3 });
   if (bronze?.loserId) ranks.push({ teamId: bronze.loserId, rank: 4 });
-  if (p56?.winnerId) ranks.push({ teamId: p56.winnerId, rank: 5 });
-  if (p56?.loserId) ranks.push({ teamId: p56.loserId, rank: 6 });
-  if (p78?.winnerId) ranks.push({ teamId: p78.winnerId, rank: 7 });
-  if (p78?.loserId) ranks.push({ teamId: p78.loserId, rank: 8 });
+
+  if (kf.every((m): m is ResolvedBracketMatch => !!m?.loserId)) {
+    kf
+      .map((m) => m!.loserId!)
+      .sort(bySeed)
+      .forEach((teamId, i) => ranks.push({ teamId, rank: 5 + i }));
+  }
+
   return ranks;
 }
 
@@ -170,71 +197,8 @@ export function resolveTop8(poulesStandings: PouleStandingsInput[]): { top8: Top
   const usedIds = new Set(seeds);
   const placementRows = poulesStandings.flatMap((p) => p.rows).filter((r) => !usedIds.has(r.teamId));
 
+  // The non-qualifiers never play another tracked match (their courts become
+  // free play), so this order — poulefase standing across all poules — is
+  // also directly the final ranking for places 9+, not just a seeding.
   return { top8: { seeds }, placementSeeds: sortStandings(placementRows).map((r) => r.teamId) };
-}
-
-export interface PlacementLadderMatch {
-  id: "R1" | "R2" | "R3";
-  round: 1 | 2 | 3;
-  label: string;
-  teamAId: string | null;
-  teamBId: string | null;
-  winnerId: string | null;
-  loserId: string | null;
-}
-
-export interface PlacementTrackResult {
-  matches: PlacementLadderMatch[];
-  /** Best-effort final order for the whole placement group, ranks 9..(8+n). */
-  ranking: RankedTeam[];
-}
-
-/**
- * The 7-team placement group only gets one court (baan 5) for 3 rounds — not
- * enough matches to fully order 7 teams. Per spec §2.3.B this is an explicit,
- * sanctioned approximation, not a bug. We run it as a 3-round gauntlet seeded
- * by poulefase standings: seed 1 vs seed 2 (round winner is provisionally
- * ranked, the loser challenges the next seed); after 3 rounds the untouched
- * lowest seeds keep their poulefase seed order.
- */
-export function resolvePlacementTrack(
-  seededTeamIds: string[],
-  results: Partial<Record<"R1" | "R2" | "R3", MatchResult>>
-): PlacementTrackResult {
-  const label = "Plaatsingswedstrijd";
-  const seed = (i: number) => seededTeamIds[i] ?? null;
-
-  function playRound(id: "R1" | "R2" | "R3", round: 1 | 2 | 3, roundLabel: string, teamAId: string | null, teamBId: string | null) {
-    const result = results[id];
-    const scoreA = result?.scoreA ?? null;
-    const scoreB = result?.scoreB ?? null;
-    let winnerId: string | null = null;
-    let loserId: string | null = null;
-    if (teamAId && teamBId && scoreA !== null && scoreB !== null && scoreA !== scoreB) {
-      if (scoreA > scoreB) {
-        winnerId = teamAId;
-        loserId = teamBId;
-      } else {
-        winnerId = teamBId;
-        loserId = teamAId;
-      }
-    }
-    const match: PlacementLadderMatch = { id, round, label: roundLabel, teamAId, teamBId, winnerId, loserId };
-    return match;
-  }
-
-  const r1 = playRound("R1", 1, label, seed(0), seed(1));
-  const r2 = playRound("R2", 2, `${label} · vervolg`, r1.loserId, seed(2));
-  const r3 = playRound("R3", 3, `${label} · finale`, r2.loserId, seed(3));
-
-  const decided = [r1.winnerId, r2.winnerId, r3.winnerId, r3.loserId].filter(
-    (id): id is string => id !== null
-  );
-  const remaining = seededTeamIds.filter((id) => !decided.includes(id));
-  const order = [...decided, ...remaining];
-
-  return {
-    matches: [r1, r2, r3],
-    ranking: order.map((teamId, i) => ({ teamId, rank: 9 + i })),
-  };
 }

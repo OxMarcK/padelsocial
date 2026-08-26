@@ -1,15 +1,8 @@
 import { generatePouleSchedule } from "../poule-scheduler";
-import {
-  BRACKET_DEFINITION,
-  resolveBracketMatches,
-  resolvePlacementTrack,
-  resolveTop8,
-  computeTop8Ranking,
-  type MatchResult,
-} from "../bracket-engine";
+import { resolveBracketMatches, resolveTop8, computeTop8Ranking, type MatchResult } from "../bracket-engine";
 import { computeStandings } from "../standings";
 import { nextStatus } from "../phases";
-import type { Match, MatchPhase, PadelEvent, Placement, Poule, PouleLabel, PublicPlayer, Team } from "../types";
+import type { Match, PadelEvent, Placement, Poule, PouleLabel, PublicPlayer, Team } from "../types";
 import type { CreateEventInput, DataRepo, NewTeamInput, Top8State } from "./repo";
 
 function uid(prefix: string) {
@@ -23,7 +16,6 @@ function player(name: string): PublicPlayer {
 interface BracketState {
   top8: Top8State | null;
   results: Partial<Record<string, MatchResult>>;
-  placementResults: Partial<Record<"R1" | "R2" | "R3", MatchResult>>;
 }
 
 interface MatchExtras {
@@ -55,7 +47,7 @@ function requireEvent(eventId: string): PadelEvent {
 function bracketStateFor(eventId: string): BracketState {
   let state = store.bracket.get(eventId);
   if (!state) {
-    state = { top8: null, results: {}, placementResults: {} };
+    state = { top8: null, results: {} };
     store.bracket.set(eventId, state);
   }
   return state;
@@ -112,34 +104,11 @@ function synthesizeBracketMatches(eventId: string): Match[] {
   });
 }
 
-function synthesizePlacementMatches(eventId: string): Match[] {
-  const state = bracketStateFor(eventId);
-  if (!state.top8) return [];
-  const { matches } = resolvePlacementTrack(state.top8.placementSeeds, state.placementResults);
-  return matches.map((m) => {
-    const id = `${eventId}:placement:${m.id}`;
-    return {
-      id,
-      eventId,
-      phase: "plaatsingswedstrijd" as MatchPhase,
-      roundNumber: m.round,
-      courtNumber: 5,
-      label: m.label,
-      teamAId: m.teamAId,
-      teamBId: m.teamBId,
-      scoreA: m.teamAId && m.teamBId ? state.placementResults[m.id]?.scoreA ?? null : null,
-      scoreB: m.teamAId && m.teamBId ? state.placementResults[m.id]?.scoreB ?? null : null,
-      videoUrl: store.extras.get(id)?.videoUrl ?? null,
-      bracketMatchId: m.id,
-    } satisfies Match;
-  });
-}
-
-function parseSyntheticId(matchId: string): { eventId: string; kind: "bracket" | "placement"; defId: string } | null {
+function parseSyntheticId(matchId: string): { eventId: string; kind: "bracket"; defId: string } | null {
   const parts = matchId.split(":");
   if (parts.length !== 3) return null;
   const [eventId, kind, defId] = parts;
-  if (kind !== "bracket" && kind !== "placement") return null;
+  if (kind !== "bracket") return null;
   return { eventId: eventId!, kind, defId: defId! };
 }
 
@@ -227,13 +196,12 @@ export const mockRepo: DataRepo = {
     const results: Placement[] = [];
     if (state.top8) {
       const resolved = resolveBracketMatches(state.top8.top8, state.results);
-      for (const r of computeTop8Ranking(resolved)) {
+      for (const r of computeTop8Ranking(resolved, state.top8.top8)) {
         results.push({ id: uid("placement"), eventId, teamId: r.teamId, finalRank: r.rank });
       }
-      const { ranking } = resolvePlacementTrack(state.top8.placementSeeds, state.placementResults);
-      for (const r of ranking) {
-        results.push({ id: uid("placement"), eventId, teamId: r.teamId, finalRank: r.rank });
-      }
+      state.top8.placementSeeds.forEach((teamId, i) => {
+        results.push({ id: uid("placement"), eventId, teamId, finalRank: 9 + i });
+      });
     }
     store.placements.set(eventId, results);
     const updated: PadelEvent = { ...event, status: "finished" };
@@ -342,22 +310,16 @@ export const mockRepo: DataRepo = {
 
   async listMatches(eventId) {
     requireEvent(eventId);
-    return [
-      ...pouleMatchesForEvent(eventId),
-      ...synthesizeBracketMatches(eventId),
-      ...synthesizePlacementMatches(eventId),
-    ].sort((a, b) => a.roundNumber - b.roundNumber || a.courtNumber - b.courtNumber);
+    return [...pouleMatchesForEvent(eventId), ...synthesizeBracketMatches(eventId)].sort(
+      (a, b) => a.roundNumber - b.roundNumber || a.courtNumber - b.courtNumber
+    );
   },
 
   async recordScore(eventId, matchId, scoreA, scoreB) {
     const synthetic = parseSyntheticId(matchId);
     if (synthetic) {
       const state = bracketStateFor(synthetic.eventId);
-      if (synthetic.kind === "bracket") {
-        state.results[synthetic.defId] = { scoreA, scoreB };
-      } else {
-        state.placementResults[synthetic.defId as "R1" | "R2" | "R3"] = { scoreA, scoreB };
-      }
+      state.results[synthetic.defId] = { scoreA, scoreB };
       const all = await mockRepo.listMatches(synthetic.eventId);
       const updated = all.find((m) => m.id === matchId);
       if (!updated) throw new Error("Match not found after score update");

@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { repo } from "@/lib/data";
 import { groupStandingsByPoule } from "@/lib/standings";
-import { top8RankingFromMatches, placementRankingFromMatches } from "@/lib/ranking-from-matches";
+import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
 import { computeSchedule, fmtTime, pouleRoundWindow } from "@/lib/schedule";
 import { TeamResultCard } from "@/components/team-result-card";
 import { Logo } from "@/components/logo";
@@ -32,7 +32,10 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
 
   let finalRank: number | null = placements.find((p) => p.teamId === team.id)?.finalRank ?? null;
   if (finalRank === null && top8State) {
-    const ranking = [...top8RankingFromMatches(matches), ...placementRankingFromMatches(matches, top8State.placementSeeds)];
+    const ranking = [
+      ...top8RankingFromMatches(matches, top8State.top8.seeds),
+      ...top8State.placementSeeds.map((teamId, i) => ({ teamId, rank: 9 + i })),
+    ];
     finalRank = ranking.find((r) => r.teamId === team.id)?.rank ?? null;
   }
 

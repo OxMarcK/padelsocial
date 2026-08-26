@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
-import { PHASE_META, bracketRoundForStatus, nextStatus } from "@/lib/phases";
+import { PHASE_META, bracketRoundForStatus, highestStartedBracketRound, nextStatus } from "@/lib/phases";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { ConfirmButton } from "@/components/admin/confirm-button";
@@ -75,12 +75,22 @@ export default async function AdminEventPage({
   const bracketMatches = matches.filter((m) => m.phase !== "poule");
   const currentBracketMatches = bracketRound ? bracketMatches.filter((m) => m.roundNumber === bracketRound) : [];
   const bracketMissingScores = currentBracketMatches.filter((m) => m.scoreA === null || m.scoreB === null).length;
-  // Matches from an earlier bracket round that got skipped over (e.g. the admin advanced
-  // the phase before scoring them) — their teams are known but no score was recorded, and
-  // since the current round's own matches are just winnerOf/loserOf lookups over the
-  // results map, catching these up here is enough to unstick a later round automatically.
+  // Matches from a bracket round that has already started (per the event's own phase
+  // history, not just "resolvable") but got skipped over unscored — e.g. the admin
+  // advanced the phase before scoring them. Their teams are known but no score was
+  // recorded, and since the current round's own matches are just winnerOf/loserOf
+  // lookups over the results map, catching these up here is enough to unstick a later
+  // round automatically. Gating on "started" (not just "not the current round") matters
+  // because a later round's teams can already be resolvable — e.g. HF1 as soon as both
+  // its KFs are done — without that round having actually begun yet.
+  const startedBracketRound = highestStartedBracketRound(event.status);
   const catchUpBracketMatches = bracketMatches.filter(
-    (m) => m.roundNumber !== bracketRound && m.teamAId && m.teamBId && (m.scoreA === null || m.scoreB === null)
+    (m) =>
+      m.roundNumber <= startedBracketRound &&
+      m.roundNumber !== bracketRound &&
+      m.teamAId &&
+      m.teamBId &&
+      (m.scoreA === null || m.scoreB === null)
   );
 
   const recordScoreBound = recordScore.bind(null, event.id);
@@ -458,7 +468,9 @@ async function Top8Editor({
         </div>
       ))}
       <label className="flex flex-col gap-1">
-        <span className="text-ink-muted">Plaatsingsgroep, beste naar slechtste (team-id&apos;s, komma-gescheiden)</span>
+        <span className="text-ink-muted">
+          Overige teams (plek 9+), beste naar slechtste — bepaalt direct de eindstand (team-id&apos;s, komma-gescheiden)
+        </span>
         <input
           name="placementSeeds"
           defaultValue={state.placementSeeds.join(",")}
