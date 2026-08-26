@@ -165,7 +165,13 @@ export default async function EventPage({ params }: { params: { slug: string } }
         <div className="flex flex-col gap-2">
           <h2 className="font-display text-lg font-bold uppercase tracking-wide">Live stand</h2>
           <StandingsList
-            rows={combinedRows.map((r) => ({ teamId: r.teamId, name: r.name, points: r.points, pouleLabel: r.pouleLabel }))}
+            rows={combinedRows.map((r) => ({
+              teamId: r.teamId,
+              name: r.name,
+              points: r.points,
+              pouleLabel: r.pouleLabel,
+              resting: restingTeamIds.includes(r.teamId),
+            }))}
           />
         </div>
       ) : null}
