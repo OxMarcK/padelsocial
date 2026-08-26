@@ -200,7 +200,7 @@ function RankingList({
             </div>
           );
           return slug ? (
-            <Link key={r.teamId} href={`/${slug}/teams/${r.teamId}`}>
+            <Link key={r.teamId} href={`/${slug}/teams/${r.teamId}`} prefetch={false}>
               {row}
             </Link>
           ) : (
