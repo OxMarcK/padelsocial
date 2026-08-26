@@ -27,12 +27,12 @@ export interface PhaseMeta {
 export const PHASE_META: Record<EventStatus, PhaseMeta> = {
   draft: { status: "draft", label: "Opzetten", isPauze: false, isCeremony: false, showCourts: false, durationMinutes: null, advanceCta: "Start poulefase" },
   poulefase: { status: "poulefase", label: "Poulefase", isPauze: false, isCeremony: false, showCourts: true, durationMinutes: null, advanceCta: "Naar pauze" },
-  pauze_1: { status: "pauze_1", label: "Pauze", isPauze: true, isCeremony: false, showCourts: false, durationMinutes: 10, advanceCta: "Start kwartfinales" },
-  finale_ronde_1: { status: "finale_ronde_1", label: "Ronde 1 Finales", isPauze: false, isCeremony: false, showCourts: true, durationMinutes: 20, advanceCta: "Naar pauze" },
-  pauze_2: { status: "pauze_2", label: "Pauze", isPauze: true, isCeremony: false, showCourts: false, durationMinutes: 5, advanceCta: "Start halve finales" },
-  finale_ronde_2: { status: "finale_ronde_2", label: "Ronde 2 Finales", isPauze: false, isCeremony: false, showCourts: true, durationMinutes: 20, advanceCta: "Naar pauze" },
-  pauze_3: { status: "pauze_3", label: "Pauze", isPauze: true, isCeremony: false, showCourts: false, durationMinutes: 5, advanceCta: "Start grote finale" },
-  finale_ronde_3: { status: "finale_ronde_3", label: "Ronde 3 Finales", isPauze: false, isCeremony: false, showCourts: true, durationMinutes: 20, advanceCta: "Naar prijsuitreiking" },
+  pauze_1: { status: "pauze_1", label: "Pauze", isPauze: true, isCeremony: false, showCourts: false, durationMinutes: 4, advanceCta: "Start kwartfinales" },
+  finale_ronde_1: { status: "finale_ronde_1", label: "Ronde 1 Finales", isPauze: false, isCeremony: false, showCourts: true, durationMinutes: 18, advanceCta: "Naar pauze" },
+  pauze_2: { status: "pauze_2", label: "Pauze", isPauze: true, isCeremony: false, showCourts: false, durationMinutes: 2, advanceCta: "Start halve finales" },
+  finale_ronde_2: { status: "finale_ronde_2", label: "Ronde 2 Finales", isPauze: false, isCeremony: false, showCourts: true, durationMinutes: 18, advanceCta: "Naar pauze" },
+  pauze_3: { status: "pauze_3", label: "Pauze", isPauze: true, isCeremony: false, showCourts: false, durationMinutes: 2, advanceCta: "Start grote finale" },
+  finale_ronde_3: { status: "finale_ronde_3", label: "Ronde 3 Finales", isPauze: false, isCeremony: false, showCourts: true, durationMinutes: 18, advanceCta: "Naar prijsuitreiking" },
   prijsuitreiking: { status: "prijsuitreiking", label: "Prijsuitreiking", isPauze: false, isCeremony: true, showCourts: false, durationMinutes: null, advanceCta: "Evenement afronden" },
   finished: { status: "finished", label: "Afgerond", isPauze: false, isCeremony: false, showCourts: false, durationMinutes: null, advanceCta: null },
 };
