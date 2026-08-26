@@ -39,7 +39,7 @@ export default async function AdminEventPage({
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { tab?: string };
+  searchParams: { tab?: string; round?: string };
 }) {
   await requireAdmin();
   const event = await repo.getEvent(params.id);
@@ -65,6 +65,12 @@ export default async function AdminEventPage({
       : null;
 
   const currentRoundMatches = pouleMatches.filter((m) => m.roundNumber === event.currentPouleRound);
+  const missingScores = currentRoundMatches.filter((m) => m.scoreA === null || m.scoreB === null).length;
+  const pouleRoundsCount = schedulePreview?.roundsCount ?? event.currentPouleRound;
+  const requestedRound = Number(searchParams.round);
+  const viewedRound =
+    requestedRound >= 1 && requestedRound <= pouleRoundsCount ? requestedRound : event.currentPouleRound;
+  const viewedRoundMatches = pouleMatches.filter((m) => m.roundNumber === viewedRound);
   const bracketRound = bracketRoundForStatus(event.status);
   const currentBracketMatches = bracketRound ? matches.filter((m) => m.roundNumber === bracketRound && m.phase !== "poule") : [];
 
@@ -254,13 +260,44 @@ export default async function AdminEventPage({
       {tab === "scores" ? (
         <>
           {meta.showCourts && event.status === "poulefase" && pouleMatches.length > 0 ? (
-            <Section title="Scores invoeren" subtitle={`Ronde ${event.currentPouleRound} van ${schedulePreview?.roundsCount ?? "?"}`}>
-              <MatchBoard matches={currentRoundMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
-              <form action={advancePouleRound.bind(null, event.id)} className="mt-3">
-                <Button type="submit" variant="ghost">
-                  Volgende ronde binnen poulefase
-                </Button>
-              </form>
+            <Section title="Scores invoeren" subtitle={`Ronde ${viewedRound} van ${pouleRoundsCount}`}>
+              <div className="mb-3 flex flex-wrap gap-2">
+                {Array.from({ length: pouleRoundsCount }, (_, i) => i + 1).map((r) => (
+                  <Link
+                    key={r}
+                    href={`/admin/e/${event.id}?tab=scores&round=${r}`}
+                    className={`flex h-9 items-center justify-center rounded-lg border px-3 text-xs font-display font-bold uppercase tracking-wide ${
+                      viewedRound === r ? "border-glass-blue bg-glass-blue text-flood-white" : "border-flood-white/15 text-ink-muted"
+                    }`}
+                  >
+                    Ronde {r}
+                  </Link>
+                ))}
+              </div>
+              <MatchBoard matches={viewedRoundMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
+              {viewedRound === event.currentPouleRound ? (
+                missingScores > 0 ? (
+                  <div className="mt-3">
+                    <ConfirmButton
+                      label="Volgende ronde binnen poulefase"
+                      confirmText={`Nog ${missingScores} wedstrijd${missingScores === 1 ? "" : "en"} niet gescoord in ronde ${event.currentPouleRound}. Toch doorgaan naar de volgende ronde?`}
+                      action={advancePouleRound.bind(null, event.id)}
+                      variant="secondary"
+                    />
+                  </div>
+                ) : (
+                  <form action={advancePouleRound.bind(null, event.id)} className="mt-3">
+                    <Button type="submit" variant="ghost">
+                      Volgende ronde binnen poulefase
+                    </Button>
+                  </form>
+                )
+              ) : (
+                <p className="mt-3 text-xs text-ink-muted">
+                  Je bekijkt een eerdere ronde. Ga naar ronde {event.currentPouleRound} om door te gaan naar de
+                  volgende ronde.
+                </p>
+              )}
             </Section>
           ) : null}
 
