@@ -33,28 +33,17 @@ function UsersIcon({ className }: { className?: string }) {
   );
 }
 
-function TvIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <rect x="3" y="6" width="18" height="12" rx="2" />
-      <path d="M9 21h6" />
-      <path d="M12 18v3" />
-    </svg>
-  );
-}
-
 const ITEMS = [
   { key: "event", label: "Event", Icon: HomeIcon },
   { key: "standen", label: "Standen", Icon: ChartIcon },
   { key: "teams", label: "Teams", Icon: UsersIcon },
-  { key: "tv", label: "TV-modus", Icon: TvIcon },
 ] as const;
 
 /**
  * Floating icon-only bottom bar (Instagram-style), shared across the event,
  * standen and teams pages. Shrinks a touch once you scroll past the top so
- * it stays out of the way of the content. TV mode is a fixed spectator
- * display and doesn't render this itself.
+ * it stays out of the way of the content. No TV-modus link — that's a
+ * spectator display, not meant for people to tap into themselves.
  */
 export function EventNav({ slug, active }: { slug: string; active: "event" | "standen" | "teams" }) {
   const [compact, setCompact] = useState(false);

@@ -7,6 +7,8 @@ import { top8RankingFromMatches, placementRankingFromMatches } from "@/lib/ranki
 import { computeSchedule, fmtTime, pouleRoundWindow } from "@/lib/schedule";
 import { TeamResultCard } from "@/components/team-result-card";
 import { Logo } from "@/components/logo";
+import { EventNav } from "@/components/event-nav";
+import { EVENT_NAV_SPACER_CLASS } from "@/lib/event-nav-spacer";
 
 export default async function TeamDetailPage({ params }: { params: { slug: string; teamId: string } }) {
   const event = await repo.getEventBySlug(params.slug);
@@ -54,10 +56,13 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col gap-6 px-5 py-8">
+    <main className={`mx-auto flex min-h-screen max-w-md flex-col gap-6 px-5 py-8 ${EVENT_NAV_SPACER_CLASS}`}>
       <Logo />
-      <Link href={`/${event.slug}`} className="text-sm underline">
-        &larr; Terug naar {event.name}
+      <Link
+        href={`/${event.slug}/teams`}
+        className="inline-flex w-fit items-center gap-1.5 font-display text-sm font-bold uppercase tracking-wide text-ink-muted hover:text-flood-white"
+      >
+        <span aria-hidden>&lt;</span> Teams
       </Link>
       <TeamResultCard
         teamName={team.name}
@@ -95,6 +100,8 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
           </div>
         </section>
       ) : null}
+
+      <EventNav slug={event.slug} active="teams" />
     </main>
   );
 }
