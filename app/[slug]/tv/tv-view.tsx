@@ -48,7 +48,7 @@ export function TvView({
 
   return (
     <div className="min-h-screen bg-court-night px-16 py-12 [background:radial-gradient(1200px_620px_at_50%_-10%,#16233A_0%,#0E1420_62%)]">
-      <LivePoll intervalMs={10000} />
+      <LivePoll />
       <div className="flex items-center gap-7 border-b-2 border-net-grey/35 pb-6">
         <Logo size="xl" />
         <div className="h-11 w-0.5 bg-net-grey" />
