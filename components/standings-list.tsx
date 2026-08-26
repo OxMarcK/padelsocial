@@ -6,6 +6,8 @@ export interface StandingsRow {
   teamId: string;
   name: string;
   points: number;
+  /** Games saldo (voor - tegen) — the first tie-break below points, shown so equal-points rows explain their order. */
+  saldo: number;
   pouleLabel?: string;
   resting?: boolean;
 }
@@ -82,6 +84,9 @@ export function StandingsList({ rows }: { rows: StandingsRow[] }) {
                 RUST
               </span>
             ) : null}
+            <span className="w-9 text-right tabular-nums text-xs text-ink-muted">
+              {row.saldo > 0 ? `+${row.saldo}` : row.saldo}
+            </span>
             <span
               className={`w-9 text-right font-display text-2xl font-bold tabular-nums ${
                 flashed ? "text-lime-serve" : "text-flood-white"

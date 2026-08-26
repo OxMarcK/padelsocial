@@ -175,6 +175,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
               teamId: r.teamId,
               name: r.name,
               points: r.points,
+              saldo: r.saldo,
               pouleLabel: r.pouleLabel,
               resting: restingTeamIds.includes(r.teamId),
             }))}
