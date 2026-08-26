@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="nl" className={`${barlowCondensed.variable} ${inter.variable}`}>
-      <body className="bg-court-root font-body text-flood-white antialiased">
+      <body className="bg-noise-test font-body text-flood-white antialiased">
         <RegisterServiceWorker />
         {children}
       </body>
