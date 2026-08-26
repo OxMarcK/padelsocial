@@ -15,7 +15,6 @@ import {
   attachVideo,
   deleteEvent,
   deleteTeam,
-  finishEvent,
   publishPouleMatches,
   publishTop8Override,
   randomizePoules,
@@ -381,15 +380,6 @@ export default async function AdminEventPage({
             </Section>
           ) : null}
 
-          {event.status === "prijsuitreiking" ? (
-            <Section title="Afronden">
-              <ConfirmButton
-                label="Evenement afronden"
-                confirmText="Eindstand vastzetten en de resultatenpagina publiceren?"
-                action={finishEvent.bind(null, event.id)}
-              />
-            </Section>
-          ) : null}
         </>
       ) : null}
 
@@ -408,6 +398,7 @@ export default async function AdminEventPage({
 function confirmTextFor(status: string, teamCount: number) {
   if (status === "draft") return `Poulefase starten met ${teamCount} teams?`;
   if (status === "pauze_1") return "Kwartfinales starten met de gepubliceerde top 8?";
+  if (status === "prijsuitreiking") return "Eindstand vastzetten en de resultatenpagina publiceren?";
   return "Doorgaan naar de volgende fase?";
 }
 
