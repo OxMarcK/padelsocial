@@ -25,7 +25,7 @@ export interface PhaseMeta {
 }
 
 export const PHASE_META: Record<EventStatus, PhaseMeta> = {
-  draft: { status: "draft", label: "Opzetten", isPauze: false, isCeremony: false, showCourts: false, durationMinutes: null, advanceCta: "Start poulefase" },
+  draft: { status: "draft", label: "Inchecken", isPauze: false, isCeremony: false, showCourts: false, durationMinutes: null, advanceCta: "Start poulefase" },
   poulefase: { status: "poulefase", label: "Poulefase", isPauze: false, isCeremony: false, showCourts: true, durationMinutes: null, advanceCta: "Naar pauze" },
   pauze_1: { status: "pauze_1", label: "Pauze", isPauze: true, isCeremony: false, showCourts: false, durationMinutes: 4, advanceCta: "Start kwartfinales" },
   finale_ronde_1: { status: "finale_ronde_1", label: "Ronde 1 Finales", isPauze: false, isCeremony: false, showCourts: true, durationMinutes: 18, advanceCta: "Naar pauze" },
