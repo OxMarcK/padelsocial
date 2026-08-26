@@ -72,7 +72,16 @@ export default async function AdminEventPage({
     requestedRound >= 1 && requestedRound <= pouleRoundsCount ? requestedRound : event.currentPouleRound;
   const viewedRoundMatches = pouleMatches.filter((m) => m.roundNumber === viewedRound);
   const bracketRound = bracketRoundForStatus(event.status);
-  const currentBracketMatches = bracketRound ? matches.filter((m) => m.roundNumber === bracketRound && m.phase !== "poule") : [];
+  const bracketMatches = matches.filter((m) => m.phase !== "poule");
+  const currentBracketMatches = bracketRound ? bracketMatches.filter((m) => m.roundNumber === bracketRound) : [];
+  const bracketMissingScores = currentBracketMatches.filter((m) => m.scoreA === null || m.scoreB === null).length;
+  // Matches from an earlier bracket round that got skipped over (e.g. the admin advanced
+  // the phase before scoring them) — their teams are known but no score was recorded, and
+  // since the current round's own matches are just winnerOf/loserOf lookups over the
+  // results map, catching these up here is enough to unstick a later round automatically.
+  const catchUpBracketMatches = bracketMatches.filter(
+    (m) => m.roundNumber !== bracketRound && m.teamAId && m.teamBId && (m.scoreA === null || m.scoreB === null)
+  );
 
   const recordScoreBound = recordScore.bind(null, event.id);
 
@@ -92,11 +101,20 @@ export default async function AdminEventPage({
       </div>
 
       {meta.advanceCta && next ? (
-        <ConfirmButton
-          label={meta.advanceCta}
-          confirmText={confirmTextFor(event.status, teams.length)}
-          action={advancePhase.bind(null, event.id)}
-        />
+        bracketRound && bracketMissingScores > 0 ? (
+          <ConfirmButton
+            label={meta.advanceCta}
+            confirmText={`Nog ${bracketMissingScores} wedstrijd${bracketMissingScores === 1 ? "" : "en"} niet gescoord in ${meta.label.toLowerCase()}. Toch doorgaan?`}
+            action={advancePhase.bind(null, event.id)}
+            variant="secondary"
+          />
+        ) : (
+          <ConfirmButton
+            label={meta.advanceCta}
+            confirmText={confirmTextFor(event.status, teams.length)}
+            action={advancePhase.bind(null, event.id)}
+          />
+        )
       ) : null}
 
       <details className="rounded-2xl border border-flood-white/10 bg-court-night p-4">
@@ -304,6 +322,15 @@ export default async function AdminEventPage({
           {event.status === "pauze_1" ? (
             <Section title="Top 8 & plaatsingsgroep" subtitle="Controleer de seeding voordat je publiceert">
               <Top8Editor eventId={event.id} teamNameById={teamNameById} published={top8} />
+            </Section>
+          ) : null}
+
+          {catchUpBracketMatches.length > 0 ? (
+            <Section
+              title="Nog niet gescoorde wedstrijden"
+              subtitle="Deze zijn overgeslagen doordat de fase al is doorgezet — vul ze alsnog in om de volgende ronde te ontgrendelen"
+            >
+              <MatchBoard matches={catchUpBracketMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
             </Section>
           ) : null}
 
