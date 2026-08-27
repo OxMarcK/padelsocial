@@ -5,19 +5,15 @@ import { repo } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { PHASE_META } from "@/lib/phases";
-
-// Public events live at /[slug] — these top-level segments are already taken by the app itself.
-const RESERVED_SLUGS = new Set(["admin", "auth"]);
+import { normalizeSlug, assertValidSlug } from "@/lib/slug";
 
 async function createEvent(formData: FormData) {
   "use server";
   await requireAdmin();
-  const slug = String(formData.get("slug") ?? "")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9-]+/g, "-");
-  if (RESERVED_SLUGS.has(slug)) {
-    throw new Error(`"${slug}" is een gereserveerd pad en kan niet als slug gebruikt worden.`);
+  const slug = normalizeSlug(String(formData.get("slug") ?? ""));
+  assertValidSlug(slug);
+  if (await repo.getEventBySlug(slug)) {
+    throw new Error(`"${slug}" is al in gebruik door een ander event.`);
   }
   const event = await repo.createEvent({
     name: String(formData.get("name") ?? ""),

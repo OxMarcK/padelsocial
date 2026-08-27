@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import type { NewTeamInput } from "@/lib/data/repo";
+import { normalizeSlug, assertValidSlug } from "@/lib/slug";
 
 function path(eventId: string) {
   return `/admin/e/${eventId}`;
@@ -46,7 +47,18 @@ export async function deleteTeam(eventId: string, teamId: string) {
 
 export async function updateEventDetails(eventId: string, formData: FormData) {
   await requireAdmin();
+  const event = await repo.getEvent(eventId);
+  const requestedSlug = normalizeSlug(String(formData.get("slug") ?? ""));
+  assertValidSlug(requestedSlug);
+  if (requestedSlug !== event?.slug) {
+    const existing = await repo.getEventBySlug(requestedSlug);
+    if (existing && existing.id !== eventId) {
+      throw new Error(`"${requestedSlug}" is al in gebruik door een ander event.`);
+    }
+  }
+
   await repo.updateEvent(eventId, {
+    slug: requestedSlug,
     name: String(formData.get("name") ?? ""),
     date: String(formData.get("date") ?? ""),
     startTime: String(formData.get("startTime") ?? ""),
@@ -55,6 +67,11 @@ export async function updateEventDetails(eventId: string, formData: FormData) {
     description: String(formData.get("description") ?? ""),
   });
   revalidatePath(path(eventId));
+  revalidatePath("/");
+  if (event && event.slug !== requestedSlug) {
+    revalidatePath(`/${event.slug}`);
+    revalidatePath(`/${requestedSlug}`);
+  }
 }
 
 export async function deleteEvent(eventId: string) {

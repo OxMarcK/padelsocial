@@ -132,6 +132,18 @@ export default async function AdminEventPage({
         </summary>
         <form action={updateEventDetails.bind(null, event.id)} className="mt-4 flex flex-col gap-3">
           <Field label="Naam" name="name" defaultValue={event.name} required />
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-ink-muted">Slug (voor de URL)</span>
+            <input
+              name="slug"
+              defaultValue={event.slug}
+              required
+              className="rounded-xl border border-flood-white/15 bg-court-night px-3 py-2 text-flood-white"
+            />
+            <span className="text-xs text-ink-muted">
+              Publieke link wordt event.padelsocial.nl/{event.slug} — al gedeelde links met de oude slug werken hierna niet meer.
+            </span>
+          </label>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Datum" name="date" type="date" defaultValue={event.date} required />
             <Field label="Starttijd" name="startTime" type="time" defaultValue={event.startTime} required />
