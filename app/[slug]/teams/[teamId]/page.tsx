@@ -50,7 +50,6 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
   const pouleMatches = matches
     .filter((m) => m.phase === "poule" && (m.teamAId === team.id || m.teamBId === team.id))
     .sort((a, b) => a.roundNumber - b.roundNumber);
-  const bracketMatches = matches.filter((m) => m.phase !== "poule" && (m.teamAId === team.id || m.teamBId === team.id));
   const schedule = generatePouleSchedule(poules.map((p) => ({ label: p.label, teamIds: p.teamIds })), event.courts);
   const windows = computeSchedule(event, schedule.roundsCount || 1);
   const pouleWindow = windows.find((w) => w.status === "poulefase")!;
@@ -59,14 +58,6 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
     matches.filter((m) => m.teamAId === team.id || m.teamBId === team.id),
     { teamNameById, pouleStartsAt: pouleWindow.startsAt, windows, perspectiveTeamId: team.id }
   );
-
-  const summaryParts: string[] = [];
-  if (poule && myRow) summaryParts.push(`Poule ${poule.label}: ${myRow.won}-${myRow.drawn}-${myRow.lost}, ${myRow.points} punten.`);
-  const lastBracket = bracketMatches[bracketMatches.length - 1];
-  if (lastBracket && lastBracket.scoreA !== null && lastBracket.scoreB !== null) {
-    const opp = lastBracket.teamAId === team.id ? lastBracket.teamBId : lastBracket.teamAId;
-    summaryParts.push(`${lastBracket.label} tegen ${opp ? teamNameById[opp] ?? "?" : "?"} (${lastBracket.scoreA}-${lastBracket.scoreB}).`);
-  }
 
   return (
     <main className={`mx-auto flex min-h-screen max-w-md flex-col gap-6 px-5 py-8 ${EVENT_NAV_SPACER_CLASS}`}>
@@ -79,13 +70,14 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
       </Link>
       <TeamResultCard
         teamName={team.name}
+        player1Name={team.player1.name}
+        player2Name={team.player2.name}
         finalRank={finalRank ?? 0}
         totalTeams={teams.length}
         pouleLabel={poule?.label ?? "?"}
         pouleRank={pouleRank || 0}
         wins={myRow?.won ?? 0}
         losses={myRow?.lost ?? 0}
-        summary={summaryParts.join(" ") || "De wedstrijden van dit team staan hier zodra ze gespeeld zijn."}
         shareUrl={shareUrl}
       />
 
