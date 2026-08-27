@@ -17,10 +17,10 @@ function parseStart(event: PadelEvent): Date {
 /**
  * The changeover between poule rounds is real time on the clock — the venue's
  * actual 3-hour court booking (10:30–13:30 for the reference 15-team/3-poule
- * event) was worked out to exactly fit 6 full poule rounds + changeovers +
- * the knockout stage, so it has to count, not just be flavor text.
+ * event) was worked out to fit a full poule phase + changeovers + the
+ * knockout stage, so it has to count, not just be flavor text.
  */
-const POULE_ROUND_MINUTES = 18;
+const POULE_ROUND_MINUTES = 20;
 const POULE_CHANGEOVER_MINUTES = 2;
 /** Fixed lead-in shown as the "voor de start" window before the official start time. */
 const DRAFT_LEAD_MINUTES = 30;
@@ -29,10 +29,10 @@ const DRAFT_LEAD_MINUTES = 30;
  * Advisory schedule assuming every phase runs exactly on time — used only
  * for the phase-indicator's clock/progress bar text. Actual transitions
  * stay admin-triggered (spec §2.3.A): nothing here auto-advances anything.
- * Poulefase duration is `pouleRoundsCount * 18 min + (pouleRoundsCount - 1) *
- * 2 min changeover`, not a hardcoded total — see the doc comment on
- * lib/poule-scheduler.ts for why the round count can be more than the
- * spec's flavor-text 5 rounds.
+ * Poulefase duration is `pouleRoundsCount * POULE_ROUND_MINUTES +
+ * (pouleRoundsCount - 1) * POULE_CHANGEOVER_MINUTES`, not a hardcoded total —
+ * see the doc comment on lib/poule-scheduler.ts for why the round count
+ * varies with poule/court shape rather than being a fixed number.
  */
 export function computeSchedule(event: PadelEvent, pouleRoundsCount: number): PhaseWindow[] {
   const start = parseStart(event);
