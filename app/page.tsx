@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { repo } from "@/lib/data";
-import { generatePouleSchedule } from "@/lib/poule-scheduler";
-import { computeSchedule, fmtTime } from "@/lib/schedule";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 
@@ -58,15 +56,6 @@ export default async function LandingPage() {
   const upcoming = events.find((e) => e.status !== "draft" && e.status !== "finished");
   const past = events.filter((e) => e.status === "finished");
 
-  let finishTime: string | null = null;
-  if (upcoming) {
-    const poules = await repo.listPoules(upcoming.id);
-    const schedule = generatePouleSchedule(poules.map((p) => ({ label: p.label, teamIds: p.teamIds })), upcoming.courts);
-    const windows = computeSchedule(upcoming, schedule.roundsCount || 1);
-    const prijsuitreiking = windows.find((w) => w.status === "prijsuitreiking");
-    finishTime = prijsuitreiking ? fmtTime(prijsuitreiking.startsAt) : null;
-  }
-
   const pastWithTeamCounts = await Promise.all(
     past.map(async (e) => ({ event: e, teamCount: (await repo.listTeams(e.id)).length }))
   );
@@ -88,10 +77,12 @@ export default async function LandingPage() {
               {countdownLabel(daysUntil(upcoming.date))}
             </span>
           </div>
-          <h1 className="relative font-display text-5xl font-bold uppercase leading-[0.95] [text-wrap:balance]">{upcoming.name}</h1>
-          <p className="relative font-display text-lg font-semibold uppercase tracking-wide text-flood-white/90">
-            {fmtEventDateLong(upcoming.date)} · {upcoming.startTime}
-          </p>
+          <div className="relative flex flex-col gap-1">
+            <h1 className="font-display text-5xl font-bold uppercase leading-[0.95] [text-wrap:balance]">{upcoming.name}</h1>
+            <p className="font-display text-lg font-semibold uppercase tracking-wide text-flood-white/90">
+              {fmtEventDateLong(upcoming.date)} · {upcoming.startTime}
+            </p>
+          </div>
           <div className="relative grid grid-cols-2 gap-4 rounded-2xl border border-flood-white/25 p-4">
             <div>
               <div className="text-xs font-semibold uppercase tracking-wider text-flood-white/70">Locatie</div>
@@ -99,9 +90,7 @@ export default async function LandingPage() {
             </div>
             <div className="border-l border-flood-white/25 pl-4">
               <div className="text-xs font-semibold uppercase tracking-wider text-flood-white/70">Opzet</div>
-              <div className="text-sm font-semibold leading-snug">
-                Poules + knock-out{finishTime ? `, klaar ${finishTime}` : ""}
-              </div>
+              <div className="text-sm font-semibold leading-snug">Poules + knock-out</div>
             </div>
           </div>
           <Link href={`/${upcoming.slug}`} className="relative">
