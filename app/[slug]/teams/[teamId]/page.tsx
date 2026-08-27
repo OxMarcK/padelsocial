@@ -5,7 +5,10 @@ import { repo } from "@/lib/data";
 import { groupStandingsByPoule } from "@/lib/standings";
 import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
 import { computeSchedule, fmtTime, pouleRoundWindow } from "@/lib/schedule";
+import { generatePouleSchedule } from "@/lib/poule-scheduler";
+import { buildMatchVideoRows } from "@/lib/match-video";
 import { TeamResultCard } from "@/components/team-result-card";
+import { MatchVideoSection } from "@/components/match-video-list";
 import { Logo } from "@/components/logo";
 import { EventNav } from "@/components/event-nav";
 import { EVENT_NAV_SPACER_CLASS } from "@/lib/event-nav-spacer";
@@ -48,7 +51,14 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
     .filter((m) => m.phase === "poule" && (m.teamAId === team.id || m.teamBId === team.id))
     .sort((a, b) => a.roundNumber - b.roundNumber);
   const bracketMatches = matches.filter((m) => m.phase !== "poule" && (m.teamAId === team.id || m.teamBId === team.id));
-  const pouleWindow = computeSchedule(event, 1).find((w) => w.status === "poulefase")!;
+  const schedule = generatePouleSchedule(poules.map((p) => ({ label: p.label, teamIds: p.teamIds })), event.courts);
+  const windows = computeSchedule(event, schedule.roundsCount || 1);
+  const pouleWindow = windows.find((w) => w.status === "poulefase")!;
+
+  const videoRows = buildMatchVideoRows(
+    matches.filter((m) => m.teamAId === team.id || m.teamBId === team.id),
+    { teamNameById, pouleStartsAt: pouleWindow.startsAt, windows, perspectiveTeamId: team.id }
+  );
 
   const summaryParts: string[] = [];
   if (poule && myRow) summaryParts.push(`Poule ${poule.label}: ${myRow.won}-${myRow.drawn}-${myRow.lost}, ${myRow.points} punten.`);
@@ -103,6 +113,8 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
           </div>
         </section>
       ) : null}
+
+      <MatchVideoSection title="Wedstrijden" rows={videoRows} />
 
       <EventNav slug={event.slug} active="teams" />
     </main>
