@@ -17,12 +17,31 @@ const inter = Inter({
   display: "swap",
 });
 
+const DEFAULT_DESCRIPTION = "Volg live de standen, je baanindeling en de knock-out.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://event.padelsocial.nl"),
   title: "Padel Social",
-  description: "Live poulefase en knock-out voor je padeltoernooi.",
+  description: DEFAULT_DESCRIPTION,
   manifest: "/manifest.json",
   themeColor: "#0E1420",
   viewport: { width: "device-width", initialScale: 1 },
+  // Fallback link-preview card — pages with their own event context (the landing
+  // page, /[slug]) override title/description via generateMetadata but inherit
+  // this image and card type unless they say otherwise.
+  openGraph: {
+    title: "Padel Social",
+    description: DEFAULT_DESCRIPTION,
+    images: ["/social/padel-social-og-thumb-whatsapp.png"],
+    locale: "nl_NL",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Padel Social",
+    description: DEFAULT_DESCRIPTION,
+    images: ["/social/padel-social-og-thumb-whatsapp.png"],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
