@@ -96,7 +96,7 @@ derives the real poulefase duration from whatever that comes out to, so the
 displayed schedule stays internally consistent regardless of how many poules
 an event has. **This shifts the real event's clock** for the 3-poule/5-court
 case specifically — worth flagging to the organizer: poulefase would run
-10:30–12:28 (6 rounds × 18 min play + 5 × 2 min changeover between rounds)
+10:30–12:40 (6 rounds × 20 min play + 5 × 2 min changeover between rounds)
 rather than 10:30–12:10 (the spec's naive 5-round, no-changeover assumption at
 20 min/round) if run as a genuinely complete round robin on 5 courts.
 
