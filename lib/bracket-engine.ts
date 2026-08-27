@@ -42,22 +42,26 @@ function seed(index: number): TeamSource {
   return { type: "seed", index };
 }
 
+// Baan 4 & 5 are the best courts on-site, so knock-out play (the matches with
+// the most eyes on them) is deliberately steered onto them: kwartfinales use
+// banen 2-5 (only baan 1 — the worst one — sits idle) and halve
+// finales/finales use exactly baan 4 & 5.
 export const BRACKET_DEFINITION: BracketMatchDef[] = [
-  { id: "KF1", round: 1, court: 1, label: "Kwartfinale 1", phase: "kwartfinale", teamA: seed(0), teamB: seed(7) },
-  { id: "KF2", round: 1, court: 2, label: "Kwartfinale 2", phase: "kwartfinale", teamA: seed(3), teamB: seed(4) },
-  { id: "KF3", round: 1, court: 3, label: "Kwartfinale 3", phase: "kwartfinale", teamA: seed(1), teamB: seed(6) },
-  { id: "KF4", round: 1, court: 4, label: "Kwartfinale 4", phase: "kwartfinale", teamA: seed(2), teamB: seed(5) },
-  { id: "HF1", round: 2, court: 1, label: "Halve Finale 1", phase: "halve_finale", teamA: { type: "winnerOf", matchId: "KF1" }, teamB: { type: "winnerOf", matchId: "KF2" } },
-  { id: "HF2", round: 2, court: 2, label: "Halve Finale 2", phase: "halve_finale", teamA: { type: "winnerOf", matchId: "KF3" }, teamB: { type: "winnerOf", matchId: "KF4" } },
-  { id: "GRAND", round: 3, court: 1, label: "Grote Finale · 1e/2e", phase: "grote_finale", teamA: { type: "winnerOf", matchId: "HF1" }, teamB: { type: "winnerOf", matchId: "HF2" } },
-  { id: "BRONZE", round: 3, court: 2, label: "Troostfinale · 3e/4e", phase: "troostfinale", teamA: { type: "loserOf", matchId: "HF1" }, teamB: { type: "loserOf", matchId: "HF2" } },
+  { id: "KF1", round: 1, court: 2, label: "Kwartfinale 1", phase: "kwartfinale", teamA: seed(0), teamB: seed(7) },
+  { id: "KF2", round: 1, court: 3, label: "Kwartfinale 2", phase: "kwartfinale", teamA: seed(3), teamB: seed(4) },
+  { id: "KF3", round: 1, court: 4, label: "Kwartfinale 3", phase: "kwartfinale", teamA: seed(1), teamB: seed(6) },
+  { id: "KF4", round: 1, court: 5, label: "Kwartfinale 4", phase: "kwartfinale", teamA: seed(2), teamB: seed(5) },
+  { id: "HF1", round: 2, court: 4, label: "Halve Finale 1", phase: "halve_finale", teamA: { type: "winnerOf", matchId: "KF1" }, teamB: { type: "winnerOf", matchId: "KF2" } },
+  { id: "HF2", round: 2, court: 5, label: "Halve Finale 2", phase: "halve_finale", teamA: { type: "winnerOf", matchId: "KF3" }, teamB: { type: "winnerOf", matchId: "KF4" } },
+  { id: "GRAND", round: 3, court: 4, label: "Grote Finale · 1e/2e", phase: "grote_finale", teamA: { type: "winnerOf", matchId: "HF1" }, teamB: { type: "winnerOf", matchId: "HF2" } },
+  { id: "BRONZE", round: 3, court: 5, label: "Troostfinale · 3e/4e", phase: "troostfinale", teamA: { type: "loserOf", matchId: "HF1" }, teamB: { type: "loserOf", matchId: "HF2" } },
 ];
 
 /** Courts a bracket round actually plays a tracked match on — every other court up to `event.courts` is free play. */
 export const BRACKET_ROUND_COURTS: Record<1 | 2 | 3, number[]> = {
-  1: [1, 2, 3, 4],
-  2: [1, 2],
-  3: [1, 2],
+  1: [2, 3, 4, 5],
+  2: [4, 5],
+  3: [4, 5],
 };
 
 /** The courts in a bracket round with no tracked match — for rendering "Vrij te spelen" placeholders. */
