@@ -204,6 +204,7 @@ export const supabaseRepo: DataRepo = {
   async updateEvent(id, patch) {
     const client = supabaseAdmin();
     const update: Record<string, unknown> = {};
+    if (patch.slug !== undefined) update.slug = patch.slug;
     if (patch.name !== undefined) update.name = patch.name;
     if (patch.date !== undefined) update.date = patch.date;
     if (patch.startTime !== undefined) update.start_time = patch.startTime;
