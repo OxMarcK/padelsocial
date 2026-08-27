@@ -4,9 +4,9 @@ import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
 import { PHASE_META, bracketRoundForStatus, highestStartedBracketRound, nextStatus } from "@/lib/phases";
-import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { ConfirmButton } from "@/components/admin/confirm-button";
+import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
 import { MatchBoard } from "@/components/admin/match-board";
 import {
   addTeamsBulk,
@@ -116,12 +116,14 @@ export default async function AdminEventPage({
             confirmText={`Nog ${bracketMissingScores} wedstrijd${bracketMissingScores === 1 ? "" : "en"} niet gescoord in ${meta.label.toLowerCase()}. Toch doorgaan?`}
             action={advancePhase.bind(null, event.id)}
             variant="secondary"
+            successMessage="Doorgezet naar de volgende fase."
           />
         ) : (
           <ConfirmButton
             label={meta.advanceCta}
             confirmText={confirmTextFor(event.status, teams.length)}
             action={advancePhase.bind(null, event.id)}
+            successMessage="Doorgezet naar de volgende fase."
           />
         )
       ) : null}
@@ -130,7 +132,7 @@ export default async function AdminEventPage({
         <summary className="cursor-pointer font-display text-lg font-bold uppercase tracking-wide">
           Event bewerken
         </summary>
-        <form action={updateEventDetails.bind(null, event.id)} className="mt-4 flex flex-col gap-3">
+        <ActionForm action={updateEventDetails.bind(null, event.id)} className="mt-4 flex flex-col gap-3">
           <Field label="Naam" name="name" defaultValue={event.name} required />
           <label className="flex flex-col gap-1 text-sm">
             <span className="text-ink-muted">Slug (voor de URL)</span>
@@ -159,10 +161,9 @@ export default async function AdminEventPage({
               className="rounded-xl border border-flood-white/15 bg-court-night px-3 py-2 text-flood-white"
             />
           </label>
-          <Button type="submit" variant="secondary">
-            Opslaan
-          </Button>
-        </form>
+          <ActionFormError />
+          <SaveButton />
+        </ActionForm>
       </details>
 
       <div className="flex gap-2 rounded-xl border border-flood-white/10 bg-surface p-1">
@@ -181,37 +182,34 @@ export default async function AdminEventPage({
 
       {tab === "teams" ? (
         <Section title="Teams" subtitle={`${teams.length} teams`}>
-          <form action={addTeamsBulk.bind(null, event.id)} className="flex flex-col gap-2">
+          <ActionForm action={addTeamsBulk.bind(null, event.id)} className="flex flex-col gap-2" resetOnSuccess>
             <textarea
               name="bulk"
               rows={4}
               placeholder={"Team naam | Speler 1 | Speler 2\nSanne & Joep | Sanne | Joep"}
               className="rounded-xl border border-flood-white/15 bg-court-night px-3 py-2 text-sm text-flood-white placeholder:text-ink-muted"
             />
-            <Button type="submit" variant="secondary">
-              Teams toevoegen
-            </Button>
-          </form>
+            <SaveButton label="Teams toevoegen" savedLabel="Toegevoegd" />
+          </ActionForm>
           {teams.length > 0 ? (
             <div className="mt-3 flex flex-col gap-1.5">
               {teams.map((t) => (
                 <div key={t.id} className="flex items-center gap-2 rounded-xl bg-flood-white/5 px-3 py-2 text-sm">
-                  <form action={renameTeam.bind(null, event.id, t.id)} className="flex flex-1 items-center gap-2">
+                  <ActionForm action={renameTeam.bind(null, event.id, t.id)} className="flex flex-1 items-center gap-2">
                     <input
                       name="name"
                       defaultValue={t.name}
                       className="h-9 min-w-0 flex-1 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
                     />
-                    <Button type="submit" variant="ghost" size="sm">
-                      Opslaan
-                    </Button>
-                  </form>
+                    <SaveButton variant="ghost" size="sm" />
+                  </ActionForm>
                   <ConfirmButton
                     label="Verwijderen"
                     confirmText={`"${t.name}" verwijderen?`}
                     action={deleteTeam.bind(null, event.id, t.id)}
                     variant="danger"
                     size="sm"
+                    successMessage="Team verwijderd."
                   />
                 </div>
               ))}
@@ -223,7 +221,7 @@ export default async function AdminEventPage({
       {tab === "poules" ? (
         <>
           <Section title="Poules" subtitle="Verdeel de teams over poules — 5 teams per poule, zoveel poules als je nodig hebt">
-            <form action={savePoulesManual.bind(null, event.id)} className="flex flex-col gap-2">
+            <ActionForm action={savePoulesManual.bind(null, event.id)} className="flex flex-col gap-2">
               {teams.map((t) => {
                 const current = poules.find((p) => p.teamIds.includes(t.id))?.label ?? "";
                 return (
@@ -246,12 +244,10 @@ export default async function AdminEventPage({
                 );
               })}
               <div className="mt-2 flex gap-2">
-                <Button type="submit" variant="secondary">
-                  Opslaan verdeling
-                </Button>
+                <SaveButton label="Opslaan verdeling" />
               </div>
-            </form>
-            <form action={randomizePoules.bind(null, event.id)} className="mt-2 flex items-end gap-2">
+            </ActionForm>
+            <ActionForm action={randomizePoules.bind(null, event.id)} className="mt-2 flex items-end gap-2">
               <label className="flex flex-col gap-1 text-xs">
                 <span className="text-ink-muted">Aantal poules</span>
                 <input
@@ -262,21 +258,17 @@ export default async function AdminEventPage({
                   className="h-9 w-20 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
                 />
               </label>
-              <Button type="submit" variant="ghost">
-                Willekeurig verdelen (5 per poule)
-              </Button>
-            </form>
+              <SaveButton variant="ghost" label="Willekeurig verdelen (5 per poule)" savedLabel="Verdeeld" />
+            </ActionForm>
           </Section>
 
           <Section title="Poulewedstrijden" subtitle="Configureer punten en genereer het schema">
-            <form action={updatePoints.bind(null, event.id)} className="mb-3 flex items-end gap-2">
+            <ActionForm action={updatePoints.bind(null, event.id)} className="mb-3 flex items-end gap-2">
               <PointField label="Winst" name="win" defaultValue={event.points.win} />
               <PointField label="Gelijk" name="draw" defaultValue={event.points.draw} />
               <PointField label="Verlies" name="loss" defaultValue={event.points.loss} />
-              <Button type="submit" variant="ghost">
-                Punten opslaan
-              </Button>
-            </form>
+              <SaveButton variant="ghost" label="Punten opslaan" />
+            </ActionForm>
 
             {schedulePreview ? (
               <p className="mb-2 text-xs text-ink-muted">
@@ -287,11 +279,14 @@ export default async function AdminEventPage({
               <p className="mb-2 text-xs text-ink-muted">Verdeel eerst de teams over de poules.</p>
             )}
 
-            <form action={publishPouleMatches.bind(null, event.id)}>
-              <Button type="submit" disabled={!schedulePreview}>
-                {pouleMatches.length > 0 ? "Opnieuw genereren" : "Genereer poulewedstrijden"}
-              </Button>
-            </form>
+            <ActionForm action={publishPouleMatches.bind(null, event.id)}>
+              <SaveButton
+                disabled={!schedulePreview}
+                variant="primary"
+                label={pouleMatches.length > 0 ? "Opnieuw genereren" : "Genereer poulewedstrijden"}
+                savedLabel="Gegenereerd"
+              />
+            </ActionForm>
           </Section>
         </>
       ) : null}
@@ -322,14 +317,17 @@ export default async function AdminEventPage({
                       confirmText={`Nog ${missingScores} wedstrijd${missingScores === 1 ? "" : "en"} niet gescoord in ronde ${event.currentPouleRound}. Toch doorgaan naar de volgende ronde?`}
                       action={advancePouleRound.bind(null, event.id)}
                       variant="secondary"
+                      successMessage="Volgende ronde gestart."
                     />
                   </div>
                 ) : (
-                  <form action={advancePouleRound.bind(null, event.id)} className="mt-3">
-                    <Button type="submit" variant="ghost">
-                      Volgende ronde binnen poulefase
-                    </Button>
-                  </form>
+                  <ActionForm action={advancePouleRound.bind(null, event.id)} className="mt-3">
+                    <SaveButton
+                      variant="ghost"
+                      label="Volgende ronde binnen poulefase"
+                      savedLabel="Volgende ronde gestart"
+                    />
+                  </ActionForm>
                 )
               ) : (
                 <p className="mt-3 text-xs text-ink-muted">
@@ -367,7 +365,7 @@ export default async function AdminEventPage({
                 {matches
                   .filter((m) => m.scoreA !== null && m.scoreB !== null)
                   .map((m) => (
-                    <form
+                    <ActionForm
                       key={m.id}
                       action={attachVideo.bind(null, event.id)}
                       className="flex flex-col gap-1.5 rounded-xl bg-flood-white/5 p-3 text-sm"
@@ -382,11 +380,9 @@ export default async function AdminEventPage({
                           placeholder="https://youtube.com/…"
                           className="h-9 min-w-0 flex-1 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white placeholder:text-ink-muted"
                         />
-                        <Button type="submit" variant="ghost" size="sm">
-                          Opslaan
-                        </Button>
+                        <SaveButton variant="ghost" size="sm" />
                       </div>
-                    </form>
+                    </ActionForm>
                   ))}
               </div>
             </Section>
@@ -454,7 +450,7 @@ async function Top8Editor({
   const name = (id: string) => teamNameById[id] ?? "?";
 
   return (
-    <form action={publishTop8Override.bind(null, eventId)} className="flex flex-col gap-3 text-sm">
+    <ActionForm action={publishTop8Override.bind(null, eventId)} className="flex flex-col gap-3 text-sm">
       <p className="text-xs text-ink-muted">
         Seed 1 t/m 8, beste eerst. Kwartfinales spelen 1-8, 4-5, 2-7, 3-6 (standaard bracket-seeding), zodat seed 1
         en 2 elkaar pas in de finale kunnen treffen.
@@ -480,12 +476,9 @@ async function Top8Editor({
           className="h-9 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
         />
       </label>
-      <p className="text-xs text-ink-muted">
-        {state.placementSeeds.map((id) => name(id)).join(" · ")}
-      </p>
-      <Button type="submit" variant="secondary">
-        {published ? "Bijwerken" : "Publiceren"}
-      </Button>
-    </form>
+      <p className="text-xs text-ink-muted">{state.placementSeeds.map((id) => name(id)).join(" · ")}</p>
+      <ActionFormError />
+      <SaveButton label={published ? "Bijwerken" : "Publiceren"} savedLabel={published ? "Bijgewerkt" : "Gepubliceerd"} />
+    </ActionForm>
   );
 }
