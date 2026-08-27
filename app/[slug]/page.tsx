@@ -2,9 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { repo } from "@/lib/data";
 import { groupStandingsByPoule } from "@/lib/standings";
-import { computeSchedule, phaseIndicatorData } from "@/lib/schedule";
+import { computeSchedule, phaseIndicatorData, type PhaseWindow } from "@/lib/schedule";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
 import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
+import { buildMatchVideoRows } from "@/lib/match-video";
 import { freePlayCourts } from "@/lib/bracket-engine";
 import type { Match, PadelEvent, Team } from "@/lib/types";
 import { Logo } from "@/components/logo";
@@ -16,6 +17,7 @@ import { CourtCard } from "@/components/court-card";
 import { StandingsList } from "@/components/standings-list";
 import { Podium } from "@/components/podium";
 import { LivePoll } from "@/components/live-poll";
+import { MatchVideoSection } from "@/components/match-video-list";
 
 function fmtEventDate(date: string): string {
   return new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { day: "numeric", month: "long" });
@@ -32,7 +34,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
   const windows = computeSchedule(event, schedule.roundsCount || 1);
 
   if (event.status === "finished") {
-    return <ResultsView event={event} teams={teams} matches={matches} teamNameById={teamNameById} />;
+    return <ResultsView event={event} teams={teams} matches={matches} teamNameById={teamNameById} windows={windows} />;
   }
 
   if (event.status === "draft") {
@@ -245,16 +247,23 @@ async function ResultsView({
   teams,
   matches,
   teamNameById,
+  windows,
 }: {
   event: NonNullable<Awaited<ReturnType<typeof repo.getEventBySlug>>>;
   teams: Team[];
   matches: Match[];
   teamNameById: Record<string, string>;
+  windows: PhaseWindow[];
 }) {
   const placements = await repo.listPlacements(event.id);
   const byRank = [...placements].sort((a, b) => (a.finalRank ?? 999) - (b.finalRank ?? 999));
   const top8 = byRank.filter((p) => (p.finalRank ?? 99) <= 8);
   const rest = byRank.filter((p) => (p.finalRank ?? 99) > 8);
+  const videoRows = buildMatchVideoRows(matches, {
+    teamNameById,
+    pouleStartsAt: windows.find((w) => w.status === "poulefase")!.startsAt,
+    windows,
+  });
 
   return (
     <Shell event={event}>
@@ -282,27 +291,7 @@ async function ResultsView({
 
       <p className="text-center text-xs text-ink-muted">Tik op een team voor de kaart en de deelknop.</p>
 
-      <Section title="Video's">
-        {matches.filter((m) => m.videoUrl).length === 0 ? (
-          <p className="text-sm text-ink-muted">Nog geen video&apos;s gekoppeld.</p>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {matches
-              .filter((m) => m.videoUrl)
-              .map((m) => (
-                <a
-                  key={m.id}
-                  href={m.videoUrl!}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="rounded-xl bg-surface px-4 py-3 text-sm underline"
-                >
-                  {m.label} — Bekijk jouw wedstrijd terug
-                </a>
-              ))}
-          </div>
-        )}
-      </Section>
+      <MatchVideoSection title="Video's" rows={videoRows} />
       <EventNav slug={event.slug} active="event" />
     </Shell>
   );
