@@ -209,6 +209,23 @@ export const mockRepo: DataRepo = {
     return updated;
   },
 
+  async recomputePlacements(eventId) {
+    requireEvent(eventId);
+    const state = bracketStateFor(eventId);
+    const results: Placement[] = [];
+    if (state.top8) {
+      const resolved = resolveBracketMatches(state.top8.top8, state.results);
+      for (const r of computeTop8Ranking(resolved, state.top8.top8)) {
+        results.push({ id: uid("placement"), eventId, teamId: r.teamId, finalRank: r.rank });
+      }
+      state.top8.placementSeeds.forEach((teamId, i) => {
+        results.push({ id: uid("placement"), eventId, teamId, finalRank: 9 + i });
+      });
+    }
+    store.placements.set(eventId, results);
+    return results;
+  },
+
   async listTeams(eventId) {
     return teamsForEvent(eventId).sort((a, b) => a.name.localeCompare(b.name));
   },

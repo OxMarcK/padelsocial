@@ -82,6 +82,27 @@ export async function deleteEvent(eventId: string) {
 }
 
 /**
+ * finishEvent computes the final ranking exactly once, from whatever bracket
+ * results exist at that moment. If an event got finished before its halve
+ * finales/finales were fully scored (e.g. by racing through the phase-advance
+ * "toch doorgaan" overrides), the public results page is stuck showing "?"
+ * for those ranks forever — there's no other way to make it pick up a score
+ * entered afterward. This recomputes and overwrites the stored ranking from
+ * the event's current match results without touching its status.
+ */
+export async function recomputePlacements(eventId: string) {
+  await requireAdmin();
+  const event = await repo.getEvent(eventId);
+  if (event?.status !== "finished") {
+    throw new Error("Alleen mogelijk voor een afgerond event.");
+  }
+  await repo.recomputePlacements(eventId);
+  revalidatePath(path(eventId));
+  revalidatePath(`/${event.slug}`);
+  revalidatePath(`/e`);
+}
+
+/**
  * Copies an event's config, teams, and poule-indeling into a brand new event —
  * for trying out a live event's exact roster/setup without touching its real
  * data. The copy starts at "draft" (no matches generated, no scores) so the

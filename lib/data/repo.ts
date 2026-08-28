@@ -40,6 +40,16 @@ export interface DataRepo {
   advancePhase(eventId: string): Promise<PadelEvent>;
   advancePouleRound(eventId: string): Promise<PadelEvent>;
   finishEvent(eventId: string): Promise<PadelEvent>;
+  /**
+   * Recomputes and overwrites the stored final ranking from the event's
+   * *current* bracket results, without touching its status. finishEvent only
+   * ever computes the ranking once, at the moment the event is finished — if
+   * a bracket match's score gets entered or corrected afterward (e.g. an
+   * event was finished before the halve finales/finales were fully scored),
+   * the public results page keeps showing the old (or missing) ranking until
+   * this is called.
+   */
+  recomputePlacements(eventId: string): Promise<Placement[]>;
 
   listTeams(eventId: string): Promise<Team[]>;
   bulkAddTeams(eventId: string, teams: NewTeamInput[]): Promise<Team[]>;
