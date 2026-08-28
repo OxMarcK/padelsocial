@@ -1,10 +1,31 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { repo } from "@/lib/data";
+import type { PadelEvent } from "@/lib/types";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 
 const OG_DESCRIPTION = "Volg live de standen, je baanindeling en de knock-out.";
+
+/** Whole calendar days from today to `date` — can be negative if the event already started. */
+function daysUntil(date: string): number {
+  const target = new Date(`${date}T00:00:00`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.round((target.getTime() - today.getTime()) / 86_400_000);
+}
+
+/**
+ * "draft" doubles as two very different things: an event an admin is still
+ * configuring (weeks out, no date/teams finalized yet — shouldn't be public)
+ * and "Inchecken", the phase actually happening live on the event's own
+ * morning before poulefase starts. Hiding drafts outright made an event
+ * disappear from the landing page at exactly the moment people are arriving
+ * and looking for it. Once its date has arrived, treat it as public either way.
+ */
+function isPubliclyVisible(e: PadelEvent): boolean {
+  return e.status !== "finished" && (e.status !== "draft" || daysUntil(e.date) <= 0);
+}
 
 function fmtEventDateLong(date: string): string {
   return new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { weekday: "long", day: "numeric", month: "long" });
@@ -22,7 +43,7 @@ function fmtEventDateShort(date: string, startTime: string): string {
 
 export async function generateMetadata(): Promise<Metadata> {
   const events = await repo.listEvents();
-  const upcoming = events.find((e) => e.status !== "draft" && e.status !== "finished");
+  const upcoming = events.find(isPubliclyVisible);
   const title = upcoming ? `${upcoming.name} - ${fmtEventDateShort(upcoming.date, upcoming.startTime)}` : "Padel Social";
 
   // Next merges `openGraph`/`twitter` shallowly against the root layout's metadata —
@@ -37,14 +58,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-/** Whole calendar days from today to `date` — can be negative if the event already started. */
-function daysUntil(date: string): number {
-  const target = new Date(`${date}T00:00:00`);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return Math.round((target.getTime() - today.getTime()) / 86_400_000);
-}
-
 function countdownLabel(days: number): string {
   if (days <= 0) return "Vandaag";
   if (days === 1) return "Morgen";
@@ -53,7 +66,7 @@ function countdownLabel(days: number): string {
 
 export default async function LandingPage() {
   const events = await repo.listEvents();
-  const upcoming = events.find((e) => e.status !== "draft" && e.status !== "finished");
+  const upcoming = events.find(isPubliclyVisible);
   const past = events.filter((e) => e.status === "finished");
 
   const pastWithTeamCounts = await Promise.all(
