@@ -114,17 +114,19 @@ export default async function AdminEventPage({
       {meta.advanceCta && next ? (
         bracketRound && bracketMissingScores > 0 ? (
           <ConfirmButton
+            key={event.status}
             label={meta.advanceCta}
             confirmText={`Nog ${bracketMissingScores} wedstrijd${bracketMissingScores === 1 ? "" : "en"} niet gescoord in ${meta.label.toLowerCase()}. Toch doorgaan?`}
-            action={advancePhase.bind(null, event.id)}
+            action={advancePhase.bind(null, event.id, event.status)}
             variant="secondary"
             successMessage="Doorgezet naar de volgende fase."
           />
         ) : (
           <ConfirmButton
+            key={event.status}
             label={meta.advanceCta}
             confirmText={confirmTextFor(event.status, teams.length)}
-            action={advancePhase.bind(null, event.id)}
+            action={advancePhase.bind(null, event.id, event.status)}
             successMessage="Doorgezet naar de volgende fase."
           />
         )
@@ -339,15 +341,20 @@ export default async function AdminEventPage({
                 missingScores > 0 ? (
                   <div className="mt-3">
                     <ConfirmButton
+                      key={event.currentPouleRound}
                       label="Volgende ronde binnen poulefase"
                       confirmText={`Nog ${missingScores} wedstrijd${missingScores === 1 ? "" : "en"} niet gescoord in ronde ${event.currentPouleRound}. Toch doorgaan naar de volgende ronde?`}
-                      action={advancePouleRound.bind(null, event.id)}
+                      action={advancePouleRound.bind(null, event.id, event.currentPouleRound)}
                       variant="secondary"
                       successMessage="Volgende ronde gestart."
                     />
                   </div>
                 ) : (
-                  <ActionForm action={advancePouleRound.bind(null, event.id)} className="mt-3">
+                  <ActionForm
+                    key={event.currentPouleRound}
+                    action={advancePouleRound.bind(null, event.id, event.currentPouleRound)}
+                    className="mt-3"
+                  >
                     <SaveButton
                       variant="ghost"
                       label="Volgende ronde binnen poulefase"
