@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import type { NewTeamInput } from "@/lib/data/repo";
+import type { EventStatus } from "@/lib/types";
 import { normalizeSlug, assertValidSlug } from "@/lib/slug";
 
 function path(eventId: string) {
@@ -203,16 +204,45 @@ export async function attachVideo(eventId: string, formData: FormData) {
   revalidatePath(path(eventId));
 }
 
-export async function advancePouleRound(eventId: string) {
+/**
+ * `expectedRound` is the round the button was showing when clicked — captured
+ * client-side at that moment. If the round has already moved on by the time
+ * this runs (a duplicate submission: a slow revalidation left the old button
+ * clickable and it got pressed twice, a retried request, browser back/forward
+ * cache, ...) this is a no-op instead of skipping a second round. See
+ * advancePhase below for the same guard on phase transitions, which is the
+ * more damaging version of this — skipping a whole bracket round.
+ */
+export async function advancePouleRound(eventId: string, expectedRound: number) {
   await requireAdmin();
+  const event = await repo.getEvent(eventId);
+  if (event?.currentPouleRound !== expectedRound) {
+    revalidatePath(path(eventId));
+    return;
+  }
   await repo.advancePouleRound(eventId);
   revalidatePath(path(eventId));
 }
 
-export async function advancePhase(eventId: string) {
+/**
+ * `expectedStatus` guards against advancing twice off one click: it's the
+ * status the button was showing when clicked, captured client-side at that
+ * moment. If the event has already moved past it by the time this runs, do
+ * nothing instead of advancing again — otherwise a slow page revalidation
+ * (real network/DB latency) can leave the old "Start kwartfinales"-style
+ * button clickable for a moment after it already fired, and a second click
+ * silently skips an entire bracket round with no matches ever generated for
+ * it (reported live: two clicks on "Start kwartfinales" landed the event on
+ * pauze_2 with the kwartfinales never played).
+ */
+export async function advancePhase(eventId: string, expectedStatus: EventStatus) {
   await requireAdmin();
   const event = await repo.getEvent(eventId);
-  if (event?.status === "pauze_1") {
+  if (event?.status !== expectedStatus) {
+    revalidatePath(path(eventId));
+    return;
+  }
+  if (event.status === "pauze_1") {
     const top8 = await repo.getTop8(eventId);
     if (!top8) {
       const preview = await repo.previewTop8(eventId);
@@ -224,7 +254,7 @@ export async function advancePhase(eventId: string) {
   // flip the status to "finished" with nobody ever ranked (see page.tsx: the
   // generic top-of-page advance button uses this action for every transition,
   // including this last one, so it has to do the right thing on its own).
-  if (event?.status === "prijsuitreiking") {
+  if (event.status === "prijsuitreiking") {
     await repo.finishEvent(eventId);
   } else {
     await repo.advancePhase(eventId);
