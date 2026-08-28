@@ -80,6 +80,68 @@ export async function deleteEvent(eventId: string) {
   redirect("/admin");
 }
 
+/**
+ * Copies an event's config, teams, and poule-indeling into a brand new event —
+ * for trying out a live event's exact roster/setup without touching its real
+ * data. The copy starts at "draft" (no matches generated, no scores) so the
+ * admin can freely click through the whole flow on it.
+ */
+export async function duplicateEvent(eventId: string, formData: FormData) {
+  await requireAdmin();
+  const source = await repo.getEvent(eventId);
+  if (!source) throw new Error("Event niet gevonden.");
+
+  const name = String(formData.get("name") ?? "").trim() || `${source.name} (test)`;
+  const slug = normalizeSlug(String(formData.get("slug") ?? ""));
+  assertValidSlug(slug);
+  if (await repo.getEventBySlug(slug)) {
+    throw new Error(`"${slug}" is al in gebruik door een ander event.`);
+  }
+
+  const copy = await repo.createEvent({
+    name,
+    slug,
+    date: source.date,
+    startTime: source.startTime,
+    location: source.location,
+    courts: source.courts,
+    description: source.description,
+    coverUrl: null,
+  });
+  await repo.updateEvent(copy.id, {
+    pointsWin: source.points.win,
+    pointsDraw: source.points.draw,
+    pointsLoss: source.points.loss,
+  });
+
+  const teams = await repo.listTeams(eventId);
+  if (teams.length > 0) {
+    const newTeams = await repo.bulkAddTeams(
+      copy.id,
+      teams.map((t) => ({
+        name: t.name,
+        player1Name: t.player1.name,
+        player2Name: t.player2.name,
+        contactEmail: t.contactEmail,
+        contactPhone: t.contactPhone,
+      }))
+    );
+    const newIdByIndex = newTeams.map((t) => t.id);
+    const oldIdToNewId = new Map(teams.map((t, i) => [t.id, newIdByIndex[i]]));
+
+    const poules = await repo.listPoules(eventId);
+    if (poules.length > 0) {
+      const assignment: Record<string, string[]> = {};
+      for (const p of poules) {
+        assignment[p.label] = p.teamIds.map((id) => oldIdToNewId.get(id)).filter((id): id is string => Boolean(id));
+      }
+      await repo.savePoules(copy.id, assignment);
+    }
+  }
+
+  redirect(`/admin/e/${copy.id}`);
+}
+
 export async function randomizePoules(eventId: string, formData: FormData) {
   await requireAdmin();
   const teams = await repo.listTeams(eventId);
