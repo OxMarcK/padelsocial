@@ -270,6 +270,35 @@ export const supabaseRepo: DataRepo = {
     return mapEvent(data);
   },
 
+  async recomputePlacements(eventId) {
+    const client = supabaseAdmin();
+    const top8 = await fetchTop8(client, eventId);
+    const rows: { event_id: string; team_id: string; final_rank: number }[] = [];
+    if (top8) {
+      const bracketResults = await fetchBracketResults(client, eventId);
+      const resolved = resolveBracketMatches(top8.top8, bracketResults);
+      for (const r of computeTop8Ranking(resolved, top8.top8)) rows.push({ event_id: eventId, team_id: r.teamId, final_rank: r.rank });
+
+      top8.placementSeeds.forEach((teamId, i) => {
+        rows.push({ event_id: eventId, team_id: teamId, final_rank: 9 + i });
+      });
+    }
+    // Delete-then-insert (not upsert) — a stale row from a previous
+    // finish/recompute for a team that no longer ranks (e.g. the top8 was
+    // republished with different seeds) must not survive the recompute.
+    const { error: deleteError } = await client.from("placements").delete().eq("event_id", eventId);
+    if (deleteError) raise(deleteError);
+    if (rows.length > 0) {
+      const { error } = await client.from("placements").insert(rows);
+      if (error) raise(error);
+    }
+    const { data, error: listError } = await client.from("placements").select("*").eq("event_id", eventId);
+    if (listError) raise(listError);
+    return (data ?? []).map(
+      (row: any): Placement => ({ id: row.id, eventId, teamId: row.team_id, finalRank: row.final_rank })
+    );
+  },
+
   async listTeams(eventId) {
     const client = supabaseAdmin();
     return fetchTeamsWithNames(client, eventId);

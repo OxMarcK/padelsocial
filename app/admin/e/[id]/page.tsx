@@ -19,6 +19,7 @@ import {
   publishPouleMatches,
   publishTop8Override,
   randomizePoules,
+  recomputePlacements,
   recordScore,
   renameTeam,
   savePoulesManual,
@@ -422,6 +423,23 @@ export default async function AdminEventPage({
           ) : null}
 
         </>
+      ) : null}
+
+      {event.status === "finished" ? (
+        <Section title="Eindstand" subtitle="Herbereken de eindstand op basis van de huidige wedstrijduitslagen">
+          <p className="text-xs text-ink-muted">
+            Nodig als het event werd afgerond terwijl de halve finales of finales nog niet (volledig) gescoord waren
+            — de publieke eindstand liet dan &quot;?&quot; zien op die plekken. Werkt de eindstand bij zonder de
+            afgeronde status te wijzigen.
+          </p>
+          <ConfirmButton
+            label="Herbereken eindstand"
+            confirmText="Eindstand opnieuw berekenen op basis van de huidige scores?"
+            action={recomputePlacements.bind(null, event.id)}
+            variant="secondary"
+            successMessage="Eindstand herberekend."
+          />
+        </Section>
       ) : null}
 
       <Section title="Gevarenzone">
