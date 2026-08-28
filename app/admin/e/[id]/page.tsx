@@ -15,6 +15,7 @@ import {
   attachVideo,
   deleteEvent,
   deleteTeam,
+  duplicateEvent,
   publishPouleMatches,
   publishTop8Override,
   randomizePoules,
@@ -24,6 +25,7 @@ import {
   updateEventDetails,
   updatePoints,
 } from "./actions";
+import { normalizeSlug } from "@/lib/slug";
 
 const POULE_LABEL_OPTIONS = Array.from({ length: 8 }, (_, i) => String.fromCharCode(65 + i)); // A..H
 const TABS = [
@@ -163,6 +165,30 @@ export default async function AdminEventPage({
           </label>
           <ActionFormError />
           <SaveButton />
+        </ActionForm>
+      </details>
+
+      <details className="rounded-2xl border border-flood-white/10 bg-court-night p-4">
+        <summary className="cursor-pointer font-display text-lg font-bold uppercase tracking-wide">
+          Dupliceer event
+        </summary>
+        <p className="mt-2 text-xs text-ink-muted">
+          Maakt een nieuw event met dezelfde teams en poule-indeling — handig om een fase of het schema te testen
+          zonder dit event te raken. Het nieuwe event begint bij Inchecken (nog geen wedstrijden of scores).
+        </p>
+        <ActionForm action={duplicateEvent.bind(null, event.id)} className="mt-4 flex flex-col gap-3">
+          <Field label="Naam" name="name" defaultValue={`${event.name} (test)`} required />
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-ink-muted">Slug (voor de URL)</span>
+            <input
+              name="slug"
+              defaultValue={normalizeSlug(`${event.slug}-test`)}
+              required
+              className="rounded-xl border border-flood-white/15 bg-court-night px-3 py-2 text-flood-white"
+            />
+          </label>
+          <ActionFormError />
+          <SaveButton label="Dupliceren" savedLabel="Gedupliceerd" />
         </ActionForm>
       </details>
 
