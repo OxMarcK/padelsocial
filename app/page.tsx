@@ -16,15 +16,15 @@ function daysUntil(date: string): number {
 }
 
 /**
- * "draft" doubles as two very different things: an event an admin is still
- * configuring (weeks out, no date/teams finalized yet — shouldn't be public)
- * and "Inchecken", the phase actually happening live on the event's own
- * morning before poulefase starts. Hiding drafts outright made an event
- * disappear from the landing page at exactly the moment people are arriving
- * and looking for it. Once its date has arrived, treat it as public either way.
+ * Any event that isn't finished yet is "upcoming" — including one still in
+ * "draft" (Inchecken), regardless of how far out its date is. People should
+ * be able to find the event and its schedule as soon as it exists, not only
+ * once its own morning arrives (previously drafts were hidden entirely,
+ * which also made a live event vanish from the landing page right when
+ * people were arriving and looking for it).
  */
 function isPubliclyVisible(e: PadelEvent): boolean {
-  return e.status !== "finished" && (e.status !== "draft" || daysUntil(e.date) <= 0);
+  return e.status !== "finished";
 }
 
 function fmtEventDateLong(date: string): string {
