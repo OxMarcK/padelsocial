@@ -19,10 +19,6 @@ import { Podium } from "@/components/podium";
 import { LivePoll } from "@/components/live-poll";
 import { MatchVideoSection } from "@/components/match-video-list";
 
-function fmtEventDate(date: string): string {
-  return new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { day: "numeric", month: "long" });
-}
-
 export default async function EventPage({ params }: { params: { slug: string } }) {
   const event = await repo.getEventBySlug(params.slug);
   if (!event) notFound();
@@ -232,9 +228,7 @@ function Shell({ children, event }: { children: React.ReactNode; event?: PadelEv
       <div className="flex items-center justify-between gap-3">
         <Logo />
         {event ? (
-          <span className="text-sm text-ink-muted">
-            {fmtEventDate(event.date)} · {event.location}
-          </span>
+          <h1 className="min-w-0 truncate font-display text-2xl font-bold uppercase tracking-wide">{event.name}</h1>
         ) : null}
       </div>
       {children}
@@ -268,7 +262,7 @@ async function ResultsView({
   return (
     <Shell event={event}>
       <div>
-        <h1 className="font-display text-4xl font-bold uppercase tracking-wide">Eindstand</h1>
+        <h2 className="font-display text-4xl font-bold uppercase tracking-wide">Eindstand</h2>
         <p className="text-sm text-ink-muted">
           {event.name} · {event.date} · {teams.length} teams
         </p>
