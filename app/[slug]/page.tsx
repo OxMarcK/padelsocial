@@ -9,7 +9,7 @@ import { buildMatchVideoRows } from "@/lib/match-video";
 import { freePlayCourts } from "@/lib/bracket-engine";
 import type { Match, PadelEvent, Team } from "@/lib/types";
 import { Logo } from "@/components/logo";
-import { EventNav } from "@/components/event-nav";
+import { EventNav } from "@/components/mint/event-nav";
 import { EVENT_NAV_SPACER_CLASS } from "@/lib/event-nav-spacer";
 import { LivePoll } from "@/components/live-poll";
 // Design 6A trial (light "mint" palette) — see components/mint/. Only this page

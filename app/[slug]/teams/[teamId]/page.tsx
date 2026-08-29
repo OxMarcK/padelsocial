@@ -10,7 +10,7 @@ import { buildMatchVideoRows } from "@/lib/match-video";
 import { TeamResultCard } from "@/components/mint/team-result-card";
 import { MatchVideoSection } from "@/components/mint/match-video-list";
 import { Logo } from "@/components/logo";
-import { EventNav } from "@/components/event-nav";
+import { EventNav } from "@/components/mint/event-nav";
 import { EVENT_NAV_SPACER_CLASS } from "@/lib/event-nav-spacer";
 
 export default async function TeamDetailPage({ params }: { params: { slug: string; teamId: string } }) {

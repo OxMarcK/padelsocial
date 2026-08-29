@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { repo } from "@/lib/data";
 import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
 import { Logo } from "@/components/logo";
-import { EventNav } from "@/components/event-nav";
+import { EventNav } from "@/components/mint/event-nav";
 import { EVENT_NAV_SPACER_CLASS } from "@/lib/event-nav-spacer";
 import { TeamSearchGrid } from "./team-search-grid";
 
