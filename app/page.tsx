@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { repo } from "@/lib/data";
-import { groupStandingsByPoule, sortStandings } from "@/lib/standings";
-import type { PadelEvent, PouleStandingRow } from "@/lib/types";
+import type { PadelEvent } from "@/lib/types";
 import { Logo } from "@/components/logo";
 
 const OG_DESCRIPTION = "Volg live de standen, je baanindeling en de knock-out.";
@@ -73,30 +72,6 @@ export default async function LandingPage() {
     past.map(async (e) => ({ event: e, teamCount: (await repo.listTeams(e.id)).length }))
   );
 
-  // Live stand: the overall combined ranking (all poules flattened, same
-  // points/saldo/games-voor tie-break as within a poule) for whichever
-  // upcoming event is currently running its poulefase. Only meaningful once
-  // poules have been drawn.
-  let liveStand: Array<PouleStandingRow & { name: string; pouleLabel: string }> = [];
-  if (upcoming) {
-    const [teams, poules, matches] = await Promise.all([
-      repo.listTeams(upcoming.id),
-      repo.listPoules(upcoming.id),
-      repo.listMatches(upcoming.id),
-    ]);
-    if (poules.length > 0) {
-      const teamNameById = Object.fromEntries(teams.map((t) => [t.id, t.name]));
-      const pouleByTeam = new Map<string, string>();
-      for (const poule of poules) for (const teamId of poule.teamIds) pouleByTeam.set(teamId, poule.label);
-      const pouleStandings = groupStandingsByPoule(poules, matches, upcoming.points);
-      liveStand = sortStandings(pouleStandings.flatMap((p) => p.rows)).map((row) => ({
-        ...row,
-        name: teamNameById[row.teamId] ?? "?",
-        pouleLabel: pouleByTeam.get(row.teamId) ?? "?",
-      }));
-    }
-  }
-
   return (
     <div
       className="min-h-screen font-mint text-mint-ink"
@@ -148,8 +123,6 @@ export default async function LandingPage() {
           <p className="text-sm text-mint-ink-muted">Nog geen aankomend event gepland.</p>
         )}
 
-        {liveStand.length > 0 ? <LiveStand rows={liveStand} /> : null}
-
         {pastWithTeamCounts.length > 0 ? (
           <section className="flex flex-col gap-2">
             <h2 className="font-mint text-2xl font-bold text-mint-ink">Vorige events</h2>
@@ -172,47 +145,6 @@ export default async function LandingPage() {
         ) : null}
       </main>
     </div>
-  );
-}
-
-/**
- * Live stand: the overall ranking across every poule combined. Typography and
- * the rank-badge treatment (solid lime circle for the top 3, pale otherwise)
- * mirror components/mint/poule-table.tsx's row styling exactly, so the same
- * "who's doing well" visual language carries over from Standen to the
- * homepage — the poule letter gets its own small muted badge alongside it
- * since this list spans all four poules at once.
- */
-function LiveStand({ rows }: { rows: Array<PouleStandingRow & { name: string; pouleLabel: string }> }) {
-  return (
-    <section className="flex flex-col gap-2">
-      <h2 className="font-mint text-2xl font-bold text-mint-ink">Live stand</h2>
-      <div className="flex flex-col gap-1 rounded-[28px] bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
-        <div className="flex items-center justify-end gap-2 px-1 pb-1">
-          <span className="w-10 flex-none text-right font-mint text-sm font-medium text-mint-ink-muted">Saldo</span>
-          <span className="w-12 flex-none text-right font-mint text-sm font-medium text-mint-ink-muted">Punten</span>
-        </div>
-        {rows.map((row, i) => (
-          <div key={row.teamId} className="flex items-center gap-2 rounded-2xl px-2 py-2.5">
-            <span
-              className={`flex h-9 w-9 flex-none items-center justify-center rounded-full font-mint text-lg font-bold tabular-nums ${
-                i < 3 ? "bg-mint-lime text-mint-lime-ink" : "bg-mint-lime/15 text-mint-ink-muted"
-              }`}
-            >
-              {i + 1}
-            </span>
-            <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-mint-net/20 font-mint text-[10px] font-bold text-mint-ink">
-              {row.pouleLabel}
-            </span>
-            <span className="min-w-0 flex-1 truncate text-base font-semibold text-mint-ink">{row.name}</span>
-            <span className="w-10 flex-none text-right text-sm tabular-nums text-mint-ink-muted">
-              {row.saldo > 0 ? `+${row.saldo}` : row.saldo}
-            </span>
-            <span className="w-12 flex-none text-right font-mint text-2xl font-bold tabular-nums text-mint-ink">{row.points}</span>
-          </div>
-        ))}
-      </div>
-    </section>
   );
 }
 

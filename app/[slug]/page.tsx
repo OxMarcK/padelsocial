@@ -170,7 +170,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
 
       {showCourts ? (
         <div className="flex flex-col gap-2">
-          <h2 className="font-mint text-lg font-bold text-mint-ink">Live stand</h2>
+          <h2 className="font-mint text-2xl font-bold text-mint-ink">Live stand</h2>
           <StandingsList
             rows={combinedRows.map((r) => ({
               teamId: r.teamId,

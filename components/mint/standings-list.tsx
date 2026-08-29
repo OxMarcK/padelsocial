@@ -47,41 +47,47 @@ export function StandingsList({ rows }: { rows: StandingsRow[] }) {
   }, [rows.map((r) => r.teamId).join(",")]);
 
   return (
-    <div className="rounded-[28px] border border-mint-net/25 bg-mint-surface p-1">
+    <div className="flex flex-col gap-1 rounded-[28px] bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+      <div className="flex items-center justify-end gap-2 px-1 pb-1">
+        <span className="w-10 flex-none text-right font-mint text-sm font-medium text-mint-ink-muted">Saldo</span>
+        <span className="w-12 flex-none text-right font-mint text-sm font-medium text-mint-ink-muted">Punten</span>
+      </div>
       {rows.map((row, i) => {
         const offset = offsets.get(row.teamId) ?? 0;
         const flashed = flashIds.has(row.teamId);
         return (
           <div
             key={row.teamId}
-            className="flex h-11 items-center gap-2 rounded-2xl px-3 text-mint-ink transition-[transform,background-color] duration-500 ease-[cubic-bezier(.2,.9,.2,1)]"
+            className="flex h-11 items-center gap-2 rounded-2xl px-2 text-mint-ink transition-[transform,background-color] duration-500 ease-[cubic-bezier(.2,.9,.2,1)]"
             style={{
               transform: offset ? `translateY(${offset}px)` : undefined,
               backgroundColor: flashed ? "rgba(210,233,92,.35)" : "transparent",
             }}
           >
             <span
-              className={`w-6 font-mint text-xl font-bold tabular-nums ${
-                i === 0 ? "text-mint-lime-ink" : i < 3 ? "text-mint-ink" : "text-mint-ink-muted"
+              className={`flex h-9 w-9 flex-none items-center justify-center rounded-full font-mint text-lg font-bold tabular-nums ${
+                i < 3 ? "bg-mint-lime text-mint-lime-ink" : "bg-mint-lime/15 text-mint-ink-muted"
               }`}
             >
               {i + 1}
             </span>
-            <span className="w-2.5 text-xs font-bold text-mint-lime-ink">{flashed ? "▲" : ""}</span>
+            <span className="w-2.5 flex-none text-xs font-bold text-mint-lime-ink">{flashed ? "▲" : ""}</span>
             {row.pouleLabel ? (
-              <span className="rounded-full bg-mint-net/20 px-1.5 py-0.5 font-mint text-[11px] font-bold text-mint-ink">
+              <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-mint-net/20 font-mint text-[10px] font-bold text-mint-ink">
                 {row.pouleLabel}
               </span>
             ) : null}
-            <span className="flex-1 truncate text-sm font-medium">{row.name}</span>
+            <span className="min-w-0 flex-1 truncate text-base font-semibold text-mint-ink">{row.name}</span>
             {row.resting ? (
-              <span className="rounded-full bg-mint-net/50 px-1.5 py-0.5 font-mint text-[10px] font-bold text-white">RUST</span>
+              <span className="flex-none rounded-full bg-mint-net/50 px-1.5 py-0.5 font-mint text-[10px] font-bold text-white">
+                RUST
+              </span>
             ) : null}
-            <span className="w-9 text-right tabular-nums text-xs text-mint-ink-muted">
+            <span className="w-10 flex-none text-right text-sm tabular-nums text-mint-ink-muted">
               {row.saldo > 0 ? `+${row.saldo}` : row.saldo}
             </span>
             <span
-              className={`w-9 text-right font-mint text-2xl font-bold tabular-nums ${
+              className={`w-12 flex-none text-right font-mint text-2xl font-bold tabular-nums ${
                 flashed ? "text-mint-lime-ink" : "text-mint-ink"
               }`}
             >
