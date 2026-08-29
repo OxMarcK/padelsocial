@@ -72,11 +72,6 @@ export function StandingsList({ rows }: { rows: StandingsRow[] }) {
               {i + 1}
             </span>
             <span className="w-2.5 flex-none text-xs font-bold text-mint-lime-ink">{flashed ? "▲" : ""}</span>
-            {row.pouleLabel ? (
-              <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-mint-net/20 font-mint text-[10px] font-bold text-mint-ink">
-                {row.pouleLabel}
-              </span>
-            ) : null}
             <span className="min-w-0 flex-1 truncate text-base font-semibold text-mint-ink">{row.name}</span>
             {row.resting ? (
               <span className="flex-none rounded-full bg-mint-net/50 px-1.5 py-0.5 font-mint text-[10px] font-bold text-white">
