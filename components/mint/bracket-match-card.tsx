@@ -14,7 +14,7 @@ export function BracketMatchCard({ label, courtNumber, teamAName, teamBName, sco
   const bWins = scoreA !== null && scoreB !== null && scoreB > scoreA;
 
   return (
-    <div className="flex flex-col gap-2 rounded-[24px] bg-white p-3.5 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+    <div className="flex flex-col gap-2 rounded-[24px] bg-white py-3.5 pl-3.5 pr-5 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
       <div className="flex items-baseline gap-2">
         <span className="font-mint text-sm font-bold text-mint-lime-ink">{label}</span>
         <span className="ml-auto font-mint text-[13px] font-bold tracking-wider text-mint-ink-muted">Baan {courtNumber}</span>
