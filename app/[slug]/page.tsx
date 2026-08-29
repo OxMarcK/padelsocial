@@ -131,7 +131,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
         // Per the canvas: "Nu op de baan" sits in its own full-bleed white section
         // (not on the mint gradient) with a large, bold, sentence-case heading —
         // the -mx-5 recovers the page's own side padding so the white bleeds edge-to-edge.
-        <div className="-mx-5 flex flex-col gap-4 bg-white px-5 py-6">
+        <div className="-mx-5 flex flex-col gap-4 bg-mint-bg-2 px-5 py-6">
           <div className="flex items-baseline justify-between">
             <h2 className="font-mint text-3xl font-bold text-mint-ink">Nu op de baan</h2>
             <span className="text-sm text-mint-ink-muted">Alle {event.courts}</span>
