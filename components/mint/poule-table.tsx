@@ -24,7 +24,7 @@ export function PouleTable({ label, rows }: PouleTableProps) {
         </span>
       </div>
       {rows.map((row, i) => (
-        <div key={row.teamId} className={`flex items-center gap-3 rounded-[28px] px-2 py-2.5 ${row.qualifies ? "bg-mint-lime/25" : ""}`}>
+        <div key={row.teamId} className={`flex items-center gap-3 rounded-[28px] py-2.5 pl-[0.8rem] pr-2 ${row.qualifies ? "bg-mint-lime/25" : ""}`}>
           <span
             className={`flex h-9 w-9 flex-none items-center justify-center rounded-full font-mint text-lg font-bold tabular-nums ${
               row.qualifies ? "bg-mint-lime text-mint-lime-ink" : "bg-mint-lime/15 text-mint-ink-muted"
