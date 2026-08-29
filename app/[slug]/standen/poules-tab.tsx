@@ -1,4 +1,4 @@
-import { PouleTable } from "@/components/poule-table";
+import { PouleTable } from "@/components/mint/poule-table";
 import type { PouleStandingRow, Top8Resolution } from "@/lib/types";
 
 export function PoulesTab({
@@ -25,7 +25,7 @@ export function PoulesTab({
           }))}
         />
       ))}
-      <p className="text-xs text-ink-muted">
+      <p className="text-xs text-mint-ink-muted">
         GV/GT = games voor en tegen. Bij gelijke punten beslist het saldo, dan games voor.
       </p>
     </div>

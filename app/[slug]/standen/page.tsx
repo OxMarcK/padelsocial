@@ -42,43 +42,49 @@ export default async function StandenPage({
   const resolvedBracket = top8State ? resolveBracketMatches(top8State.top8, bracketResults) : [];
 
   return (
-    <main className={`mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-5 py-8 ${EVENT_NAV_SPACER_CLASS}`}>
+    <div
+      className={`min-h-screen font-mint text-mint-ink ${EVENT_NAV_SPACER_CLASS}`}
+      style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
+    >
       <LivePoll />
-      <div className="flex items-center justify-between gap-3">
-        <Logo />
-        <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Standen</h1>
-      </div>
-
-      <div className="flex gap-2 rounded-xl border border-flood-white/10 bg-surface p-1">
-        <Link
-          href={`/${event.slug}/standen?tab=poules`}
-          className={`flex-1 rounded-lg py-2 text-center font-display text-sm font-bold uppercase tracking-wide ${
-            tab === "poules" ? "bg-glass-blue text-flood-white" : "text-ink-muted"
-          }`}
-        >
-          Groepsfase
-        </Link>
-        <Link
-          href={`/${event.slug}/standen?tab=bracket`}
-          className={`flex-1 rounded-lg py-2 text-center font-display text-sm font-bold uppercase tracking-wide ${
-            tab === "bracket" ? "bg-glass-blue text-flood-white" : "text-ink-muted"
-          }`}
-        >
-          Knock-outfase
-        </Link>
-      </div>
-
-      {tab === "poules" ? (
-        <PoulesTab pouleStandings={pouleStandings} teamNameById={teamNameById} top8={suggestedTop8.top8} />
-      ) : hasBracket ? (
-        <BracketTab resolvedBracket={resolvedBracket} teamNameById={teamNameById} />
-      ) : (
-        <div className="rounded-2xl border border-flood-white/10 bg-surface p-4 text-sm text-ink-muted">
-          De knock-out is nog niet gepubliceerd. Verwachte top 8 op basis van de huidige poulestand staat vast op het
-          moment dat de organisator publiceert.
+      <header className="sticky top-0 z-10 bg-white">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-5 py-4">
+          <Logo variant="light" />
+          <h1 className="font-mint text-2xl font-bold text-mint-ink">Standen</h1>
         </div>
-      )}
-      <EventNav slug={event.slug} active="standen" />
-    </main>
+      </header>
+      <main className="mx-auto flex max-w-2xl flex-col gap-6 px-5 py-8">
+        <div className="flex gap-2 rounded-full bg-white p-1 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+          <Link
+            href={`/${event.slug}/standen?tab=poules`}
+            className={`flex-1 rounded-full py-2 text-center font-mint text-sm font-bold ${
+              tab === "poules" ? "bg-glass-blue text-white" : "text-mint-ink-muted"
+            }`}
+          >
+            Groepsfase
+          </Link>
+          <Link
+            href={`/${event.slug}/standen?tab=bracket`}
+            className={`flex-1 rounded-full py-2 text-center font-mint text-sm font-bold ${
+              tab === "bracket" ? "bg-glass-blue text-white" : "text-mint-ink-muted"
+            }`}
+          >
+            Knock-outfase
+          </Link>
+        </div>
+
+        {tab === "poules" ? (
+          <PoulesTab pouleStandings={pouleStandings} teamNameById={teamNameById} top8={suggestedTop8.top8} />
+        ) : hasBracket ? (
+          <BracketTab resolvedBracket={resolvedBracket} teamNameById={teamNameById} />
+        ) : (
+          <div className="rounded-[24px] bg-white p-4 text-sm text-mint-ink-muted shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+            De knock-out is nog niet gepubliceerd. Verwachte top 8 op basis van de huidige poulestand staat vast op het
+            moment dat de organisator publiceert.
+          </div>
+        )}
+        <EventNav slug={event.slug} active="standen" />
+      </main>
+    </div>
   );
 }
