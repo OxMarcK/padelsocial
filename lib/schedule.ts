@@ -7,11 +7,62 @@ export interface PhaseWindow {
   endsAt: Date | null;
 }
 
+/** Every event runs in the Netherlands, regardless of which timezone the server happens to run in. */
+const VENUE_TIME_ZONE = "Europe/Amsterdam";
+
+/** Minutes `timeZone`'s wall clock is ahead of UTC at the given instant (DST-aware). */
+function tzOffsetMinutes(date: Date, timeZone: string): number {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      hourCycle: "h23",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
+      .formatToParts(date)
+      .map((p) => [p.type, p.value])
+  );
+  const asUtc = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    Number(parts.hour),
+    Number(parts.minute),
+    Number(parts.second)
+  );
+  return (asUtc - date.getTime()) / 60_000;
+}
+
+/**
+ * `event.date`/`event.startTime` are wall-clock values for `VENUE_TIME_ZONE` —
+ * "10:30" always means 10:30 in Rotterdam, whatever timezone this code
+ * actually executes in (Vercel's Node functions default to UTC). `setHours`
+ * sets the *runtime's local* hour, so parsing "10:30" that way is only
+ * correct by coincidence when the runtime happens to also be Europe/Amsterdam
+ * — it wasn't, which meant every countdown/time-window on the site was off
+ * by the CET/CEST offset (1-2 hours). This instead reads the target
+ * wall-clock fields directly (no runtime-timezone dependency at all) and
+ * shifts by the venue's real DST-aware offset at that date.
+ */
+function zonedWallClockToUtc(dateStr: string, timeStr: string, timeZone: string): Date {
+  const dateParts = dateStr.split("-").map(Number);
+  const timeParts = timeStr.split(":").map(Number);
+  const year = dateParts[0] ?? 1970;
+  const month = dateParts[1] ?? 1;
+  const day = dateParts[2] ?? 1;
+  const hour = timeParts[0] ?? 0;
+  const minute = timeParts[1] ?? 0;
+  const guessUtcMs = Date.UTC(year, month - 1, day, hour, minute, 0);
+  const offsetMin = tzOffsetMinutes(new Date(guessUtcMs), timeZone);
+  return new Date(guessUtcMs - offsetMin * 60_000);
+}
+
 function parseStart(event: PadelEvent): Date {
-  const [h, m] = event.startTime.split(":").map((n) => Number(n));
-  const d = new Date(`${event.date}T00:00:00`);
-  d.setHours(h ?? 0, m ?? 0, 0, 0);
-  return d;
+  return zonedWallClockToUtc(event.date, event.startTime, VENUE_TIME_ZONE);
 }
 
 /**
@@ -74,7 +125,7 @@ export function pouleRoundWindow(pouleStartsAt: Date, round: number): { startsAt
 }
 
 export function fmtTime(d: Date): string {
-  return d.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit", timeZone: VENUE_TIME_ZONE });
 }
 
 export function fmtCountdown(ms: number): string {
