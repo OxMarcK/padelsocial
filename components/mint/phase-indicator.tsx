@@ -1,3 +1,5 @@
+import { LiveCountdown } from "./live-countdown";
+
 export type PhaseKind = "pre" | "live" | "pauze" | "ceremony" | "done";
 
 export interface PhaseIndicatorProps {
@@ -8,14 +10,31 @@ export interface PhaseIndicatorProps {
   kind: PhaseKind;
   countdownText?: string;
   progress?: number;
+  /** ISO timestamps of the current window — when present, the countdown/progress bar tick locally every second via LiveCountdown instead of only updating on LivePoll's 20s refresh. */
+  countdownStartsAt?: string;
+  countdownEndsAt?: string;
 }
 
 /** Design 6A trial variant of components/phase-indicator.tsx, restyled for the light "mint" palette. */
-export function PhaseIndicator({ phaseLabel, subLabel, timeWindowText, nextLine, kind, countdownText, progress }: PhaseIndicatorProps) {
+export function PhaseIndicator({
+  phaseLabel,
+  subLabel,
+  timeWindowText,
+  nextLine,
+  kind,
+  countdownText,
+  progress,
+  countdownStartsAt,
+  countdownEndsAt,
+}: PhaseIndicatorProps) {
   if (kind === "pre" || kind === "pauze" || kind === "ceremony") {
-    return <BillboardIndicator {...{ phaseLabel, subLabel, timeWindowText, nextLine, countdownText, progress }} />;
+    return <BillboardIndicator {...{ phaseLabel, subLabel, timeWindowText, nextLine, countdownText, progress, countdownStartsAt, countdownEndsAt }} />;
   }
-  return <SplitCardIndicator {...{ phaseLabel, subLabel, timeWindowText, nextLine, kind, countdownText, progress }} />;
+  return (
+    <SplitCardIndicator
+      {...{ phaseLabel, subLabel, timeWindowText, nextLine, kind, countdownText, progress, countdownStartsAt, countdownEndsAt }}
+    />
+  );
 }
 
 /**
@@ -33,29 +52,26 @@ function BillboardIndicator({
   timeWindowText,
   nextLine,
   countdownText,
-  progress,
-}: Pick<PhaseIndicatorProps, "phaseLabel" | "subLabel" | "timeWindowText" | "nextLine" | "countdownText" | "progress">) {
+  countdownStartsAt,
+  countdownEndsAt,
+}: Pick<
+  PhaseIndicatorProps,
+  "phaseLabel" | "subLabel" | "timeWindowText" | "nextLine" | "countdownText" | "progress" | "countdownStartsAt" | "countdownEndsAt"
+>) {
   return (
     <div className="rounded-[28px] bg-mint-lime p-4">
       <div className="font-mint text-sm font-semibold text-mint-ink/70">
         {phaseLabel} · {timeWindowText}
       </div>
-      <div className="mt-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-        {countdownText ? (
-          <span className="font-mint text-5xl font-bold leading-none tabular-nums text-mint-ink">{countdownText}</span>
-        ) : null}
-        <span className="flex-none whitespace-nowrap rounded-full bg-black/10 px-3.5 py-1.5 font-mint text-sm font-bold text-mint-ink">
-          {subLabel}
-        </span>
-      </div>
-      {typeof progress === "number" ? (
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-black/10">
-          <div
-            className="h-full rounded-full bg-mint-ink transition-[width] duration-1000 ease-linear"
-            style={{ width: `${Math.round(Math.min(1, Math.max(0, progress)) * 100)}%` }}
-          />
+      {countdownText && countdownStartsAt && countdownEndsAt ? (
+        <LiveCountdown variant="billboard" subLabel={subLabel} startsAtIso={countdownStartsAt} endsAtIso={countdownEndsAt} />
+      ) : (
+        <div className="mt-1 flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
+          <span className="flex-none whitespace-nowrap rounded-full bg-black/10 px-3.5 py-1.5 font-mint text-sm font-bold text-mint-ink">
+            {subLabel}
+          </span>
         </div>
-      ) : null}
+      )}
       <div className="mt-3 text-sm font-medium text-mint-ink">{nextLine}</div>
     </div>
   );
@@ -78,8 +94,12 @@ function SplitCardIndicator({
   nextLine,
   kind,
   countdownText,
-  progress,
-}: Pick<PhaseIndicatorProps, "phaseLabel" | "subLabel" | "timeWindowText" | "nextLine" | "kind" | "countdownText" | "progress">) {
+  countdownStartsAt,
+  countdownEndsAt,
+}: Pick<
+  PhaseIndicatorProps,
+  "phaseLabel" | "subLabel" | "timeWindowText" | "nextLine" | "kind" | "countdownText" | "progress" | "countdownStartsAt" | "countdownEndsAt"
+>) {
   const isLive = kind === "live";
   return (
     <div className="overflow-hidden rounded-[28px] bg-white">
@@ -89,22 +109,13 @@ function SplitCardIndicator({
           <span className="font-mint text-lg font-bold text-mint-ink">{phaseLabel}</span>
           <span className="ml-auto text-sm text-mint-ink-muted">{timeWindowText}</span>
         </div>
-        <div className="mt-1 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-          {countdownText ? (
-            <span className="font-mint text-5xl font-bold leading-none tabular-nums text-mint-ink">{countdownText}</span>
-          ) : null}
-          <span className={countdownText ? "text-base text-mint-ink-muted" : "font-mint text-lg font-bold text-mint-ink"}>
-            {subLabel}
-          </span>
-        </div>
-        {typeof progress === "number" ? (
-          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-mint-net/20">
-            <div
-              className="h-full rounded-full bg-mint-lime transition-[width] duration-1000 ease-linear"
-              style={{ width: `${Math.round(Math.min(1, Math.max(0, progress)) * 100)}%` }}
-            />
+        {countdownText && countdownStartsAt && countdownEndsAt ? (
+          <LiveCountdown variant="split" subLabel={subLabel} startsAtIso={countdownStartsAt} endsAtIso={countdownEndsAt} />
+        ) : (
+          <div className="mt-1 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+            <span className="font-mint text-lg font-bold text-mint-ink">{subLabel}</span>
           </div>
-        ) : null}
+        )}
       </div>
       <div className="flex items-baseline gap-2 bg-mint-ink px-4 py-3.5">
         <span className="font-mint text-sm font-bold text-mint-lime">Straks</span>

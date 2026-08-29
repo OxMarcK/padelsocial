@@ -143,6 +143,9 @@ export interface PhaseIndicatorData {
   kind: "pre" | "live" | "pauze" | "ceremony" | "done";
   countdownText?: string;
   progress?: number;
+  /** ISO timestamps of the current window — lets the client tick the countdown/progress bar every second instead of only on LivePoll's 20s refresh. */
+  countdownStartsAt?: string;
+  countdownEndsAt?: string;
 }
 
 /** Shared by /[slug] and /[slug]/tv so both read the same clock. */
@@ -167,11 +170,15 @@ export function phaseIndicatorData(event: PadelEvent, pouleRoundsCount: number, 
 
   let countdownText: string | undefined;
   let progress: number | undefined;
+  let countdownStartsAt: string | undefined;
+  let countdownEndsAt: string | undefined;
   if (current.endsAt) {
     const totalMs = current.endsAt.getTime() - current.startsAt.getTime();
     const remainingMs = current.endsAt.getTime() - now.getTime();
     countdownText = fmtCountdown(remainingMs);
     progress = totalMs > 0 ? 1 - Math.max(0, remainingMs) / totalMs : 1;
+    countdownStartsAt = current.startsAt.toISOString();
+    countdownEndsAt = current.endsAt.toISOString();
   }
 
   const timeWindowText = current.endsAt ? `tot ${fmtTime(current.endsAt)}` : `vanaf ${fmtTime(current.startsAt)}`;
@@ -194,5 +201,5 @@ export function phaseIndicatorData(event: PadelEvent, pouleRoundsCount: number, 
       ? `${POULE_CHANGEOVER_MINUTES} minuten pauze om te wisselen, dan ronde ${event.currentPouleRound + 1}.`
       : nextPhaseLine;
 
-  return { phaseLabel: meta.label, subLabel, timeWindowText, nextLine, kind, countdownText, progress };
+  return { phaseLabel: meta.label, subLabel, timeWindowText, nextLine, kind, countdownText, progress, countdownStartsAt, countdownEndsAt };
 }

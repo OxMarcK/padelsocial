@@ -50,6 +50,8 @@ export default async function EventPage({ params }: { params: { slug: string } }
           kind={indicator.kind}
           countdownText={indicator.countdownText}
           progress={indicator.progress}
+          countdownStartsAt={indicator.countdownStartsAt}
+          countdownEndsAt={indicator.countdownEndsAt}
         />
         {firstRoundMatches.length > 0 ? (
           <div className="flex flex-col gap-2">
@@ -112,6 +114,8 @@ export default async function EventPage({ params }: { params: { slug: string } }
         kind={indicator.kind}
         countdownText={indicator.countdownText}
         progress={indicator.progress}
+        countdownStartsAt={indicator.countdownStartsAt}
+        countdownEndsAt={indicator.countdownEndsAt}
       />
 
       {showPodium ? (

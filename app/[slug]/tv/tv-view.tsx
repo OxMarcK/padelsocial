@@ -5,6 +5,7 @@ import { LivePoll } from "@/components/live-poll";
 import { Logo } from "@/components/logo";
 import { CourtCard } from "@/components/mint/court-card";
 import { Podium } from "@/components/mint/podium";
+import { LiveCountdownText } from "@/components/mint/live-countdown";
 import type { PhaseIndicatorData } from "@/lib/schedule";
 import type { PouleStandingRow } from "@/lib/types";
 
@@ -68,7 +69,11 @@ export function TvView({
             <span className="h-5 w-5 animate-pulse2 rounded-full bg-mint-lime" />
             <span className="font-mint text-4xl font-bold tracking-[0.1em] text-mint-lime-ink">Live</span>
             <span className="min-w-[270px] text-right font-mint text-8xl font-bold leading-none tabular-nums text-mint-ink">
-              {indicator.countdownText}
+              {indicator.countdownStartsAt && indicator.countdownEndsAt ? (
+                <LiveCountdownText startsAtIso={indicator.countdownStartsAt} endsAtIso={indicator.countdownEndsAt} />
+              ) : (
+                indicator.countdownText
+              )}
             </span>
           </div>
         ) : null}
@@ -96,7 +101,13 @@ export function TvView({
         ) : !showCourts ? (
           <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
             <div className="font-mint text-6xl font-bold tracking-[0.2em] text-mint-lime-ink">Pauze</div>
-            <div className="font-mint text-[10rem] font-bold leading-none tabular-nums text-mint-ink">{indicator.countdownText}</div>
+            <div className="font-mint text-[10rem] font-bold leading-none tabular-nums text-mint-ink">
+              {indicator.countdownStartsAt && indicator.countdownEndsAt ? (
+                <LiveCountdownText startsAtIso={indicator.countdownStartsAt} endsAtIso={indicator.countdownEndsAt} />
+              ) : (
+                indicator.countdownText
+              )}
+            </div>
             <div className="font-mint text-3xl font-semibold text-mint-ink-muted">{indicator.nextLine}</div>
           </div>
         ) : view === 0 ? (
