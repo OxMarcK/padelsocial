@@ -15,10 +15,13 @@ export interface PouleTableProps {
  */
 export function PouleTable({ label, rows }: PouleTableProps) {
   return (
-    <div className="flex flex-col gap-1 rounded-[28px] bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
-      <div className="flex items-center justify-between px-1 pb-1">
+    <div className="flex flex-col gap-1 rounded-[28px] bg-white py-4 pl-4 pr-6 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+      <div className="flex items-center justify-between gap-3 px-1 pb-1">
         <span className="font-mint text-2xl font-bold text-mint-ink">Poule {label}</span>
-        <span className="font-mint text-sm font-medium text-mint-ink-muted">Punten</span>
+        <span className="flex items-center gap-3">
+          <span className="w-12 flex-none text-right font-mint text-sm font-medium text-mint-ink-muted">Saldo</span>
+          <span className="w-14 flex-none text-right font-mint text-sm font-medium text-mint-ink-muted">Punten</span>
+        </span>
       </div>
       {rows.map((row, i) => (
         <div key={row.teamId} className={`flex items-center gap-3 rounded-2xl px-2 py-2.5 ${row.qualifies ? "bg-mint-lime/25" : ""}`}>
@@ -35,8 +38,10 @@ export function PouleTable({ label, rows }: PouleTableProps) {
               {row.played} · {row.won}-{row.drawn}-{row.lost} · {row.gamesFor}:{row.gamesAgainst}
             </span>
           </span>
-          <span className="flex-none text-sm tabular-nums text-mint-ink-muted">{row.saldo > 0 ? `+${row.saldo}` : row.saldo}</span>
-          <span className="w-9 flex-none text-right font-mint text-2xl font-bold tabular-nums text-mint-ink">{row.points}</span>
+          <span className="w-12 flex-none text-right text-sm tabular-nums text-mint-ink-muted">
+            {row.saldo > 0 ? `+${row.saldo}` : row.saldo}
+          </span>
+          <span className="w-14 flex-none text-right font-mint text-2xl font-bold tabular-nums text-mint-ink">{row.points}</span>
         </div>
       ))}
     </div>
