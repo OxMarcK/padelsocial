@@ -28,8 +28,8 @@ export interface CourtCardProps {
  * - Inner lines, from full to subtle: the net (100% white, full height,
  *   splits the court into a left and right square) → each of those 2 squares
  *   gets its own subtle vertical center line (4 rectangles left to right) →
- *   only the right pair of rectangles additionally gets a subtle horizontal
- *   center line (asymmetric — not mirrored on the left pair).
+ *   only the middle pair of rectangles (2 & 3 — the ones straddling the net)
+ *   additionally gets a subtle horizontal center line, not the outer pair.
  */
 export function CourtCard({ courtNumber, eyebrow, teamA, teamB, highlight, size = "sm", freePlay }: CourtCardProps) {
   const scoreSize = size === "lg" ? "text-5xl" : "text-4xl";
@@ -48,8 +48,8 @@ export function CourtCard({ courtNumber, eyebrow, teamA, teamB, highlight, size 
         {/* Each of the 2 squares the net makes gets its own subtle vertical center line. */}
         <div className={`absolute inset-y-3 left-1/4 w-[1.5px] -translate-x-1/2 bg-white/45 ${freePlay ? "opacity-40" : ""}`} />
         <div className={`absolute inset-y-3 left-3/4 w-[1.5px] -translate-x-1/2 bg-white/45 ${freePlay ? "opacity-40" : ""}`} />
-        {/* Only the right pair of rectangles additionally gets a subtle horizontal center line. */}
-        <div className={`absolute left-1/2 right-3 top-1/2 h-[1.5px] -translate-y-1/2 bg-white/45 ${freePlay ? "opacity-40" : ""}`} />
+        {/* Only the middle pair of rectangles (2 & 3, straddling the net) gets a subtle horizontal center line. */}
+        <div className={`absolute left-1/4 right-1/4 top-1/2 h-[1.5px] -translate-y-1/2 bg-white/45 ${freePlay ? "opacity-40" : ""}`} />
         {freePlay ? (
           <div className="absolute inset-0 flex items-center justify-center font-mint text-sm font-bold text-mint-ink-muted">
             Vrij te spelen
