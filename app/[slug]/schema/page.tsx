@@ -33,11 +33,11 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
   const bracketDefById = Object.fromEntries(BRACKET_DEFINITION.map((d) => [d.id, d]));
 
   return (
-    <main
-      className="min-h-screen px-16 py-12 font-mint text-mint-ink"
+    <div
+      className="min-h-screen font-mint text-mint-ink"
       style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
     >
-      <header className="flex items-center gap-7 border-b-2 border-mint-net/30 pb-6">
+      <header className="flex items-center gap-7 bg-white px-16 py-8">
         <Logo variant="light" size="xl" />
         <div className="h-11 w-0.5 bg-mint-net/40" />
         <div>
@@ -48,6 +48,7 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
         </div>
       </header>
 
+      <main className="px-16 py-12">
       <section className="mt-10 flex flex-col gap-4">
         <h2 className="font-mint text-3xl font-bold text-mint-ink">Dagindeling</h2>
         <div className="flex overflow-x-auto rounded-[28px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">
@@ -187,6 +188,7 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
           </table>
         </div>
       </section>
-    </main>
+      </main>
+    </div>
   );
 }

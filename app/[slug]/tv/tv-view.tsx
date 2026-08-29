@@ -50,11 +50,11 @@ export function TvView({
 
   return (
     <div
-      className="min-h-screen px-16 py-12 font-mint text-mint-ink"
+      className="min-h-screen font-mint text-mint-ink"
       style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
     >
       <LivePoll />
-      <div className="flex items-center gap-7 border-b-2 border-mint-net/30 pb-6">
+      <div className="flex items-center gap-7 bg-white px-16 py-8">
         <Logo variant="light" size="xl" />
         <div className="h-11 w-0.5 bg-mint-net/40" />
         <div>
@@ -74,6 +74,7 @@ export function TvView({
         ) : null}
       </div>
 
+      <div className="px-16 py-12">
       <div className="pt-8">
         {showPodium ? (
           <div className="flex flex-col gap-10">
@@ -161,6 +162,7 @@ export function TvView({
             <span className={`h-2 w-14 rounded-full ${view === 1 ? "bg-mint-lime" : "bg-mint-net/40"}`} />
           </div>
         ) : null}
+      </div>
       </div>
     </div>
   );
