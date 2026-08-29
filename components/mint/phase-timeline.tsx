@@ -24,10 +24,8 @@ export function PhaseTimeline({ windows, currentStatus }: { windows: PhaseWindow
               isCurrent ? "border-mint-lime bg-mint-lime" : "border-mint-net/40 bg-mint-surface"
             }`}
           >
-            <div className={`font-mint text-sm font-bold ${isCurrent ? "text-mint-lime-ink" : "text-mint-ink"}`}>
-              {PHASE_META[status].label}
-            </div>
-            <div className={`text-xs ${isCurrent ? "text-mint-lime-ink/70" : "text-mint-ink-muted"}`}>{timeText}</div>
+            <div className="font-mint text-sm font-bold text-mint-ink">{PHASE_META[status].label}</div>
+            <div className={`text-xs ${isCurrent ? "text-mint-ink/70" : "text-mint-ink-muted"}`}>{timeText}</div>
           </div>
         );
       })}
