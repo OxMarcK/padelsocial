@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   title: "Padel Social",
   description: DEFAULT_DESCRIPTION,
   manifest: "/manifest.json",
-  themeColor: "#0E1420",
+  themeColor: "#CFE4D7",
   viewport: { width: "device-width", initialScale: 1 },
   // Fallback link-preview card — pages with their own event context (the landing
   // page, /[slug]) override title/description via generateMetadata but inherit
