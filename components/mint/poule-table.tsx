@@ -5,45 +5,40 @@ export interface PouleTableProps {
   rows: Array<PouleStandingRow & { name: string; qualifies?: boolean }>;
 }
 
-/** Design 6A trial variant of components/poule-table.tsx, restyled for the light "mint" palette. */
+/**
+ * Design 6A trial variant of components/poule-table.tsx, restyled for the
+ * light "mint" palette. Per the canvas reference (screenshot check): the
+ * title + "Punten" label live inside the same white card as the rows (not
+ * above it), rank numbers sit in a circular badge (solid lime for a
+ * qualifying row, pale lime otherwise), and qualifying rows are shown with a
+ * lime-tinted row background instead of a separate "Naar KO" pill.
+ */
 export function PouleTable({ label, rows }: PouleTableProps) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-mint text-xl font-bold text-mint-ink">Poule {label}</span>
-        <span className="font-mint text-[11px] font-bold tracking-wider text-mint-ink-muted">G · W-GL-V · GV:GT · PTN</span>
+    <div className="flex flex-col gap-1 rounded-[28px] bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+      <div className="flex items-center justify-between px-1 pb-1">
+        <span className="font-mint text-2xl font-bold text-mint-ink">Poule {label}</span>
+        <span className="font-mint text-sm font-medium text-mint-ink-muted">Punten</span>
       </div>
-      <div className="overflow-hidden rounded-[24px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">
-        {rows.map((row, i) => (
-          <div
-            key={row.teamId}
-            className={`flex items-center gap-2.5 border-b border-mint-net/15 px-3 py-2.5 last:border-b-0 ${
-              row.qualifies ? "border-l-[3px] border-l-mint-lime" : ""
+      {rows.map((row, i) => (
+        <div key={row.teamId} className={`flex items-center gap-3 rounded-2xl px-2 py-2.5 ${row.qualifies ? "bg-mint-lime/25" : ""}`}>
+          <span
+            className={`flex h-9 w-9 flex-none items-center justify-center rounded-full font-mint text-lg font-bold tabular-nums ${
+              row.qualifies ? "bg-mint-lime text-mint-lime-ink" : "bg-mint-lime/15 text-mint-ink-muted"
             }`}
           >
-            <span className={`w-[18px] font-mint text-xl font-bold tabular-nums ${i === 0 ? "text-mint-lime-ink" : "text-mint-ink-muted"}`}>
-              {i + 1}
+            {i + 1}
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span className="truncate text-base font-semibold text-mint-ink">{row.name}</span>
+            <span className="text-xs tabular-nums text-mint-ink-muted">
+              {row.played} · {row.won}-{row.drawn}-{row.lost} · {row.gamesFor}:{row.gamesAgainst}
             </span>
-            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span className="flex items-center gap-1.5">
-                <span className="truncate text-sm font-semibold text-mint-ink">{row.name}</span>
-                {row.qualifies ? (
-                  <span className="inline-flex items-center rounded-full bg-mint-lime px-1.5 py-0.5 font-mint text-[10px] font-bold text-mint-lime-ink">
-                    Naar KO
-                  </span>
-                ) : null}
-              </span>
-              <span className="text-xs tabular-nums text-mint-ink-muted">
-                {row.played} · {row.won}-{row.drawn}-{row.lost} · {row.gamesFor}:{row.gamesAgainst} ({row.saldo > 0 ? "+" : ""}
-                {row.saldo})
-              </span>
-            </span>
-            <span className={`font-mint text-2xl font-bold tabular-nums ${row.qualifies ? "text-mint-lime-ink" : "text-mint-ink"}`}>
-              {row.points}
-            </span>
-          </div>
-        ))}
-      </div>
+          </span>
+          <span className="flex-none text-sm tabular-nums text-mint-ink-muted">{row.saldo > 0 ? `+${row.saldo}` : row.saldo}</span>
+          <span className="w-9 flex-none text-right font-mint text-2xl font-bold tabular-nums text-mint-ink">{row.points}</span>
+        </div>
+      ))}
     </div>
   );
 }

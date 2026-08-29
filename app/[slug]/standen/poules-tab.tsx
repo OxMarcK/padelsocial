@@ -26,7 +26,8 @@ export function PoulesTab({
         />
       ))}
       <p className="text-xs text-mint-ink-muted">
-        GV/GT = games voor en tegen. Bij gelijke punten beslist het saldo, dan games voor.
+        G = gespeeld, W-GL-V = gewonnen-gelijk-verloren, GV:GT = games voor en tegen. Bij gelijke punten beslist het saldo, dan
+        games voor.
       </p>
     </div>
   );
