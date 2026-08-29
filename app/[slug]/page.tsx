@@ -9,15 +9,17 @@ import { buildMatchVideoRows } from "@/lib/match-video";
 import { freePlayCourts } from "@/lib/bracket-engine";
 import type { Match, PadelEvent, Team } from "@/lib/types";
 import { Logo } from "@/components/logo";
-import { EventNav } from "@/components/event-nav";
+import { EventNav } from "@/components/mint/event-nav";
 import { EVENT_NAV_SPACER_CLASS } from "@/lib/event-nav-spacer";
-import { PhaseIndicator } from "@/components/phase-indicator";
-import { PhaseTimeline } from "@/components/phase-timeline";
-import { CourtCard } from "@/components/court-card";
-import { StandingsList } from "@/components/standings-list";
-import { Podium } from "@/components/podium";
 import { LivePoll } from "@/components/live-poll";
-import { MatchVideoSection } from "@/components/match-video-list";
+// Design 6A trial (light "mint" palette) — see components/mint/. Only this page
+// has been redone; standen/teams/homepage still use the original components above.
+import { PhaseIndicator } from "@/components/mint/phase-indicator";
+import { PhaseTimeline } from "@/components/mint/phase-timeline";
+import { CourtCard } from "@/components/mint/court-card";
+import { StandingsList } from "@/components/mint/standings-list";
+import { Podium } from "@/components/mint/podium";
+import { MatchVideoSection } from "@/components/mint/match-video-list";
 
 export default async function EventPage({ params }: { params: { slug: string } }) {
   const event = await repo.getEventBySlug(params.slug);
@@ -51,15 +53,15 @@ export default async function EventPage({ params }: { params: { slug: string } }
         />
         {firstRoundMatches.length > 0 ? (
           <div className="flex flex-col gap-2">
-            <h2 className="font-display text-lg font-bold uppercase tracking-wide">Zo beginnen we</h2>
+            <h2 className="font-mint text-lg font-bold text-mint-ink">Zo beginnen we</h2>
             <div className="flex flex-col gap-2">
               {firstRoundMatches.map((m) => (
-                <div key={m.id} className="rounded-2xl border border-flood-white/10 bg-surface p-4">
-                  <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider">
-                    <span className="text-lime-serve">{m.label}</span>
-                    <span className="text-ink-muted">Baan {m.courtNumber}</span>
+                <div key={m.id} className="rounded-[24px] border border-mint-net/25 bg-mint-surface p-4">
+                  <div className="flex items-center justify-between text-xs font-bold">
+                    <span className="text-mint-lime-ink">{m.label}</span>
+                    <span className="text-mint-ink-muted">Baan {m.courtNumber}</span>
                   </div>
-                  <div className="mt-1 text-sm">
+                  <div className="mt-1 text-sm text-mint-ink">
                     {teamNameById[m.teamAId ?? ""] ?? "?"} vs {teamNameById[m.teamBId ?? ""] ?? "?"}
                   </div>
                 </div>
@@ -67,7 +69,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
             </div>
           </div>
         ) : (
-          <p className="text-ink-muted">Dit event wordt nog opgezet.</p>
+          <p className="text-mint-ink-muted">Dit event wordt nog opgezet.</p>
         )}
         <EventNav slug={event.slug} active="event" />
       </Shell>
@@ -120,44 +122,45 @@ export default async function EventPage({ params }: { params: { slug: string } }
               return { rank: rank as 1 | 2 | 3, name: row ? teamNameById[row.teamId] ?? "?" : "?" };
             })}
           />
-          <div className="text-center text-sm text-ink-muted">Banen zijn vrij — kom naar binnen voor de prijsuitreiking.</div>
+          <div className="text-center text-sm text-mint-ink-muted">Banen zijn vrij — kom naar binnen voor de prijsuitreiking.</div>
           <RankingList rows={[...top8, ...placementRanking]} teamNameById={teamNameById} />
         </div>
       ) : null}
 
       {showCourts ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {currentMatches
-            .sort((a, b) => a.courtNumber - b.courtNumber)
-            .map((m) => (
-              <CourtCard
-                key={m.id}
-                courtNumber={m.courtNumber}
-                eyebrow={m.label}
-                teamA={{ name: m.teamAId ? teamNameById[m.teamAId] ?? "?" : "?", score: m.scoreA, winning: won(m, "A") }}
-                teamB={{ name: m.teamBId ? teamNameById[m.teamBId] ?? "?" : "?", score: m.scoreB, winning: won(m, "B") }}
-              />
+        <div className="flex flex-col gap-4">
+          <h2 className="font-mint text-3xl font-bold text-mint-ink">Nu op de baan</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {currentMatches
+              .sort((a, b) => a.courtNumber - b.courtNumber)
+              .map((m) => (
+                <CourtCard
+                  key={m.id}
+                  courtNumber={m.courtNumber}
+                  eyebrow={m.label}
+                  teamA={{ name: m.teamAId ? teamNameById[m.teamAId] ?? "?" : "?", score: m.scoreA, winning: won(m, "A") }}
+                  teamB={{ name: m.teamBId ? teamNameById[m.teamBId] ?? "?" : "?", score: m.scoreB, winning: won(m, "B") }}
+                />
+              ))}
+            {freeCourts.map((court) => (
+              <CourtCard key={`free-${court}`} courtNumber={court} freePlay />
             ))}
-          {freeCourts.map((court) => (
-            <CourtCard key={`free-${court}`} courtNumber={court} freePlay />
-          ))}
+          </div>
         </div>
       ) : null}
 
       {restingTeamIds.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <h2 className="font-display text-lg font-bold uppercase tracking-wide">
-            Rust deze ronde <span className="text-sm normal-case tracking-normal text-ink-muted">{restingTeamIds.length} teams</span>
+          <h2 className="font-mint text-lg font-bold text-mint-ink">
+            Rust deze ronde <span className="text-sm font-normal text-mint-ink-muted">{restingTeamIds.length} teams</span>
           </h2>
           <div className="flex flex-wrap gap-2">
             {restingTeamIds.map((teamId) => (
               <span
                 key={teamId}
-                className="flex items-center gap-1.5 rounded-full border border-flood-white/15 px-3 py-1.5 text-sm"
+                className="flex items-center gap-1.5 rounded-full border border-mint-net/30 bg-mint-surface px-3 py-1.5 text-sm text-mint-ink"
               >
-                <span className="rounded bg-net-grey px-1.5 py-0.5 font-display text-[10px] font-bold tracking-wider text-court-night">
-                  RUST
-                </span>
+                <span className="rounded-full bg-mint-net/60 px-1.5 py-0.5 font-mint text-[10px] font-bold text-white">RUST</span>
                 {teamNameById[teamId] ?? "?"}
               </span>
             ))}
@@ -167,7 +170,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
 
       {showCourts ? (
         <div className="flex flex-col gap-2">
-          <h2 className="font-display text-lg font-bold uppercase tracking-wide">Live stand</h2>
+          <h2 className="font-mint text-2xl font-bold text-mint-ink">Live stand</h2>
           <StandingsList
             rows={combinedRows.map((r) => ({
               teamId: r.teamId,
@@ -200,14 +203,14 @@ function RankingList({
   slug?: string;
 }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-flood-white/10 bg-surface">
+    <div className="overflow-hidden rounded-[24px] border border-mint-net/25 bg-mint-surface">
       {rows
         .sort((a, b) => a.rank - b.rank)
         .map((r) => {
           const row = (
-            <div className="flex items-center gap-3 border-b border-net-grey/20 px-4 py-2.5 last:border-b-0">
-              <span className="w-8 font-display text-xl font-bold tabular-nums text-ink-muted">{r.rank}</span>
-              <span className="flex-1 truncate text-sm font-medium">{teamNameById[r.teamId] ?? "?"}</span>
+            <div className="flex items-center gap-3 border-b border-mint-net/20 px-4 py-2.5 last:border-b-0">
+              <span className="w-8 font-mint text-xl font-bold tabular-nums text-mint-ink-muted">{r.rank}</span>
+              <span className="flex-1 truncate text-sm font-medium text-mint-ink">{teamNameById[r.teamId] ?? "?"}</span>
             </div>
           );
           return slug ? (
@@ -222,17 +225,27 @@ function RankingList({
   );
 }
 
+// Design 6A trial: light "mint" gradient background + Plus Jakarta Sans, applied only
+// to this page (see components/mint/ for the matching component restyles). The
+// gradient is painted directly on <main> — opaque and min-h-screen — so it fully
+// covers the dark noise texture from the root layout's <body> for this route.
+// Per the 6A canvas: the header sits on its own solid white bar — logo and title
+// aren't floating directly on the gradient — while everything else keeps the mint
+// background. Sticky so it stays put while scrolling, matching the reference.
 function Shell({ children, event }: { children: React.ReactNode; event?: PadelEvent }) {
   return (
-    <main className={`mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-5 py-8 ${EVENT_NAV_SPACER_CLASS}`}>
-      <div className="flex items-center justify-between gap-3">
-        <Logo />
-        {event ? (
-          <h1 className="min-w-0 truncate font-display text-2xl font-bold uppercase tracking-wide">{event.name}</h1>
-        ) : null}
-      </div>
-      {children}
-    </main>
+    <div
+      className={`min-h-screen font-mint text-mint-ink ${EVENT_NAV_SPACER_CLASS}`}
+      style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
+    >
+      <header className="sticky top-0 z-10 bg-white">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-5 py-4">
+          <Logo variant="light" />
+          {event ? <h1 className="min-w-0 truncate font-mint text-2xl font-bold text-mint-ink">{event.name}</h1> : null}
+        </div>
+      </header>
+      <main className="mx-auto flex max-w-2xl flex-col gap-6 px-5 py-8">{children}</main>
+    </div>
   );
 }
 
@@ -262,8 +275,8 @@ async function ResultsView({
   return (
     <Shell event={event}>
       <div>
-        <h2 className="font-display text-4xl font-bold uppercase tracking-wide">Eindstand</h2>
-        <p className="text-sm text-ink-muted">
+        <h2 className="font-mint text-4xl font-bold text-mint-ink">Eindstand</h2>
+        <p className="text-sm text-mint-ink-muted">
           {event.name} · {event.date} · {teams.length} teams
         </p>
       </div>
@@ -283,7 +296,7 @@ async function ResultsView({
         <RankingList rows={rest.map((p) => ({ teamId: p.teamId, rank: p.finalRank ?? 0 }))} teamNameById={teamNameById} slug={event.slug} />
       </Section>
 
-      <p className="text-center text-xs text-ink-muted">Tik op een team voor de kaart en de deelknop.</p>
+      <p className="text-center text-xs text-mint-ink-muted">Tik op een team voor de kaart en de deelknop.</p>
 
       <MatchVideoSection title="Video's" rows={videoRows} />
       <EventNav slug={event.slug} active="event" />
@@ -294,7 +307,7 @@ async function ResultsView({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="font-display text-lg font-bold uppercase tracking-wide">{title}</h2>
+      <h2 className="font-mint text-lg font-bold text-mint-ink">{title}</h2>
       {children}
     </section>
   );

@@ -3,13 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 
-export function TeamSearchGrid({
-  slug,
-  teams,
-}: {
-  slug: string;
-  teams: Array<{ id: string; name: string; pouleLabel: string | null }>;
-}) {
+export interface TeamListRow {
+  id: string;
+  name: string;
+  pouleLabel: string | null;
+  player1Name: string;
+  player2Name: string;
+  finalRank: number | null;
+}
+
+function firstName(name: string): string {
+  return name.trim().split(/\s+/)[0] ?? name;
+}
+
+/** Design 6A trial: Teams list restyled to match the Claude Design canvas's ranked-list format. */
+export function TeamSearchGrid({ slug, teams }: { slug: string; teams: TeamListRow[] }) {
   const [query, setQuery] = useState("");
   const filtered = teams.filter((t) => t.name.toLowerCase().includes(query.toLowerCase()));
 
@@ -19,25 +27,39 @@ export function TeamSearchGrid({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Zoek een team…"
-        className="h-12 rounded-xl border border-flood-white/15 bg-surface px-4 text-flood-white placeholder:text-ink-muted"
+        className="h-12 rounded-full bg-white px-4 text-mint-ink shadow-[0_1px_3px_rgba(20,35,28,.08)] placeholder:text-mint-ink-muted"
       />
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+      <div className="flex flex-col gap-2.5">
         {filtered.map((t) => (
           <Link
             key={t.id}
             href={`/${slug}/teams/${t.id}`}
             prefetch={false}
-            className="flex flex-col gap-1 rounded-xl border border-flood-white/10 bg-surface px-3 py-3 hover:bg-flood-white/5"
+            className="flex items-center gap-3.5 rounded-[24px] bg-white px-4 py-3.5 shadow-[0_1px_3px_rgba(20,35,28,.08)] hover:brightness-95"
           >
-            {t.pouleLabel ? (
-              <span className="w-fit rounded bg-flood-white/10 px-1.5 py-0.5 font-display text-[10px] font-bold tracking-wider text-ink">
-                POULE {t.pouleLabel}
+            <span className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-mint-lime/40 font-mint text-lg font-bold text-mint-lime-ink">
+              {t.pouleLabel ?? "?"}
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="flex items-center gap-2">
+                <span className="truncate font-mint text-lg font-bold text-mint-ink">{t.name}</span>
+                {t.finalRank !== null && t.finalRank <= 3 ? (
+                  <span className="flex-none rounded-full bg-mint-lime px-2.5 py-0.5 font-mint text-xs font-bold text-mint-lime-ink">
+                    Top 3
+                  </span>
+                ) : t.finalRank !== null && t.finalRank <= 8 ? (
+                  <span className="flex-none rounded-full bg-mint-lime/40 px-2.5 py-0.5 font-mint text-xs font-bold text-mint-lime-ink">
+                    Top 8
+                  </span>
+                ) : null}
               </span>
-            ) : null}
-            <span className="truncate text-sm font-medium">{t.name}</span>
+              <span className="truncate text-sm text-mint-ink-muted">
+                {firstName(t.player1Name)} & {firstName(t.player2Name)}
+              </span>
+            </span>
           </Link>
         ))}
-        {filtered.length === 0 ? <p className="col-span-full text-sm text-ink-muted">Geen teams gevonden.</p> : null}
+        {filtered.length === 0 ? <p className="text-sm text-mint-ink-muted">Geen teams gevonden.</p> : null}
       </div>
     </div>
   );

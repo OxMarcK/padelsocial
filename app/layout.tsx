@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Barlow_Condensed, Inter } from "next/font/google";
+import { Barlow_Condensed, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { RegisterServiceWorker } from "@/components/register-sw";
 import "./globals.css";
 
@@ -14,6 +14,14 @@ const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-body",
+  display: "swap",
+});
+
+// Design 6A trial only (see components/mint/) — not used anywhere else yet.
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
   display: "swap",
 });
 
@@ -46,7 +54,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="nl" className={`${barlowCondensed.variable} ${inter.variable}`}>
+    <html lang="nl" className={`${barlowCondensed.variable} ${inter.variable} ${plusJakartaSans.variable}`}>
       <body className="bg-noise-test font-body text-flood-white antialiased">
         <RegisterServiceWorker />
         {children}

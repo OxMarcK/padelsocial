@@ -19,6 +19,7 @@ const KNOCKOUT_GROUPS: Array<{ title: string; round: 1 | 2 | 3; ids: string[] }>
   { title: "Finales", round: 3, ids: ["GRAND", "BRONZE"] },
 ];
 
+/** Design 6A trial: /schema restyled for the light "mint" palette — no canvas reference for this screen, extrapolates the established tokens directly onto the existing tables. */
 export default async function SchemaPage({ params }: { params: { slug: string } }) {
   const event = await repo.getEventBySlug(params.slug);
   if (!event) notFound();
@@ -32,25 +33,29 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
   const bracketDefById = Object.fromEntries(BRACKET_DEFINITION.map((d) => [d.id, d]));
 
   return (
-    <main className="min-h-screen bg-court-night px-16 py-12 text-flood-white">
-      <header className="flex items-center gap-7 border-b-2 border-net-grey/35 pb-6">
-        <Logo size="xl" />
-        <div className="h-11 w-0.5 bg-net-grey" />
+    <div
+      className="min-h-screen font-mint text-mint-ink"
+      style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
+    >
+      <header className="flex items-center gap-7 bg-white px-16 py-8">
+        <Logo variant="light" size="xl" />
+        <div className="h-11 w-0.5 bg-mint-net/40" />
         <div>
-          <div className="font-display text-5xl font-bold uppercase leading-none tracking-wide">{event.name}</div>
-          <div className="mt-1.5 text-xl text-ink-muted">
+          <div className="font-mint text-5xl font-bold leading-none text-mint-ink">{event.name}</div>
+          <div className="mt-1.5 text-xl text-mint-ink-muted">
             {event.date} · {event.startTime} · {event.location}
           </div>
         </div>
       </header>
 
+      <main className="px-16 py-12">
       <section className="mt-10 flex flex-col gap-4">
-        <h2 className="font-display text-3xl font-bold uppercase tracking-wide">Dagindeling</h2>
-        <div className="flex overflow-x-auto rounded-2xl border border-flood-white/10 bg-surface">
+        <h2 className="font-mint text-3xl font-bold text-mint-ink">Dagindeling</h2>
+        <div className="flex overflow-x-auto rounded-[28px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">
           {windows.map((w) => (
-            <div key={w.status} className="min-w-[170px] flex-1 border-r border-flood-white/10 px-5 py-4 last:border-r-0">
-              <div className="font-display text-base font-bold uppercase tracking-wide">{PHASE_META[w.status].label}</div>
-              <div className="mt-1 text-sm tabular-nums text-ink-muted">
+            <div key={w.status} className="min-w-[170px] flex-1 border-r border-mint-net/15 px-5 py-4 last:border-r-0">
+              <div className="font-mint text-base font-bold text-mint-ink">{PHASE_META[w.status].label}</div>
+              <div className="mt-1 text-sm tabular-nums text-mint-ink-muted">
                 {fmtTime(w.startsAt)}
                 {w.endsAt ? `–${fmtTime(w.endsAt)}` : ""}
               </div>
@@ -61,18 +66,18 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
 
       {schedule.roundsCount > 0 ? (
         <section className="mt-10 flex flex-col gap-4">
-          <h2 className="font-display text-3xl font-bold uppercase tracking-wide">Poulefase</h2>
-          <div className="overflow-x-auto rounded-2xl border border-flood-white/10">
-            <table className="w-full min-w-[900px] border-collapse bg-surface">
+          <h2 className="font-mint text-3xl font-bold text-mint-ink">Poulefase</h2>
+          <div className="overflow-x-auto rounded-[28px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+            <table className="w-full min-w-[900px] border-collapse">
               <thead>
                 <tr>
-                  <th className="w-40 border-b border-flood-white/10 bg-surface-alt px-4 py-3 text-left font-display text-sm font-bold uppercase tracking-wide text-ink-muted">
+                  <th className="w-40 border-b border-mint-net/15 bg-mint-net/10 px-4 py-3 text-left font-mint text-sm font-bold text-mint-ink-muted">
                     Ronde
                   </th>
                   {courtNumbers.map((c) => (
                     <th
                       key={c}
-                      className="border-b border-flood-white/10 bg-surface-alt px-3 py-3 text-center font-display text-sm font-bold uppercase tracking-wide text-ink-muted"
+                      className="border-b border-mint-net/15 bg-mint-net/10 px-3 py-3 text-center font-mint text-sm font-bold text-mint-ink-muted"
                     >
                       Baan {c}
                     </th>
@@ -84,10 +89,10 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
                   const { startsAt, endsAt } = pouleRoundWindow(pouleStartsAt, round);
                   const byCourt = Object.fromEntries(schedule.matches.filter((m) => m.round === round).map((m) => [m.court, m]));
                   return (
-                    <tr key={round} className="border-b border-flood-white/8 last:border-b-0">
+                    <tr key={round} className="border-b border-mint-net/10 last:border-b-0">
                       <td className="px-4 py-2.5 align-middle">
-                        <div className="font-display text-lg font-bold">Ronde {round}</div>
-                        <div className="text-xs tabular-nums text-ink-muted">
+                        <div className="font-mint text-lg font-bold text-mint-ink">Ronde {round}</div>
+                        <div className="text-xs tabular-nums text-mint-ink-muted">
                           {fmtTime(startsAt)}–{fmtTime(endsAt)}
                         </div>
                       </td>
@@ -96,14 +101,14 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
                         return (
                           <td key={court} className="p-1.5 align-middle">
                             {m ? (
-                              <div className="rounded-xl border border-glass-blue/50 bg-glass-blue/15 px-3 py-2">
-                                <div className="font-display text-xs font-bold uppercase tracking-wide text-lime-serve">Poule {m.pouleLabel}</div>
-                                <div className="truncate text-sm font-medium">
+                              <div className="rounded-xl border border-glass-blue/40 bg-glass-blue/10 px-3 py-2">
+                                <div className="font-mint text-xs font-bold text-mint-lime-ink">Poule {m.pouleLabel}</div>
+                                <div className="truncate text-sm font-medium text-mint-ink">
                                   {teamNameById[m.teamAId] ?? "?"} – {teamNameById[m.teamBId] ?? "?"}
                                 </div>
                               </div>
                             ) : (
-                              <div className="rounded-xl border border-dashed border-net-grey/40 px-3 py-2 text-center font-display text-xs font-bold uppercase tracking-wide text-ink-muted">
+                              <div className="rounded-xl border border-dashed border-mint-net/40 px-3 py-2 text-center font-mint text-xs font-bold text-mint-ink-muted">
                                 Vrij
                               </div>
                             )}
@@ -120,18 +125,18 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
       ) : null}
 
       <section className="mt-10 flex flex-col gap-4">
-        <h2 className="font-display text-3xl font-bold uppercase tracking-wide">Knock-out</h2>
-        <div className="overflow-x-auto rounded-2xl border border-flood-white/10">
-          <table className="w-full min-w-[900px] border-collapse bg-surface">
+        <h2 className="font-mint text-3xl font-bold text-mint-ink">Knock-out</h2>
+        <div className="overflow-x-auto rounded-[28px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+          <table className="w-full min-w-[900px] border-collapse">
             <thead>
               <tr>
-                <th className="w-40 border-b border-flood-white/10 bg-surface-alt px-4 py-3 text-left font-display text-sm font-bold uppercase tracking-wide text-ink-muted">
+                <th className="w-40 border-b border-mint-net/15 bg-mint-net/10 px-4 py-3 text-left font-mint text-sm font-bold text-mint-ink-muted">
                   Fase
                 </th>
                 {courtNumbers.map((c) => (
                   <th
                     key={c}
-                    className="border-b border-flood-white/10 bg-surface-alt px-3 py-3 text-center font-display text-sm font-bold uppercase tracking-wide text-ink-muted"
+                    className="border-b border-mint-net/15 bg-mint-net/10 px-3 py-3 text-center font-mint text-sm font-bold text-mint-ink-muted"
                   >
                     Baan {c}
                   </th>
@@ -148,11 +153,11 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
                     .map((def) => [def.court, def])
                 );
                 return (
-                  <tr key={group.title} className="border-b border-flood-white/8 last:border-b-0">
+                  <tr key={group.title} className="border-b border-mint-net/10 last:border-b-0">
                     <td className="px-4 py-2.5 align-middle">
-                      <div className="font-display text-lg font-bold">{group.title}</div>
+                      <div className="font-mint text-lg font-bold text-mint-ink">{group.title}</div>
                       {window ? (
-                        <div className="text-xs tabular-nums text-ink-muted">
+                        <div className="text-xs tabular-nums text-mint-ink-muted">
                           {fmtTime(window.startsAt)}–{fmtTime(window.endsAt!)}
                         </div>
                       ) : null}
@@ -162,14 +167,14 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
                       return (
                         <td key={court} className="p-1.5 align-middle">
                           {def ? (
-                            <div className="rounded-xl border border-clay-orange/50 bg-clay-orange/15 px-3 py-2">
-                              <div className="font-display text-xs font-bold uppercase tracking-wide text-clay-orange">{def.label}</div>
-                              <div className="truncate text-sm font-medium">
+                            <div className="rounded-xl border border-clay-orange/40 bg-clay-orange/10 px-3 py-2">
+                              <div className="font-mint text-xs font-bold text-clay-orange">{def.label}</div>
+                              <div className="truncate text-sm font-medium text-mint-ink">
                                 {describeSource(def.teamA)} – {describeSource(def.teamB)}
                               </div>
                             </div>
                           ) : (
-                            <div className="rounded-xl border border-dashed border-net-grey/40 px-3 py-2 text-center font-display text-xs font-bold uppercase tracking-wide text-ink-muted">
+                            <div className="rounded-xl border border-dashed border-mint-net/40 px-3 py-2 text-center font-mint text-xs font-bold text-mint-ink-muted">
                               Vrij
                             </div>
                           )}
@@ -183,6 +188,7 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
           </table>
         </div>
       </section>
-    </main>
+      </main>
+    </div>
   );
 }

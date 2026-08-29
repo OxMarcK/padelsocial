@@ -7,10 +7,10 @@ import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
 import { computeSchedule, fmtTime, pouleRoundWindow } from "@/lib/schedule";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
 import { buildMatchVideoRows } from "@/lib/match-video";
-import { TeamResultCard } from "@/components/team-result-card";
-import { MatchVideoSection } from "@/components/match-video-list";
+import { TeamResultCard } from "@/components/mint/team-result-card";
+import { MatchVideoSection } from "@/components/mint/match-video-list";
 import { Logo } from "@/components/logo";
-import { EventNav } from "@/components/event-nav";
+import { EventNav } from "@/components/mint/event-nav";
 import { EVENT_NAV_SPACER_CLASS } from "@/lib/event-nav-spacer";
 
 export default async function TeamDetailPage({ params }: { params: { slug: string; teamId: string } }) {
@@ -60,11 +60,19 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
   );
 
   return (
-    <main className={`mx-auto flex min-h-screen max-w-md flex-col gap-6 px-5 py-8 ${EVENT_NAV_SPACER_CLASS}`}>
-      <Logo />
+    <div
+      className={`min-h-screen font-mint text-mint-ink ${EVENT_NAV_SPACER_CLASS}`}
+      style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
+    >
+      <header className="sticky top-0 z-10 bg-white">
+        <div className="mx-auto max-w-md px-5 py-4">
+          <Logo variant="light" />
+        </div>
+      </header>
+      <main className="mx-auto flex max-w-md flex-col gap-6 px-5 py-8">
       <Link
         href={`/${event.slug}/teams`}
-        className="inline-flex w-fit items-center gap-1.5 font-display text-sm font-bold uppercase tracking-wide text-ink-muted hover:text-flood-white"
+        className="inline-flex w-fit items-center gap-1.5 font-mint text-sm font-bold text-mint-ink-muted hover:text-mint-ink"
       >
         <span aria-hidden>&lt;</span> Teams
       </Link>
@@ -83,7 +91,7 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
 
       {pouleMatches.length > 0 && event.status !== "finished" ? (
         <section className="flex flex-col gap-2">
-          <h2 className="font-display text-lg font-bold uppercase tracking-wide">Poule Schema</h2>
+          <h2 className="font-mint text-lg font-bold text-mint-ink">Poule Schema</h2>
           <div className="flex flex-col gap-1.5">
             {pouleMatches.map((m) => {
               const opp = m.teamAId === team.id ? m.teamBId : m.teamAId;
@@ -91,14 +99,14 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
               const oppScore = m.teamAId === team.id ? m.scoreB : m.scoreA;
               const { startsAt, endsAt } = pouleRoundWindow(pouleWindow.startsAt, m.roundNumber);
               return (
-                <div key={m.id} className="flex items-center justify-between rounded-xl bg-surface px-3 py-2 text-sm">
+                <div key={m.id} className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-sm shadow-[0_1px_3px_rgba(20,35,28,.08)]">
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-xs text-ink-muted">
+                    <span className="text-xs text-mint-ink-muted">
                       Ronde {m.roundNumber} · Baan {m.courtNumber} · {fmtTime(startsAt)}–{fmtTime(endsAt)}
                     </span>
-                    <span className="truncate">{opp ? teamNameById[opp] ?? "?" : "?"}</span>
+                    <span className="truncate text-mint-ink">{opp ? teamNameById[opp] ?? "?" : "?"}</span>
                   </div>
-                  <span className="tabular-nums text-ink-muted">{myScore !== null ? `${myScore}-${oppScore}` : "–"}</span>
+                  <span className="tabular-nums text-mint-ink-muted">{myScore !== null ? `${myScore}-${oppScore}` : "–"}</span>
                 </div>
               );
             })}
@@ -109,6 +117,7 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
       <MatchVideoSection title="Wedstrijden" rows={videoRows} />
 
       <EventNav slug={event.slug} active="teams" />
-    </main>
+      </main>
+    </div>
   );
 }
