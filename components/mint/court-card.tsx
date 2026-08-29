@@ -25,8 +25,11 @@ export interface CourtCardProps {
  *   into a letterbox strip on a wide card.
  * - A fully-opaque white court *outline*, inset from the blue card edge with
  *   visible blue margin around it (not edge-to-edge) — like a picture frame.
- * - The net/half lines *inside* that outline are a lower-opacity white, not
- *   the same full-strength white as the outline.
+ * - Inner lines, from full to subtle: the net (100% white, full height,
+ *   splits the court into a left and right square) → each of those 2 squares
+ *   gets its own subtle vertical center line (4 rectangles left to right) →
+ *   only the right pair of rectangles additionally gets a subtle horizontal
+ *   center line (asymmetric — not mirrored on the left pair).
  */
 export function CourtCard({ courtNumber, eyebrow, teamA, teamB, highlight, size = "sm", freePlay }: CourtCardProps) {
   const scoreSize = size === "lg" ? "text-5xl" : "text-4xl";
@@ -40,9 +43,13 @@ export function CourtCard({ courtNumber, eyebrow, teamA, teamB, highlight, size 
       <div className={`relative aspect-[2/1] w-full overflow-hidden rounded-[24px] ${freePlay ? "bg-mint-net/30" : "bg-glass-blue"}`}>
         {/* Court outline — fully opaque white, inset with a visible blue margin around it. */}
         <div className={`absolute inset-3 rounded-2xl border-2 border-white ${freePlay ? "opacity-40" : ""}`} />
-        {/* Net (vertical) + half line (horizontal) — lower opacity than the outline, within it. */}
-        <div className={`absolute inset-y-3 left-1/2 w-[2px] -translate-x-1/2 bg-white/45 ${freePlay ? "opacity-40" : ""}`} />
-        <div className={`absolute inset-x-3 top-1/2 h-[2px] -translate-y-1/2 bg-white/45 ${freePlay ? "opacity-40" : ""}`} />
+        {/* Net — full height, 100% opaque, same strength as the outline. */}
+        <div className={`absolute inset-y-3 left-1/2 w-[2px] -translate-x-1/2 bg-white ${freePlay ? "opacity-40" : ""}`} />
+        {/* Each of the 2 squares the net makes gets its own subtle vertical center line. */}
+        <div className={`absolute inset-y-3 left-1/4 w-[1.5px] -translate-x-1/2 bg-white/45 ${freePlay ? "opacity-40" : ""}`} />
+        <div className={`absolute inset-y-3 left-3/4 w-[1.5px] -translate-x-1/2 bg-white/45 ${freePlay ? "opacity-40" : ""}`} />
+        {/* Only the right pair of rectangles additionally gets a subtle horizontal center line. */}
+        <div className={`absolute left-1/2 right-3 top-1/2 h-[1.5px] -translate-y-1/2 bg-white/45 ${freePlay ? "opacity-40" : ""}`} />
         {freePlay ? (
           <div className="absolute inset-0 flex items-center justify-center font-mint text-sm font-bold text-mint-ink-muted">
             Vrij te spelen
