@@ -55,7 +55,6 @@ export function TeamSearchGrid({ slug, teams }: { slug: string; teams: TeamListR
               </span>
               <span className="truncate text-sm text-mint-ink-muted">
                 {firstName(t.player1Name)} & {firstName(t.player2Name)}
-                {t.pouleLabel ? ` · poule ${t.pouleLabel}` : ""}
               </span>
             </span>
           </Link>
