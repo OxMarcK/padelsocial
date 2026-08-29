@@ -17,9 +17,11 @@ export interface CourtCardProps {
 /**
  * Design 6A trial variant of components/court-card.tsx — restyled for the light
  * "mint" palette. Per the canvas reference: each match is its own white rounded
- * card (not bare on the section background) with a header row — big "Baan N",
- * a smaller "Poule · Ronde" line, and a dark "Live" pill — above the blue court
- * rectangle, which keeps the same white-lines-on-blue look as the dark theme.
+ * card (not bare on the section background) with a header row — big "Baan N"
+ * and a smaller "Poule · Ronde" line, no status pill — above the blue court
+ * rectangle. The court lines are a plain "+": one full-height net line and one
+ * full-width line crossing it, splitting the court into 4 equal quadrants
+ * (simpler than the dark theme's service-line marks).
  */
 export function CourtCard({ courtNumber, eyebrow, teamA, teamB, highlight, size = "sm", freePlay }: CourtCardProps) {
   const height = size === "lg" ? "h-[150px]" : "h-28";
@@ -27,26 +29,13 @@ export function CourtCard({ courtNumber, eyebrow, teamA, teamB, highlight, size 
 
   return (
     <div className={`flex flex-col gap-4 rounded-[32px] bg-white p-5 shadow-[0_1px_3px_rgba(20,35,28,.08)] ${highlight ? "ring-2 ring-mint-lime" : ""}`}>
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-baseline gap-2 min-w-0">
-          <span className="font-mint text-2xl font-bold leading-none text-mint-ink">Baan {courtNumber}</span>
-          {!freePlay && eyebrow ? <span className="truncate font-mint text-sm font-medium text-mint-lime-ink">{eyebrow}</span> : null}
-        </div>
-        {freePlay ? (
-          <span className="flex-none rounded-full bg-mint-net/20 px-3 py-1 font-mint text-xs font-bold text-mint-ink-muted">Vrij</span>
-        ) : (
-          <span className="flex flex-none items-center gap-1.5 rounded-full bg-mint-ink px-3 py-1.5">
-            <span className="h-2 w-2 rounded-full bg-mint-lime animate-pulse2" />
-            <span className="font-mint text-sm font-bold text-white">Live</span>
-          </span>
-        )}
+      <div className="flex items-baseline gap-2 min-w-0">
+        <span className="font-mint text-2xl font-bold leading-none text-mint-ink">Baan {courtNumber}</span>
+        {!freePlay && eyebrow ? <span className="truncate font-mint text-sm font-medium text-mint-lime-ink">{eyebrow}</span> : null}
       </div>
       <div className={`relative ${height} overflow-hidden rounded-[24px] ${freePlay ? "bg-mint-net/30" : "bg-glass-blue"} shadow-[inset_0_0_0_3px_rgba(255,255,255,.55)]`}>
         <div className={`absolute inset-y-0 left-1/2 w-[3px] -translate-x-1/2 bg-white/90 ${freePlay ? "opacity-30" : ""}`} />
-        <div className={`absolute inset-y-0 left-[22%] w-[2px] bg-white/40 ${freePlay ? "opacity-30" : ""}`} />
-        <div className={`absolute inset-y-0 left-[78%] w-[2px] bg-white/40 ${freePlay ? "opacity-30" : ""}`} />
-        <div className={`absolute left-0 top-1/2 h-[2px] w-[22%] bg-white/40 ${freePlay ? "opacity-30" : ""}`} />
-        <div className={`absolute right-0 top-1/2 h-[2px] w-[22%] bg-white/40 ${freePlay ? "opacity-30" : ""}`} />
+        <div className={`absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 bg-white/90 ${freePlay ? "opacity-30" : ""}`} />
         {freePlay ? (
           <div className="absolute inset-0 flex items-center justify-center font-mint text-sm font-bold text-mint-ink-muted">
             Vrij te spelen
