@@ -22,6 +22,7 @@ async function requestLink(formData: FormData) {
 
 export default function AdminLoginPage({ searchParams }: { searchParams: { sent?: string; error?: string } }) {
   return (
+    <div className="min-h-screen bg-court-night">
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
       <Logo size="lg" />
       <div>
@@ -52,5 +53,6 @@ export default function AdminLoginPage({ searchParams }: { searchParams: { sent?
         </form>
       )}
     </main>
+    </div>
   );
 }

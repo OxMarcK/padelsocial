@@ -103,6 +103,7 @@ export default async function AdminEventPage({
   const tabHref = (key: TabKey) => `/admin/e/${event.id}?tab=${key}`;
 
   return (
+    <div className="min-h-screen bg-court-night">
     <main className="mx-auto flex max-w-2xl flex-col gap-8 px-6 py-10">
       <div>
         <h1 className="font-display text-4xl font-bold uppercase tracking-wide">{event.name}</h1>
@@ -451,6 +452,7 @@ export default async function AdminEventPage({
         />
       </Section>
     </main>
+    </div>
   );
 }
 

@@ -33,6 +33,7 @@ export default async function AdminHomePage() {
   const events = await repo.listEvents();
 
   return (
+    <div className="min-h-screen bg-court-night">
     <main className="mx-auto flex max-w-2xl flex-col gap-8 px-6 py-10">
       <h1 className="font-display text-4xl font-bold uppercase tracking-wide">Events</h1>
 
@@ -87,5 +88,6 @@ export default async function AdminHomePage() {
         </form>
       </details>
     </main>
+    </div>
   );
 }
