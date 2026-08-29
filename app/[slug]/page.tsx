@@ -226,18 +226,23 @@ function RankingList({
 // to this page (see components/mint/ for the matching component restyles). The
 // gradient is painted directly on <main> — opaque and min-h-screen — so it fully
 // covers the dark noise texture from the root layout's <body> for this route.
+// Per the 6A canvas: the header sits on its own solid white bar — logo and title
+// aren't floating directly on the gradient — while everything else keeps the mint
+// background. Sticky so it stays put while scrolling, matching the reference.
 function Shell({ children, event }: { children: React.ReactNode; event?: PadelEvent }) {
   return (
-    <main
-      className={`mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-5 py-8 font-mint text-mint-ink ${EVENT_NAV_SPACER_CLASS}`}
+    <div
+      className={`min-h-screen font-mint text-mint-ink ${EVENT_NAV_SPACER_CLASS}`}
       style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
     >
-      <div className="flex items-center justify-between gap-3">
-        <Logo variant="light" />
-        {event ? <h1 className="min-w-0 truncate font-mint text-2xl font-bold text-mint-ink">{event.name}</h1> : null}
-      </div>
-      {children}
-    </main>
+      <header className="sticky top-0 z-10 bg-white">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-5 py-4">
+          <Logo variant="light" />
+          {event ? <h1 className="min-w-0 truncate font-mint text-2xl font-bold text-mint-ink">{event.name}</h1> : null}
+        </div>
+      </header>
+      <main className="mx-auto flex max-w-2xl flex-col gap-6 px-5 py-8">{children}</main>
+    </div>
   );
 }
 
