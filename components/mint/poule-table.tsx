@@ -19,8 +19,8 @@ export function PouleTable({ label, rows }: PouleTableProps) {
       <div className="flex items-center justify-between gap-3 px-1 pb-1">
         <span className="font-mint text-2xl font-bold text-mint-ink">Poule {label}</span>
         <span className="flex items-center gap-3">
-          <span className="w-12 flex-none text-right font-mint text-sm font-medium text-mint-ink-muted">Saldo</span>
-          <span className="w-14 flex-none text-right font-mint text-sm font-medium text-mint-ink-muted">Punten</span>
+          <span className="w-12 flex-none text-center font-mint text-sm font-medium text-mint-ink-muted">Saldo</span>
+          <span className="w-14 flex-none text-center font-mint text-sm font-medium text-mint-ink-muted">Punten</span>
         </span>
       </div>
       {rows.map((row, i) => (
@@ -38,10 +38,10 @@ export function PouleTable({ label, rows }: PouleTableProps) {
               {row.played} · {row.won}-{row.drawn}-{row.lost} · {row.gamesFor}:{row.gamesAgainst}
             </span>
           </span>
-          <span className="w-12 flex-none text-right text-sm tabular-nums text-mint-ink-muted">
+          <span className="w-12 flex-none text-center text-sm tabular-nums text-mint-ink-muted">
             {row.saldo > 0 ? `+${row.saldo}` : row.saldo}
           </span>
-          <span className="w-14 flex-none text-right font-mint text-2xl font-bold tabular-nums text-mint-ink">{row.points}</span>
+          <span className="w-14 flex-none text-center font-mint text-2xl font-bold tabular-nums text-mint-ink">{row.points}</span>
         </div>
       ))}
     </div>
