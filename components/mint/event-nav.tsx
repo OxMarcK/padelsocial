@@ -60,7 +60,7 @@ export function EventNav({ slug, active }: { slug: string; active: "event" | "st
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
       <nav
         className={`pointer-events-auto flex items-center rounded-full bg-white shadow-[0_4px_16px_rgba(20,35,28,.16)] transition-all duration-200 ${
-          compact ? "gap-0.5 px-2 py-1.5" : "gap-1.5 px-3 py-2.5"
+          compact ? "gap-1 px-2.5 py-2" : "gap-1.5 px-3 py-2.5"
         }`}
       >
         {ITEMS.map(({ key, label, Icon }) => {
@@ -71,10 +71,10 @@ export function EventNav({ slug, active }: { slug: string; active: "event" | "st
               href={key === "event" ? `/${slug}` : `/${slug}/${key}`}
               aria-label={label}
               className={`flex items-center justify-center rounded-full transition-all duration-200 ${
-                compact ? "h-9 w-9" : "h-12 w-12"
+                compact ? "h-10 w-10" : "h-12 w-12"
               } ${isActive ? "bg-mint-ink text-white" : "text-mint-ink-muted"}`}
             >
-              <Icon className={`transition-all duration-200 ${compact ? "h-4 w-4" : "h-5 w-5"}`} />
+              <Icon className={`transition-all duration-200 ${compact ? "h-[18px] w-[18px]" : "h-5 w-5"}`} />
             </Link>
           );
         })}
