@@ -15,8 +15,10 @@ export default async function TeamsPage({ params }: { params: { slug: string } }
 
   return (
     <main className={`mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-5 py-8 ${EVENT_NAV_SPACER_CLASS}`}>
-      <Logo />
-      <h1 className="font-display text-4xl font-bold uppercase tracking-wide">Teams</h1>
+      <div className="flex items-center justify-between gap-3">
+        <Logo />
+        <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Teams</h1>
+      </div>
       <TeamSearchGrid
         slug={event.slug}
         teams={teams.map((t) => ({ id: t.id, name: t.name, pouleLabel: pouleByTeam.get(t.id) ?? null }))}
