@@ -16,8 +16,8 @@ export function BracketMatchCard({ label, courtNumber, teamAName, teamBName, sco
   return (
     <div className="flex flex-col gap-2 rounded-[24px] bg-white py-3.5 pl-3.5 pr-5 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
       <div className="flex items-baseline gap-2">
-        <span className="font-mint text-sm font-bold text-mint-lime-ink">{label}</span>
-        <span className="ml-auto font-mint text-[13px] font-bold tracking-wider text-mint-ink-muted">Baan {courtNumber}</span>
+        <span className="font-mint text-base font-bold text-mint-lime-ink">{label}</span>
+        <span className="ml-auto font-mint text-sm font-medium text-mint-ink-muted">Baan {courtNumber}</span>
       </div>
       <MatchRow name={teamAName} score={scoreA} winning={aWins} />
       <div className="h-px bg-mint-net/20" />
@@ -30,7 +30,7 @@ export function BracketMatchCard({ label, courtNumber, teamAName, teamBName, sco
 function MatchRow({ name, score, winning }: { name: string; score: number | null; winning: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <span className={`flex-1 truncate text-sm ${winning ? "font-bold text-mint-lime-ink" : "font-medium text-mint-ink"}`}>{name}</span>
+      <span className={`flex-1 truncate text-base ${winning ? "font-bold text-mint-lime-ink" : "font-semibold text-mint-ink"}`}>{name}</span>
       <span className={`font-mint text-2xl font-bold tabular-nums ${winning ? "text-mint-lime-ink" : "text-mint-ink-muted"}`}>
         {score ?? "–"}
       </span>

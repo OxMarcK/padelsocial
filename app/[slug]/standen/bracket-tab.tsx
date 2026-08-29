@@ -22,7 +22,7 @@ export function BracketTab({
       {GROUPS.map((group) => (
         <div key={group.title} className="flex flex-col gap-2">
           <div className="flex items-baseline gap-2">
-            <h2 className="font-mint text-lg font-bold text-mint-ink">{group.title}</h2>
+            <h2 className="font-mint text-2xl font-bold text-mint-ink">{group.title}</h2>
             <span className="text-xs text-mint-ink-muted">{group.note}</span>
           </div>
           {group.ids.map((id) => {
