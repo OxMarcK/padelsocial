@@ -406,7 +406,12 @@ export default async function AdminEventPage({
                       className="flex flex-col gap-1.5 rounded-xl bg-flood-white/5 p-3 text-sm"
                     >
                       <input type="hidden" name="matchId" value={m.id} />
-                      <span className="truncate text-ink-muted">{m.label}</span>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="truncate text-ink-muted">{m.label}</span>
+                        <span className="truncate font-semibold text-flood-white">
+                          {m.teamAId ? teamNameById[m.teamAId] ?? "?" : "?"} vs {m.teamBId ? teamNameById[m.teamBId] ?? "?" : "?"}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-2">
                         <input
                           type="url"
