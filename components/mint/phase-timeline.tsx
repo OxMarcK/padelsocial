@@ -8,7 +8,7 @@ export function PhaseTimeline({ windows, currentStatus }: { windows: PhaseWindow
   const statuses = PHASE_ORDER.filter((s) => s !== "finished");
 
   return (
-    <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+    <div className="-mx-5 flex gap-2 overflow-x-auto px-6 pb-1">
       {statuses.map((status) => {
         const window = byStatus.get(status);
         const isCurrent = status === currentStatus;
