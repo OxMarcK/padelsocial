@@ -3,10 +3,10 @@ import { repo } from "@/lib/data";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
 import { computeSchedule, pouleRoundWindow, fmtTime } from "@/lib/schedule";
 import { PHASE_META } from "@/lib/phases";
-import { BRACKET_DEFINITION, type TeamSource } from "@/lib/bracket-engine";
+import { BRACKET_DEFINITION, resolveBracketMatches, type ResolvedBracketMatch, type TeamSource } from "@/lib/bracket-engine";
 import { Logo } from "@/components/logo";
 
-/** The bracket hasn't been played yet at this point, so a slot can only ever describe the *rule* that decides it. */
+/** Before the top-8 is published/played, a slot can only describe the *rule* that decides it. */
 function describeSource(source: TeamSource): string {
   if (source.type === "seed") return `Seed ${source.index + 1}`;
   if (source.type === "winnerOf") return `Winnaar ${source.matchId}`;
@@ -24,13 +24,36 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
   const event = await repo.getEventBySlug(params.slug);
   if (!event) notFound();
 
-  const [teams, poules] = await Promise.all([repo.listTeams(event.id), repo.listPoules(event.id)]);
+  const [teams, poules, matches, top8State] = await Promise.all([
+    repo.listTeams(event.id),
+    repo.listPoules(event.id),
+    repo.listMatches(event.id),
+    repo.getTop8(event.id),
+  ]);
   const teamNameById = Object.fromEntries(teams.map((t) => [t.id, t.name]));
   const schedule = generatePouleSchedule(poules.map((p) => ({ label: p.label, teamIds: p.teamIds })), event.courts);
   const windows = computeSchedule(event, schedule.roundsCount || 1);
   const pouleStartsAt = windows.find((w) => w.status === "poulefase")!.startsAt;
   const courtNumbers = Array.from({ length: event.courts }, (_, i) => i + 1);
   const bracketDefById = Object.fromEntries(BRACKET_DEFINITION.map((d) => [d.id, d]));
+
+  // Once the top-8 is published, show the actual team names instead of the
+  // generic "Seed N"/"Winnaar KF1" placeholders — same source the Standen
+  // bracket tab uses (see app/[slug]/standen/page.tsx).
+  const bracketResults: Record<string, { scoreA: number; scoreB: number }> = {};
+  for (const m of matches) {
+    if (m.bracketMatchId && m.scoreA !== null && m.scoreB !== null) {
+      bracketResults[m.bracketMatchId] = { scoreA: m.scoreA, scoreB: m.scoreB };
+    }
+  }
+  const resolvedById: Record<string, ResolvedBracketMatch> = top8State
+    ? Object.fromEntries(resolveBracketMatches(top8State.top8, bracketResults).map((m) => [m.id, m]))
+    : {};
+
+  function describeSlot(defId: string, source: TeamSource, side: "A" | "B"): string {
+    const resolvedId = side === "A" ? resolvedById[defId]?.teamAId : resolvedById[defId]?.teamBId;
+    return resolvedId ? teamNameById[resolvedId] ?? "?" : describeSource(source);
+  }
 
   return (
     <div
@@ -170,7 +193,7 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
                             <div className="rounded-xl border border-clay-orange/40 bg-clay-orange/10 px-3 py-2">
                               <div className="font-mint text-xs font-bold text-clay-orange">{def.label}</div>
                               <div className="truncate text-sm font-medium text-mint-ink">
-                                {describeSource(def.teamA)} – {describeSource(def.teamB)}
+                                {describeSlot(def.id, def.teamA, "A")} – {describeSlot(def.id, def.teamB, "B")}
                               </div>
                             </div>
                           ) : (
