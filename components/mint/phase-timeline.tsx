@@ -20,8 +20,8 @@ export function PhaseTimeline({ windows, currentStatus }: { windows: PhaseWindow
         return (
           <div
             key={status}
-            className={`flex-none rounded-full border px-4 py-2 ${
-              isCurrent ? "border-mint-lime bg-mint-lime" : "border-mint-net/40 bg-mint-surface"
+            className={`flex-none rounded-full px-4 py-2 shadow-[0_1px_3px_rgba(20,35,28,.08)] ${
+              isCurrent ? "bg-mint-lime" : "bg-white"
             }`}
           >
             <div className="font-mint text-sm font-bold text-mint-ink">{PHASE_META[status].label}</div>
