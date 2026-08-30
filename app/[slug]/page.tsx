@@ -126,8 +126,8 @@ export default async function EventPage({ params }: { params: { slug: string } }
               const row = top8.find((r) => r.rank === rank);
               return { rank: rank as 1 | 2 | 3, name: row ? teamNameById[row.teamId] ?? "?" : "?" };
             })}
+            caption="Banen zijn vrij — kom naar binnen voor de prijsuitreiking."
           />
-          <div className="text-center text-sm text-mint-ink-muted">Banen zijn vrij — kom naar binnen voor de prijsuitreiking.</div>
           <RankingList rows={[...top8, ...placementRanking]} teamNameById={teamNameById} />
         </div>
       ) : null}
