@@ -109,7 +109,9 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
                     <span className="text-xs text-mint-ink-muted">
                       Ronde {m.roundNumber} · Baan {m.courtNumber} · {fmtTime(startsAt)}–{fmtTime(endsAt)}
                     </span>
-                    <span className="truncate text-mint-ink">{opp ? teamNameById[opp] ?? "?" : "?"}</span>
+                    <span className="truncate text-mint-ink">
+                      {team.name} vs {opp ? teamNameById[opp] ?? "?" : "?"}
+                    </span>
                   </div>
                   <span className="tabular-nums text-mint-ink-muted">{myScore !== null ? `${myScore}-${oppScore}` : "–"}</span>
                 </div>
