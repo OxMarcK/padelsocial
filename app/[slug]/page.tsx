@@ -215,9 +215,15 @@ function RankingList({
         .sort((a, b) => a.rank - b.rank)
         .map((r) => {
           const row = (
-            <div className="flex items-center gap-3 rounded-2xl px-3 py-2.5">
-              <span className="w-8 font-mint text-xl font-bold tabular-nums text-mint-ink-muted">{r.rank}</span>
-              <span className="flex-1 truncate text-sm font-medium text-mint-ink">{teamNameById[r.teamId] ?? "?"}</span>
+            <div className="flex items-center gap-3 rounded-2xl px-2 py-2.5">
+              <span
+                className={`flex h-9 w-9 flex-none items-center justify-center rounded-full font-mint text-lg font-bold tabular-nums ${
+                  r.rank <= 3 ? "bg-mint-lime text-mint-lime-ink" : "bg-mint-lime/15 text-mint-ink-muted"
+                }`}
+              >
+                {r.rank}
+              </span>
+              <span className="flex-1 truncate text-base font-semibold text-mint-ink">{teamNameById[r.teamId] ?? "?"}</span>
             </div>
           );
           return slug ? (
