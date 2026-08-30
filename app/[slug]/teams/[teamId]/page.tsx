@@ -7,6 +7,7 @@ import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
 import { computeSchedule, fmtTime, pouleRoundWindow } from "@/lib/schedule";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
 import { buildMatchVideoRows } from "@/lib/match-video";
+import { buildTeamSlugMap, resolveTeamBySlugOrId } from "@/lib/team-slug";
 import { TeamResultCard } from "@/components/mint/team-result-card";
 import { MatchVideoSection } from "@/components/mint/match-video-list";
 import { Logo } from "@/components/logo";
@@ -24,7 +25,7 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
     repo.listPlacements(event.id),
     repo.getTop8(event.id),
   ]);
-  const team = teams.find((t) => t.id === params.teamId);
+  const team = resolveTeamBySlugOrId(teams, params.teamId);
   if (!team) notFound();
 
   const poule = poules.find((p) => p.teamIds.includes(team.id));
@@ -42,9 +43,10 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
     finalRank = ranking.find((r) => r.teamId === team.id)?.rank ?? null;
   }
 
+  const teamSlug = buildTeamSlugMap(teams).get(team.id) ?? team.id;
   const host = headers().get("host");
   const proto = process.env.NODE_ENV === "development" ? "http" : "https";
-  const shareUrl = host ? `${proto}://${host}/${event.slug}/teams/${team.id}` : `/${event.slug}/teams/${team.id}`;
+  const shareUrl = host ? `${proto}://${host}/${event.slug}/teams/${teamSlug}` : `/${event.slug}/teams/${teamSlug}`;
 
   const teamNameById = Object.fromEntries(teams.map((t) => [t.id, t.name]));
   const pouleMatches = matches

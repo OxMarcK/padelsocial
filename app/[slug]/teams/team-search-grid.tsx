@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getFavoriteTeamId, setFavoriteTeamId } from "@/lib/client/favorite-team";
+import { buildTeamSlugMap } from "@/lib/team-slug";
 import { StarIcon } from "@/components/mint/star-icon";
 
 export interface TeamListRow {
@@ -35,6 +36,10 @@ export function TeamSearchGrid({ slug, teams }: { slug: string; teams: TeamListR
     setFavoriteTeamId(slug, next);
   }
 
+  // Built from the full, stable team list (not the filtered/sorted view below) so a
+  // team's friendly URL never shifts around based on search/favorite state.
+  const slugById = useMemo(() => buildTeamSlugMap(teams), [teams]);
+
   const filtered = teams.filter((t) => t.name.toLowerCase().includes(query.toLowerCase()));
   // The starred team ("onthoud dit team") rises to the top, so it's the first thing visible on return visits.
   const sorted = [...filtered].sort((a, b) => (a.id === favoriteId ? -1 : b.id === favoriteId ? 1 : 0));
@@ -51,7 +56,7 @@ export function TeamSearchGrid({ slug, teams }: { slug: string; teams: TeamListR
         {sorted.map((t) => (
           <Link
             key={t.id}
-            href={`/${slug}/teams/${t.id}`}
+            href={`/${slug}/teams/${slugById.get(t.id) ?? t.id}`}
             prefetch={false}
             className="flex items-center gap-3.5 rounded-[24px] bg-white px-4 py-3.5 shadow-[0_1px_3px_rgba(20,35,28,.08)] hover:brightness-95"
           >

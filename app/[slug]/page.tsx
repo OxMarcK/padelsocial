@@ -7,6 +7,7 @@ import { generatePouleSchedule } from "@/lib/poule-scheduler";
 import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
 import { buildMatchVideoRows } from "@/lib/match-video";
 import { freePlayCourts } from "@/lib/bracket-engine";
+import { buildTeamSlugMap } from "@/lib/team-slug";
 import type { Match, PadelEvent, Team } from "@/lib/types";
 import { Logo } from "@/components/logo";
 import { EventNav } from "@/components/mint/event-nav";
@@ -200,10 +201,12 @@ function won(m: Match, side: "A" | "B") {
 function RankingList({
   rows,
   teamNameById,
+  teamSlugById,
   slug,
 }: {
   rows: { teamId: string; rank: number }[];
   teamNameById: Record<string, string>;
+  teamSlugById?: Record<string, string>;
   slug?: string;
 }) {
   return (
@@ -218,7 +221,7 @@ function RankingList({
             </div>
           );
           return slug ? (
-            <Link key={r.teamId} href={`/${slug}/teams/${r.teamId}`} prefetch={false}>
+            <Link key={r.teamId} href={`/${slug}/teams/${teamSlugById?.[r.teamId] ?? r.teamId}`} prefetch={false}>
               {row}
             </Link>
           ) : (
@@ -269,6 +272,7 @@ async function ResultsView({
   windows: PhaseWindow[];
 }) {
   const placements = await repo.listPlacements(event.id);
+  const teamSlugById = Object.fromEntries(buildTeamSlugMap(teams));
   const byRank = [...placements].sort((a, b) => (a.finalRank ?? 999) - (b.finalRank ?? 999));
   const top8 = byRank.filter((p) => (p.finalRank ?? 99) <= 8);
   const rest = byRank.filter((p) => (p.finalRank ?? 99) > 8);
@@ -295,11 +299,21 @@ async function ResultsView({
       />
 
       <Section title="Top 8">
-        <RankingList rows={top8.map((p) => ({ teamId: p.teamId, rank: p.finalRank ?? 0 }))} teamNameById={teamNameById} slug={event.slug} />
+        <RankingList
+          rows={top8.map((p) => ({ teamId: p.teamId, rank: p.finalRank ?? 0 }))}
+          teamNameById={teamNameById}
+          teamSlugById={teamSlugById}
+          slug={event.slug}
+        />
       </Section>
 
       <Section title="Overige teams · 9e en verder">
-        <RankingList rows={rest.map((p) => ({ teamId: p.teamId, rank: p.finalRank ?? 0 }))} teamNameById={teamNameById} slug={event.slug} />
+        <RankingList
+          rows={rest.map((p) => ({ teamId: p.teamId, rank: p.finalRank ?? 0 }))}
+          teamNameById={teamNameById}
+          teamSlugById={teamSlugById}
+          slug={event.slug}
+        />
       </Section>
 
       <p className="text-center text-xs text-mint-ink-muted">Tik op een team voor de kaart en de deelknop.</p>
