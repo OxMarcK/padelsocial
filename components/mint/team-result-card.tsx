@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { FavoriteStarButton } from "./favorite-star";
 
 export interface TeamResultCardProps {
+  slug: string;
+  teamId: string;
   teamName: string;
   player1Name: string;
   player2Name: string;
@@ -22,6 +25,8 @@ function firstName(name: string): string {
 
 /** Design 6A trial variant of components/team-result-card.tsx, restyled for the light "mint" palette. */
 export function TeamResultCard({
+  slug,
+  teamId,
   teamName,
   player1Name,
   player2Name,
@@ -62,12 +67,15 @@ export function TeamResultCard({
         <Stat label={`Poule ${pouleLabel}`} value={pouleRank} suffix="e" />
         <Stat label="W–V" value={`${wins}–${losses}`} />
       </div>
-      <button
-        onClick={handleShare}
-        className="flex h-14 w-full items-center justify-center rounded-full bg-mint-lime font-mint text-lg font-bold text-mint-lime-ink hover:brightness-105"
-      >
-        {shared ? "Link gekopieerd" : "Deel je kaart"}
-      </button>
+      <div className="flex gap-2">
+        <FavoriteStarButton slug={slug} teamId={teamId} />
+        <button
+          onClick={handleShare}
+          className="flex h-14 flex-1 items-center justify-center rounded-full bg-mint-lime font-mint text-lg font-bold text-mint-lime-ink hover:brightness-105"
+        >
+          {shared ? "Link gekopieerd" : "Deel je kaart"}
+        </button>
+      </div>
     </div>
   );
 }

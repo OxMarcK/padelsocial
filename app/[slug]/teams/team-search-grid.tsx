@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { getFavoriteTeamId, setFavoriteTeamId } from "@/lib/client/favorite-team";
+import { StarIcon } from "@/components/mint/star-icon";
 
 export interface TeamListRow {
   id: string;
@@ -19,7 +21,23 @@ function firstName(name: string): string {
 /** Design 6A trial: Teams list restyled to match the Claude Design canvas's ranked-list format. */
 export function TeamSearchGrid({ slug, teams }: { slug: string; teams: TeamListRow[] }) {
   const [query, setQuery] = useState("");
+  const [favoriteId, setFavoriteId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setFavoriteId(getFavoriteTeamId(slug));
+  }, [slug]);
+
+  function toggleFavorite(e: React.MouseEvent, teamId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    const next = favoriteId === teamId ? null : teamId;
+    setFavoriteId(next);
+    setFavoriteTeamId(slug, next);
+  }
+
   const filtered = teams.filter((t) => t.name.toLowerCase().includes(query.toLowerCase()));
+  // The starred team ("onthoud dit team") rises to the top, so it's the first thing visible on return visits.
+  const sorted = [...filtered].sort((a, b) => (a.id === favoriteId ? -1 : b.id === favoriteId ? 1 : 0));
 
   return (
     <div className="flex flex-col gap-4">
@@ -30,7 +48,7 @@ export function TeamSearchGrid({ slug, teams }: { slug: string; teams: TeamListR
         className="h-12 rounded-full bg-white px-4 text-mint-ink shadow-[0_1px_3px_rgba(20,35,28,.08)] placeholder:text-mint-ink-muted"
       />
       <div className="flex flex-col gap-2.5">
-        {filtered.map((t) => (
+        {sorted.map((t) => (
           <Link
             key={t.id}
             href={`/${slug}/teams/${t.id}`}
@@ -57,6 +75,16 @@ export function TeamSearchGrid({ slug, teams }: { slug: string; teams: TeamListR
                 {firstName(t.player1Name)} & {firstName(t.player2Name)}
               </span>
             </span>
+            <button
+              onClick={(e) => toggleFavorite(e, t.id)}
+              aria-pressed={favoriteId === t.id}
+              aria-label={favoriteId === t.id ? "Team onthouden — tik om te vergeten" : "Onthoud dit team"}
+              className={`flex h-9 w-9 flex-none items-center justify-center rounded-full ${
+                favoriteId === t.id ? "text-mint-lime-ink" : "text-mint-net/60 hover:text-mint-ink-muted"
+              }`}
+            >
+              <StarIcon filled={favoriteId === t.id} className="h-5 w-5" />
+            </button>
           </Link>
         ))}
         {filtered.length === 0 ? <p className="text-sm text-mint-ink-muted">Geen teams gevonden.</p> : null}

@@ -78,6 +78,8 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
         <span aria-hidden>&lt;</span> Teams
       </Link>
       <TeamResultCard
+        slug={event.slug}
+        teamId={team.id}
         teamName={team.name}
         player1Name={team.player1.name}
         player2Name={team.player2.name}
