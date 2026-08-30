@@ -40,7 +40,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
       .filter((m) => m.phase === "poule" && m.roundNumber === 1)
       .sort((a, b) => a.courtNumber - b.courtNumber);
     return (
-      <Shell event={event}>
+      <Shell event={event} headerLabel="Live">
         <PhaseTimeline windows={windows} currentStatus={event.status} />
         <PhaseIndicator
           phaseLabel={indicator.phaseLabel}
@@ -103,7 +103,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
   const placementRanking = top8State ? top8State.placementSeeds.map((teamId, i) => ({ teamId, rank: 9 + i })) : [];
 
   return (
-    <Shell event={event}>
+    <Shell event={event} headerLabel="Live">
       <LivePoll />
       <PhaseTimeline windows={windows} currentStatus={event.status} />
       <PhaseIndicator
@@ -236,7 +236,7 @@ function RankingList({
 // Per the 6A canvas: the header sits on its own solid white bar — logo and title
 // aren't floating directly on the gradient — while everything else keeps the mint
 // background. Sticky so it stays put while scrolling, matching the reference.
-function Shell({ children, event }: { children: React.ReactNode; event?: PadelEvent }) {
+function Shell({ children, event, headerLabel }: { children: React.ReactNode; event?: PadelEvent; headerLabel?: string }) {
   return (
     <div
       className={`min-h-screen font-mint text-mint-ink ${EVENT_NAV_SPACER_CLASS}`}
@@ -245,7 +245,9 @@ function Shell({ children, event }: { children: React.ReactNode; event?: PadelEv
       <header className="sticky top-0 z-10 bg-white">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-5 py-4">
           <Logo variant="light" />
-          {event ? <h1 className="min-w-0 truncate font-mint text-2xl font-bold text-mint-ink">{event.name}</h1> : null}
+          {event ? (
+            <h1 className="min-w-0 truncate font-mint text-2xl font-bold text-mint-ink">{headerLabel ?? event.name}</h1>
+          ) : null}
         </div>
       </header>
       <main className="mx-auto flex max-w-2xl flex-col gap-6 px-5 py-8">{children}</main>
