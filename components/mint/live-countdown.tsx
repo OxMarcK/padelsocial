@@ -3,12 +3,18 @@
 import { useEffect, useState } from "react";
 
 export type CountdownVariant = "billboard" | "split";
+/** Billboard-only: which solid background it's sitting on, so text/pill/progress bar stay legible. */
+export type CountdownTone = "lime" | "blue";
 
 export interface LiveCountdownProps {
   variant: CountdownVariant;
   subLabel: string;
   startsAtIso: string;
   endsAtIso: string;
+  /** Server-rendered values (from lib/schedule.ts's phaseIndicatorData) — used verbatim until the first client tick, so hydration matches exactly. */
+  initialText: string;
+  initialProgress: number;
+  tone?: CountdownTone;
 }
 
 function fmtCountdown(ms: number): string {
@@ -19,17 +25,49 @@ function fmtCountdown(ms: number): string {
 }
 
 /**
+ * Ticks a countdown from `startsAtIso`/`endsAtIso` every second, starting
+ * from `now = null` (meaning "not yet ticking — use the server's own
+ * initialText/initialProgress verbatim") and only switching to a live
+ * Date.now()-based computation once the first effect fires post-hydration.
+ * Computing "now" eagerly on the client's first render (the more obvious
+ * approach) reliably mismatches the server's render-time "now" by however
+ * long the response took to reach the browser, throwing a React hydration
+ * error on literally every load.
+ */
+function useTicking(startsAtIso: string, endsAtIso: string, initialText: string, initialProgress: number) {
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (now === null) return { countdownText: initialText, pct: Math.round(Math.min(1, Math.max(0, initialProgress)) * 100) };
+
+  const end = new Date(endsAtIso).getTime();
+  const start = new Date(startsAtIso).getTime();
+  const totalMs = end - start;
+  const remainingMs = end - now;
+  const progress = totalMs > 0 ? 1 - Math.max(0, remainingMs) / totalMs : 1;
+  return { countdownText: fmtCountdown(remainingMs), pct: Math.round(Math.min(1, Math.max(0, progress)) * 100) };
+}
+
+/**
  * Just the ticking number, no wrapping markup — for places that already have
  * their own countdown styling (e.g. TV mode's two countdown spots) and only
  * need the text itself kept in sync every second.
  */
-export function LiveCountdownText({ startsAtIso, endsAtIso }: { startsAtIso: string; endsAtIso: string }) {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-  return <>{fmtCountdown(new Date(endsAtIso).getTime() - now)}</>;
+export function LiveCountdownText({
+  startsAtIso,
+  endsAtIso,
+  initialText,
+}: {
+  startsAtIso: string;
+  endsAtIso: string;
+  initialText: string;
+}) {
+  const { countdownText } = useTicking(startsAtIso, endsAtIso, initialText, 0);
+  return <>{countdownText}</>;
 }
 
 /**
@@ -41,33 +79,40 @@ export function LiveCountdownText({ startsAtIso, endsAtIso }: { startsAtIso: str
  * (LivePoll refresh / navigation) since startsAtIso/endsAtIso come from
  * there — this component only fills in the seconds in between.
  */
-export function LiveCountdown({ variant, subLabel, startsAtIso, endsAtIso }: LiveCountdownProps) {
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const end = new Date(endsAtIso).getTime();
-  const start = new Date(startsAtIso).getTime();
-  const totalMs = end - start;
-  const remainingMs = end - now;
-  const progress = totalMs > 0 ? 1 - Math.max(0, remainingMs) / totalMs : 1;
-  const pct = Math.round(Math.min(1, Math.max(0, progress)) * 100);
-  const countdownText = fmtCountdown(remainingMs);
+export function LiveCountdown({
+  variant,
+  subLabel,
+  startsAtIso,
+  endsAtIso,
+  initialText,
+  initialProgress,
+  tone = "lime",
+}: LiveCountdownProps) {
+  const { countdownText, pct } = useTicking(startsAtIso, endsAtIso, initialText, initialProgress);
 
   if (variant === "billboard") {
+    const isBlue = tone === "blue";
     return (
       <>
         <div className="mt-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-          <span className="font-mint text-5xl font-bold leading-none tabular-nums text-mint-ink">{countdownText}</span>
-          <span className="flex-none whitespace-nowrap rounded-full bg-black/10 px-3.5 py-1.5 font-mint text-sm font-bold text-mint-ink">
+          <span
+            className={`font-mint text-5xl font-bold leading-none tabular-nums ${isBlue ? "text-white" : "text-mint-ink"}`}
+          >
+            {countdownText}
+          </span>
+          <span
+            className={`flex-none whitespace-nowrap rounded-full px-3.5 py-1.5 font-mint text-sm font-bold ${
+              isBlue ? "bg-black/20 text-white" : "bg-black/10 text-mint-ink"
+            }`}
+          >
             {subLabel}
           </span>
         </div>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-black/10">
-          <div className="h-full rounded-full bg-mint-ink transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%` }} />
+        <div className={`mt-3 h-1.5 overflow-hidden rounded-full ${isBlue ? "bg-white/20" : "bg-black/10"}`}>
+          <div
+            className={`h-full rounded-full transition-[width] duration-1000 ease-linear ${isBlue ? "bg-white" : "bg-mint-ink"}`}
+            style={{ width: `${pct}%` }}
+          />
         </div>
       </>
     );

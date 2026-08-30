@@ -70,7 +70,7 @@ export function TvView({
             <span className="font-mint text-4xl font-bold tracking-[0.1em] text-mint-lime-ink">Live</span>
             <span className="min-w-[270px] text-right font-mint text-8xl font-bold leading-none tabular-nums text-mint-ink">
               {indicator.countdownStartsAt && indicator.countdownEndsAt ? (
-                <LiveCountdownText startsAtIso={indicator.countdownStartsAt} endsAtIso={indicator.countdownEndsAt} />
+                <LiveCountdownText startsAtIso={indicator.countdownStartsAt} endsAtIso={indicator.countdownEndsAt} initialText={indicator.countdownText ?? ""} />
               ) : (
                 indicator.countdownText
               )}
@@ -103,7 +103,7 @@ export function TvView({
             <div className="font-mint text-6xl font-bold tracking-[0.2em] text-mint-lime-ink">Pauze</div>
             <div className="font-mint text-[10rem] font-bold leading-none tabular-nums text-mint-ink">
               {indicator.countdownStartsAt && indicator.countdownEndsAt ? (
-                <LiveCountdownText startsAtIso={indicator.countdownStartsAt} endsAtIso={indicator.countdownEndsAt} />
+                <LiveCountdownText startsAtIso={indicator.countdownStartsAt} endsAtIso={indicator.countdownEndsAt} initialText={indicator.countdownText ?? ""} />
               ) : (
                 indicator.countdownText
               )}
