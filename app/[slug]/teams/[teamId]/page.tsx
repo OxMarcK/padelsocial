@@ -65,8 +65,9 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
       style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
     >
       <header className="sticky top-0 z-10 bg-white">
-        <div className="mx-auto max-w-md px-5 py-4">
+        <div className="mx-auto flex max-w-md items-center justify-between gap-3 px-5 py-4">
           <Logo variant="light" />
+          <h1 className="font-mint text-2xl font-bold text-mint-ink">Team</h1>
         </div>
       </header>
       <main className="mx-auto flex max-w-md flex-col gap-6 px-5 py-8">
