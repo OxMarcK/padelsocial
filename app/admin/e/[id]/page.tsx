@@ -97,6 +97,13 @@ export default async function AdminEventPage({
 
   const recordScoreBound = recordScore.bind(null, event.id);
 
+  // Not-yet-linked matches float to the top — that's the actual to-do here, and the list
+  // only grows over the course of an event, so surfacing what's missing beats chronological order.
+  const scoredMatches = matches
+    .filter((m) => m.scoreA !== null && m.scoreB !== null)
+    .sort((a, b) => Number(!!a.videoUrl) - Number(!!b.videoUrl));
+  const videosLinkedCount = scoredMatches.filter((m) => m.videoUrl).length;
+
   const defaultTab: TabKey = pouleMatches.length > 0 ? "scores" : poules.length > 0 ? "poules" : "teams";
   const requestedTab = searchParams.tab;
   const tab: TabKey = TABS.some((t) => t.key === requestedTab) ? (requestedTab as TabKey) : defaultTab;
@@ -136,64 +143,6 @@ export default async function AdminEventPage({
           />
         )
       ) : null}
-
-      <details className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
-        <summary className="cursor-pointer font-mint text-lg font-bold text-mint-ink">Event bewerken</summary>
-        <ActionForm action={updateEventDetails.bind(null, event.id)} className="mt-4 flex flex-col gap-3">
-          <Field label="Naam" name="name" defaultValue={event.name} required />
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-mint-ink-muted">Slug (voor de URL)</span>
-            <input
-              name="slug"
-              defaultValue={event.slug}
-              required
-              className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
-            />
-            <span className="text-xs text-mint-ink-muted">
-              Publieke link wordt event.padelsocial.nl/{event.slug} — al gedeelde links met de oude slug werken hierna niet meer.
-            </span>
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Datum" name="date" type="date" defaultValue={event.date} required />
-            <Field label="Starttijd" name="startTime" type="time" defaultValue={event.startTime} required />
-          </div>
-          <Field label="Locatie" name="location" defaultValue={event.location} required />
-          <Field label="Aantal banen" name="courts" type="number" defaultValue={event.courts} required />
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-mint-ink-muted">Omschrijving</span>
-            <textarea
-              name="description"
-              rows={3}
-              defaultValue={event.description}
-              className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
-            />
-          </label>
-          <ActionFormError />
-          <SaveButton />
-        </ActionForm>
-      </details>
-
-      <details className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
-        <summary className="cursor-pointer font-mint text-lg font-bold text-mint-ink">Dupliceer event</summary>
-        <p className="mt-2 text-xs text-mint-ink-muted">
-          Maakt een nieuw event met dezelfde teams en poule-indeling — handig om een fase of het schema te testen
-          zonder dit event te raken. Het nieuwe event begint bij Inchecken (nog geen wedstrijden of scores).
-        </p>
-        <ActionForm action={duplicateEvent.bind(null, event.id)} className="mt-4 flex flex-col gap-3">
-          <Field label="Naam" name="name" defaultValue={`${event.name} (test)`} required />
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-mint-ink-muted">Slug (voor de URL)</span>
-            <input
-              name="slug"
-              defaultValue={normalizeSlug(`${event.slug}-test`)}
-              required
-              className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
-            />
-          </label>
-          <ActionFormError />
-          <SaveButton label="Dupliceren" savedLabel="Gedupliceerd" />
-        </ActionForm>
-      </details>
 
       <div className="flex gap-1 rounded-2xl bg-white p-1 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
         {TABS.map((t) => (
@@ -374,7 +323,7 @@ export default async function AdminEventPage({
 
           {event.status === "pauze_1" ? (
             <Section title="Top 8 & plaatsingsgroep" subtitle="Controleer de seeding voordat je publiceert">
-              <Top8Editor eventId={event.id} teamNameById={teamNameById} published={top8} />
+              <Top8Editor eventId={event.id} teams={teams} published={top8} />
             </Section>
           ) : null}
 
@@ -393,36 +342,38 @@ export default async function AdminEventPage({
             </Section>
           ) : null}
 
-          {matches.some((m) => m.scoreA !== null) ? (
-            <Section title="Video's koppelen" subtitle="Plak een YouTube-link per wedstrijd">
-              <div className="flex flex-col gap-2">
-                {matches
-                  .filter((m) => m.scoreA !== null && m.scoreB !== null)
-                  .map((m) => (
-                    <ActionForm
-                      key={m.id}
-                      action={attachVideo.bind(null, event.id)}
-                      className="flex flex-col gap-1.5 rounded-xl bg-mint-net/10 p-3 text-sm"
-                    >
-                      <input type="hidden" name="matchId" value={m.id} />
-                      <div className="flex flex-col gap-0.5">
-                        <span className="truncate text-mint-ink-muted">{m.label}</span>
-                        <span className="truncate font-semibold text-mint-ink">
-                          {m.teamAId ? teamNameById[m.teamAId] ?? "?" : "?"} vs {m.teamBId ? teamNameById[m.teamBId] ?? "?" : "?"}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="url"
-                          name="videoUrl"
-                          defaultValue={m.videoUrl ?? ""}
-                          placeholder="https://youtube.com/…"
-                          className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink placeholder:text-mint-ink-muted/60"
-                        />
-                        <SaveButton variant="ghost" size="sm" />
-                      </div>
-                    </ActionForm>
-                  ))}
+          {scoredMatches.length > 0 ? (
+            <Section
+              title="Video's koppelen"
+              subtitle={`${videosLinkedCount} van ${scoredMatches.length} wedstrijden gekoppeld`}
+            >
+              <div className="flex max-h-[420px] flex-col gap-2 overflow-y-auto">
+                {scoredMatches.map((m) => (
+                  <ActionForm
+                    key={m.id}
+                    action={attachVideo.bind(null, event.id)}
+                    className="flex flex-col gap-1.5 rounded-xl bg-mint-net/10 p-3 text-sm"
+                  >
+                    <input type="hidden" name="matchId" value={m.id} />
+                    <div className="flex items-center gap-1.5">
+                      {m.videoUrl ? <span aria-hidden className="text-mint-lime-ink">✓</span> : null}
+                      <span className="truncate text-mint-ink-muted">{m.label}</span>
+                    </div>
+                    <span className="truncate font-semibold text-mint-ink">
+                      {m.teamAId ? teamNameById[m.teamAId] ?? "?" : "?"} vs {m.teamBId ? teamNameById[m.teamBId] ?? "?" : "?"}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="url"
+                        name="videoUrl"
+                        defaultValue={m.videoUrl ?? ""}
+                        placeholder="https://youtube.com/…"
+                        className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink placeholder:text-mint-ink-muted/60"
+                      />
+                      <SaveButton variant="ghost" size="sm" />
+                    </div>
+                  </ActionForm>
+                ))}
               </div>
             </Section>
           ) : null}
@@ -447,14 +398,80 @@ export default async function AdminEventPage({
         </Section>
       ) : null}
 
-      <Section title="Gevarenzone">
-        <ConfirmButton
-          label="Event verwijderen"
-          confirmText={`"${event.name}" permanent verwijderen? Alle teams, poules en wedstrijden gaan verloren.`}
-          action={deleteEvent.bind(null, event.id)}
-          variant="danger"
-        />
-      </Section>
+      <details className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+        <summary className="cursor-pointer px-4 py-4 font-mint text-lg font-bold text-mint-ink">Instellingen</summary>
+        <div className="flex flex-col gap-6 border-t border-mint-net/15 px-4 pb-4 pt-4">
+          <div className="flex flex-col gap-3">
+            <h3 className="font-mint text-sm font-bold text-mint-ink-muted">Event bewerken</h3>
+            <ActionForm action={updateEventDetails.bind(null, event.id)} className="flex flex-col gap-3">
+              <Field label="Naam" name="name" defaultValue={event.name} required />
+              <label className="flex flex-col gap-1 text-sm">
+                <span className="text-mint-ink-muted">Slug (voor de URL)</span>
+                <input
+                  name="slug"
+                  defaultValue={event.slug}
+                  required
+                  className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
+                />
+                <span className="text-xs text-mint-ink-muted">
+                  Publieke link wordt event.padelsocial.nl/{event.slug} — al gedeelde links met de oude slug werken
+                  hierna niet meer.
+                </span>
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Datum" name="date" type="date" defaultValue={event.date} required />
+                <Field label="Starttijd" name="startTime" type="time" defaultValue={event.startTime} required />
+              </div>
+              <Field label="Locatie" name="location" defaultValue={event.location} required />
+              <Field label="Aantal banen" name="courts" type="number" defaultValue={event.courts} required />
+              <label className="flex flex-col gap-1 text-sm">
+                <span className="text-mint-ink-muted">Omschrijving</span>
+                <textarea
+                  name="description"
+                  rows={3}
+                  defaultValue={event.description}
+                  className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
+                />
+              </label>
+              <ActionFormError />
+              <SaveButton />
+            </ActionForm>
+          </div>
+
+          <div className="flex flex-col gap-3 border-t border-mint-net/15 pt-6">
+            <h3 className="font-mint text-sm font-bold text-mint-ink-muted">Dupliceer event</h3>
+            <p className="text-xs text-mint-ink-muted">
+              Maakt een nieuw event met dezelfde teams en poule-indeling — handig om een fase of het schema te
+              testen zonder dit event te raken. Het nieuwe event begint bij Inchecken (nog geen wedstrijden of
+              scores).
+            </p>
+            <ActionForm action={duplicateEvent.bind(null, event.id)} className="flex flex-col gap-3">
+              <Field label="Naam" name="name" defaultValue={`${event.name} (test)`} required />
+              <label className="flex flex-col gap-1 text-sm">
+                <span className="text-mint-ink-muted">Slug (voor de URL)</span>
+                <input
+                  name="slug"
+                  defaultValue={normalizeSlug(`${event.slug}-test`)}
+                  required
+                  className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
+                />
+              </label>
+              <ActionFormError />
+              <SaveButton label="Dupliceren" savedLabel="Gedupliceerd" />
+            </ActionForm>
+          </div>
+
+          <div className="flex flex-col gap-3 border-t border-mint-net/15 pt-6">
+            <h3 className="font-mint text-sm font-bold text-clay-orange">Gevarenzone</h3>
+            <ConfirmButton
+              label="Event verwijderen"
+              confirmText={`"${event.name}" permanent verwijderen? Alle teams, poules en wedstrijden gaan verloren.`}
+              action={deleteEvent.bind(null, event.id)}
+              variant="danger"
+            />
+          </div>
+        </div>
+      </details>
     </main>
     </div>
   );
@@ -495,47 +512,70 @@ function PointField({ label, name, defaultValue }: { label: string; name: string
 
 async function Top8Editor({
   eventId,
-  teamNameById,
+  teams,
   published,
 }: {
   eventId: string;
-  teamNameById: Record<string, string>;
+  teams: Array<{ id: string; name: string }>;
   published: Awaited<ReturnType<typeof repo.getTop8>>;
 }) {
   const preview = await repo.previewTop8(eventId);
   const state = published ?? preview;
-  const name = (id: string) => teamNameById[id] ?? "?";
+  const placementTeamIds = state.placementSeeds.length > 0 ? state.placementSeeds : teams.map((t) => t.id).filter((id) => !state.top8.seeds.includes(id));
 
   return (
-    <ActionForm action={publishTop8Override.bind(null, eventId)} className="flex flex-col gap-3 text-sm">
-      <p className="text-xs text-mint-ink-muted">
-        Seed 1 t/m 8, beste eerst. Kwartfinales spelen 1-8, 4-5, 2-7, 3-6 (standaard bracket-seeding), zodat seed 1
-        en 2 elkaar pas in de finale kunnen treffen.
-      </p>
-      {state.top8.seeds.map((teamId, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <span className="w-16 flex-none text-mint-ink-muted">Seed {i + 1}</span>
-          <input
-            name={`seed${i + 1}`}
-            defaultValue={teamId}
-            className="h-9 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
-          />
-          <span className="w-32 flex-none truncate text-xs text-mint-ink-muted">{name(teamId)}</span>
-        </div>
-      ))}
-      <label className="flex flex-col gap-1">
-        <span className="text-mint-ink-muted">
-          Overige teams (plek 9+), beste naar slechtste — bepaalt direct de eindstand (team-id&apos;s, komma-gescheiden)
-        </span>
-        <input
-          name="placementSeeds"
-          defaultValue={state.placementSeeds.join(",")}
-          className="h-9 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
-        />
-      </label>
-      <p className="text-xs text-mint-ink-muted">{state.placementSeeds.map((id) => name(id)).join(" · ")}</p>
+    <ActionForm action={publishTop8Override.bind(null, eventId)} className="flex flex-col gap-4 text-sm">
+      <div className="flex flex-col gap-2">
+        <p className="text-xs text-mint-ink-muted">
+          Seed 1 t/m 8, beste eerst. Kwartfinales spelen 1-8, 4-5, 2-7, 3-6 (standaard bracket-seeding), zodat seed 1
+          en 2 elkaar pas in de finale kunnen treffen.
+        </p>
+        {state.top8.seeds.map((teamId, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <span className="w-16 flex-none text-mint-ink-muted">Seed {i + 1}</span>
+            <TeamSelect name={`seed${i + 1}`} teams={teams} defaultValue={teamId} />
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-col gap-2 border-t border-mint-net/15 pt-3">
+        <p className="text-xs text-mint-ink-muted">
+          Overige teams, plek 9 en verder — bepaalt direct de eindstand.
+        </p>
+        {placementTeamIds.map((teamId, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <span className="w-16 flex-none text-mint-ink-muted">Plek {i + 9}</span>
+            <TeamSelect name={`placement${i + 9}`} teams={teams} defaultValue={teamId} />
+          </div>
+        ))}
+      </div>
       <ActionFormError />
       <SaveButton label={published ? "Bijwerken" : "Publiceren"} savedLabel={published ? "Bijgewerkt" : "Gepubliceerd"} />
     </ActionForm>
+  );
+}
+
+/** Team picker for the Top 8 editor — a <select> of team names beats a hand-typed team id:
+ * no way to fat-finger it, and the id/name mapping (teamNameById) becomes unnecessary here. */
+function TeamSelect({
+  name,
+  teams,
+  defaultValue,
+}: {
+  name: string;
+  teams: Array<{ id: string; name: string }>;
+  defaultValue: string;
+}) {
+  return (
+    <select
+      name={name}
+      defaultValue={defaultValue}
+      className="h-9 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+    >
+      {teams.map((t) => (
+        <option key={t.id} value={t.id}>
+          {t.name}
+        </option>
+      ))}
+    </select>
   );
 }

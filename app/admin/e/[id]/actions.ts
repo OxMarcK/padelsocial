@@ -287,10 +287,14 @@ export async function advancePhase(eventId: string, expectedStatus: EventStatus)
 export async function publishTop8Override(eventId: string, formData: FormData) {
   await requireAdmin();
   const seeds = Array.from({ length: 8 }, (_, i) => String(formData.get(`seed${i + 1}`) ?? "").trim());
-  const placementSeeds = String(formData.get("placementSeeds") ?? "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  // One <select> per placement (plek 9, 10, ...) instead of a single free-typed, comma-joined
+  // id list — same failure mode as the seed pickers below: a hand-typed team id is easy to
+  // fat-finger and gives no feedback until publish. Field count is however many the form sent.
+  const placementSeeds: string[] = [];
+  for (let i = 9; formData.has(`placement${i}`); i++) {
+    const value = String(formData.get(`placement${i}`) ?? "").trim();
+    if (value) placementSeeds.push(value);
+  }
   await repo.publishTop8(eventId, { top8: { seeds }, placementSeeds });
   revalidatePath(path(eventId));
 }
