@@ -8,6 +8,7 @@ import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
 import { buildMatchVideoRows } from "@/lib/match-video";
 import { freePlayCourts } from "@/lib/bracket-engine";
 import { buildTeamSlugMap } from "@/lib/team-slug";
+import { computeTournamentStats, formatPodiumCaption } from "@/lib/tournament-stats";
 import type { Match, PadelEvent, Team } from "@/lib/types";
 import { Logo } from "@/components/logo";
 import { EventNav } from "@/components/mint/event-nav";
@@ -311,6 +312,7 @@ async function ResultsView({
           rank: rank as 1 | 2 | 3,
           name: teamNameById[top8.find((p) => p.finalRank === rank)?.teamId ?? ""] ?? "?",
         }))}
+        caption={formatPodiumCaption(computeTournamentStats(matches, teamNameById))}
       />
 
       <Section title="Top 8">
