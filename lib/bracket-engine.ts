@@ -6,7 +6,11 @@
  * the bracket itself never changes shape). The 8 qualifiers are ranked
  * best-to-worst across *all* poules combined (see resolveTop8) and seeded
  * into the kwartfinales with the standard single-elimination pattern
- * (1v8, 4v5, 2v7, 3v6), which keeps the top 2 seeds apart until the final.
+ * (1v8, 4v5, 2v7, 3v6), which keeps the top 2 seeds apart until the final —
+ * except that resolveTop8 will locally reorder seeds to avoid putting two
+ * teams from the same poule into the same kwartfinale (see
+ * avoidSamePouleKwartfinales): a rematch of a poulefase match nobody asked
+ * to see again, decided minutes earlier, in round one of the knockout.
  * Halve finales take the KF winners; the grote finale takes the halve-finale
  * winners and the troostfinale (3e/4e) takes the halve-finale losers, so
  * every podium place is decided by an actual match. There is no wider
@@ -167,6 +171,70 @@ export interface PouleStandingsInput {
   rows: PouleStandingRow[];
 }
 
+// Which seed-index pairs actually meet each other in the kwartfinales — must
+// stay in sync with BRACKET_DEFINITION's KF1-4 (seed(0)v(7), (3)v(4), (1)v(6), (2)v(5)).
+// Exported so tests can assert "no same-poule pair" without hardcoding the pattern twice.
+export const KWARTFINALE_SEED_PAIRS: Array<[number, number]> = [
+  [0, 7],
+  [3, 4],
+  [1, 6],
+  [2, 5],
+];
+
+/**
+ * Reassigns 8 rank-ordered qualifiers onto seed slots 0-7 so that no
+ * kwartfinale pair (see KWARTFINALE_SEED_PAIRS) is two teams from the same
+ * poule — two teams that may well have played each other minutes earlier in
+ * the poulefase have no business meeting again in the very first knockout
+ * round. This isn't a preference toggle: no organizer wants a rematch that
+ * poulefase already decided, so it's just correct default behavior.
+ *
+ * Branch-and-bound search over the 8! slot assignments, minimizing (in
+ * priority order) the number of same-poule kwartfinale pairs, then the total
+ * displacement from the natural rank order (so the fix disturbs the fair
+ * ranking as little as possible — normally just one local swap). Falls back
+ * to the least-bad assignment if a fully clash-free one is impossible (e.g.
+ * one poule alone supplies more than half the qualifiers).
+ */
+function avoidSamePouleKwartfinales(ranked: string[], pouleOfTeam: Map<string, PouleLabel>): string[] {
+  const n = ranked.length;
+  if (n !== 8) return ranked; // only the standard top-8 bracket shape is defined
+
+  const partnerOfSlot = new Map<number, number>();
+  for (const [a, b] of KWARTFINALE_SEED_PAIRS) {
+    partnerOfSlot.set(a, b);
+    partnerOfSlot.set(b, a);
+  }
+
+  const used = new Array<boolean>(n).fill(false);
+  const assignment = new Array<string | null>(n).fill(null);
+  let best: { assignment: string[]; collisions: number; displacement: number } | null = null;
+
+  function search(slot: number, collisions: number, displacement: number) {
+    if (best && (collisions > best.collisions || (collisions === best.collisions && displacement >= best.displacement))) {
+      return; // can only get worse or equal-and-no-better from here — prune
+    }
+    if (slot === n) {
+      best = { assignment: assignment.slice() as string[], collisions, displacement };
+      return;
+    }
+    for (let i = 0; i < n; i++) {
+      if (used[i]) continue;
+      used[i] = true;
+      assignment[slot] = ranked[i]!;
+      const partner = partnerOfSlot.get(slot);
+      const clashesWithPartner =
+        partner !== undefined && partner < slot && pouleOfTeam.get(assignment[partner]!) === pouleOfTeam.get(ranked[i]!);
+      search(slot + 1, collisions + (clashesWithPartner ? 1 : 0), displacement + Math.abs(slot - i));
+      used[i] = false;
+      assignment[slot] = null;
+    }
+  }
+
+  search(0, 0, 0);
+  return best!.assignment;
+}
+
 /**
  * Auto-suggests the top-8 seeding from poulefase standings, per the spec's
  * tie-break order (points, then saldo, then games voor — already applied by
@@ -197,7 +265,9 @@ export function resolveTop8(poulesStandings: PouleStandingsInput[]): { top8: Top
     qualifiers = [...qualifiers, ...afterRest];
   }
 
-  const seeds = sortStandings(qualifiers).map((r) => r.teamId);
+  const rankedSeeds = sortStandings(qualifiers).map((r) => r.teamId);
+  const pouleOfTeam = new Map(poulesStandings.flatMap((p) => p.rows.map((r) => [r.teamId, p.label] as const)));
+  const seeds = avoidSamePouleKwartfinales(rankedSeeds, pouleOfTeam);
   const usedIds = new Set(seeds);
   const placementRows = poulesStandings.flatMap((p) => p.rows).filter((r) => !usedIds.has(r.teamId));
 

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { computeTop8Ranking, resolveBracketMatches, resolveTop8, type PouleStandingsInput } from "./bracket-engine";
+import {
+  computeTop8Ranking,
+  resolveBracketMatches,
+  resolveTop8,
+  KWARTFINALE_SEED_PAIRS,
+  type PouleStandingsInput,
+} from "./bracket-engine";
 import type { PouleStandingRow, Top8Resolution } from "./types";
 
 // index0..7 = seed1..seed8, best to worst.
@@ -144,7 +150,11 @@ describe("resolveTop8 — 3 poules (reduces to the spec's original 3+3+2 shape)"
   const { top8, placementSeeds } = resolveTop8(poulesStandings);
 
   it("seeds all 3 winners and all 3 runners-up ahead of any 3rd place, ranked by standings", () => {
-    expect(top8.seeds).toEqual(["A1", "B1", "C1", "A2", "B2", "C2", "A3", "B3"]);
+    // Not toEqual with a fixed order: this fixture's naive rank order (C1 at
+    // index 2, C2 at index 5) is exactly the same-poule KF collision
+    // resolveTop8 now corrects for — see the "no same-poule kwartfinale"
+    // describe block below. Membership/ranking-tier is what's guaranteed here.
+    expect(top8.seeds).toEqual(expect.arrayContaining(["A1", "B1", "C1", "A2", "B2", "C2"]));
   });
 
   it("fills the last 2 of 8 slots with the 2 best 3rd-place teams across poules", () => {
@@ -161,6 +171,55 @@ describe("resolveTop8 — 3 poules (reduces to the spec's original 3+3+2 shape)"
     expect(placementSeeds).toHaveLength(7);
     // best remaining team (C3, 4pt/-1) should seed above every 4th/5th place team
     expect(placementSeeds[0]).toBe("C3");
+  });
+
+  it("never pairs two same-poule teams into a kwartfinale, even though the naive rank order would (C1 vs C2)", () => {
+    const pouleOf = new Map(poulesStandings.flatMap((p) => p.rows.map((r) => [r.teamId, p.label] as const)));
+    for (const [a, b] of KWARTFINALE_SEED_PAIRS) {
+      expect(pouleOf.get(top8.seeds[a]!)).not.toBe(pouleOf.get(top8.seeds[b]!));
+    }
+  });
+});
+
+describe("resolveTop8 — same-poule kwartfinale avoidance (regression: two poule-A teams landing in one KF pair)", () => {
+  // Reproduces the reported bug with just 2 poules of 4 qualifiers each: poule
+  // B is strong enough to take the top 2 overall ranks, which pushes the
+  // naive best-to-worst order to [B1,B2,A1,B3,A2,A3,B4,A4] — colliding at
+  // both KF pairs (1,6)=B2/B4 and (2,5)=A1/A3. Confirm resolveTop8 fixes it
+  // without changing which 8 teams qualify.
+  const poulesStandings: PouleStandingsInput[] = [
+    { label: "A", rows: [row("A1", 12, 5), row("A2", 10, 2), row("A3", 9, 0), row("A4", 7, -4)] },
+    { label: "B", rows: [row("B1", 14, 9), row("B2", 13, 7), row("B3", 11, 3), row("B4", 8, -1)] },
+  ];
+
+  it("produces the same 8 qualifiers, just reordered, with zero same-poule kwartfinale pairs", () => {
+    const naiveOrder = ["B1", "B2", "A1", "B3", "A2", "A3", "B4", "A4"];
+    const pouleOf = new Map(poulesStandings.flatMap((p) => p.rows.map((r) => [r.teamId, p.label] as const)));
+
+    // Sanity-check the fixture actually reproduces a collision in naive rank
+    // order — otherwise this test would pass for the wrong reason.
+    expect(pouleOf.get(naiveOrder[1]!)).toBe(pouleOf.get(naiveOrder[6]!)); // B2 vs B4
+    expect(pouleOf.get(naiveOrder[2]!)).toBe(pouleOf.get(naiveOrder[5]!)); // A1 vs A3
+
+    const { top8 } = resolveTop8(poulesStandings);
+    expect(top8.seeds).toHaveLength(8);
+    expect(top8.seeds).toEqual(expect.arrayContaining(naiveOrder));
+    for (const [a, b] of KWARTFINALE_SEED_PAIRS) {
+      expect(pouleOf.get(top8.seeds[a]!)).not.toBe(pouleOf.get(top8.seeds[b]!));
+    }
+  });
+
+  it("leaves an already collision-free ranking untouched", () => {
+    // Every-other interleaving (A1,B1,A2,B2,...) never puts two same-poule
+    // teams in a KF pair (0v7, 3v4, 1v6, 2v5 all cross the A/B split), so
+    // there's nothing to fix here — the natural rank order should survive
+    // unchanged rather than being needlessly reshuffled.
+    const balanced: PouleStandingsInput[] = [
+      { label: "A", rows: [row("A1", 12, 20), row("A2", 9, 10), row("A3", 6, 0), row("A4", 3, -10)] },
+      { label: "B", rows: [row("B1", 11, 18), row("B2", 8, 8), row("B3", 5, -2), row("B4", 2, -12)] },
+    ];
+    const { top8 } = resolveTop8(balanced);
+    expect(top8.seeds).toEqual(["A1", "B1", "A2", "B2", "A3", "B3", "A4", "B4"]);
   });
 });
 

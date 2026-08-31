@@ -3,11 +3,13 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
+import { computeSchedule } from "@/lib/schedule";
 import { PHASE_META, bracketRoundForStatus, highestStartedBracketRound, nextStatus } from "@/lib/phases";
 import { Field } from "@/components/ui/field";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
 import { MatchBoard } from "@/components/admin/match-board";
+import { PhaseTimeline } from "@/components/mint/phase-timeline";
 import {
   addTeamsBulk,
   advancePhase,
@@ -66,6 +68,8 @@ export default async function AdminEventPage({
         )
       : null;
 
+  const windows = computeSchedule(event, schedulePreview?.roundsCount || event.currentPouleRound || 1);
+
   const currentRoundMatches = pouleMatches.filter((m) => m.roundNumber === event.currentPouleRound);
   const missingScores = currentRoundMatches.filter((m) => m.scoreA === null || m.scoreB === null).length;
   const pouleRoundsCount = schedulePreview?.roundsCount ?? event.currentPouleRound;
@@ -122,6 +126,8 @@ export default async function AdminEventPage({
         </p>
         <p className="mt-2 font-mint text-lg font-bold text-mint-lime-ink">{meta.label}</p>
       </div>
+
+      <PhaseTimeline windows={windows} currentStatus={event.status} />
 
       {meta.advanceCta && next ? (
         bracketRound && bracketMissingScores > 0 ? (
