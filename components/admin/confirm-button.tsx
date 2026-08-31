@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export function ConfirmButton({
   label,
+  icon,
   confirmText,
   action,
   variant = "primary",
@@ -12,6 +13,11 @@ export function ConfirmButton({
   successMessage,
 }: {
   label: string;
+  /** Renders the trigger as a compact square icon button (e.g. "✕") instead of a text
+   * button — `label` still becomes its aria-label, so it stays as accessible as the
+   * text variant. Use this wherever a full-width text button would crowd a tight row
+   * (a table row's delete action, say) instead of overflowing it. */
+  icon?: string;
   confirmText: string;
   action: () => Promise<void>;
   variant?: "primary" | "secondary" | "danger";
@@ -40,12 +46,14 @@ export function ConfirmButton({
           type="button"
           variant={variant}
           size={size}
+          aria-label={icon ? label : undefined}
+          className={icon ? "!w-9 flex-none !px-0 text-center" : undefined}
           onClick={() => {
             setConfirming(true);
             setError(null);
           }}
         >
-          {label}
+          {icon ?? label}
         </Button>
         {error ? <p className="text-xs text-clay-orange">{error}</p> : null}
       </div>
@@ -56,7 +64,7 @@ export function ConfirmButton({
     variant === "danger" ? "border-clay-orange bg-clay-orange/10" : "border-mint-lime bg-mint-lime/15";
 
   return (
-    <div className={`flex flex-col gap-3 rounded-2xl border ${size === "sm" ? "p-3" : "p-4"} ${boxClasses}`}>
+    <div className={`flex w-full flex-col gap-3 rounded-2xl border ${size === "sm" ? "p-3" : "p-4"} ${boxClasses}`}>
       <p className="text-sm text-mint-ink">{confirmText}</p>
       <div className="flex gap-2">
         <Button

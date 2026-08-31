@@ -172,8 +172,8 @@ export default async function AdminEventPage({
           {teams.length > 0 ? (
             <div className="mt-3 flex flex-col gap-1.5">
               {teams.map((t) => (
-                <div key={t.id} className="flex items-center gap-2 rounded-xl bg-mint-net/10 px-3 py-2 text-sm">
-                  <ActionForm action={renameTeam.bind(null, event.id, t.id)} className="flex flex-1 items-center gap-2">
+                <div key={t.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-mint-net/10 px-3 py-2 text-sm">
+                  <ActionForm action={renameTeam.bind(null, event.id, t.id)} className="flex min-w-0 flex-1 items-center gap-2">
                     <input
                       name="name"
                       defaultValue={t.name}
@@ -183,6 +183,7 @@ export default async function AdminEventPage({
                   </ActionForm>
                   <ConfirmButton
                     label="Verwijderen"
+                    icon="✕"
                     confirmText={`"${t.name}" verwijderen?`}
                     action={deleteTeam.bind(null, event.id, t.id)}
                     variant="danger"
