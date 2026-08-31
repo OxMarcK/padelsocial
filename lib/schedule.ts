@@ -168,20 +168,34 @@ export function phaseIndicatorData(event: PadelEvent, pouleRoundsCount: number, 
 
   const kind: PhaseIndicatorData["kind"] = meta.isPauze ? "pauze" : meta.isCeremony ? "ceremony" : meta.showCourts ? "live" : "pre";
 
+  // Poulefase ticks per round, not as one block — the whole-phase window can
+  // span 3+ rounds, and a countdown that doesn't move until the very last one
+  // ends is exactly the "63 minutes left" number nobody can act on, while the
+  // subLabel right next to it already says "Ronde 1 van 3". Round advancement
+  // stays admin-triggered (advancePouleRound), so this is advisory like the
+  // rest of computeSchedule: it assumes the round runs on time and can drift
+  // once the admin advances early/late — fmtCountdown floors at 0:00 rather
+  // than going negative, so a round running over just reads "time's up"
+  // instead of something nonsensical.
+  const countdownWindow =
+    event.status === "poulefase" ? pouleRoundWindow(current.startsAt, event.currentPouleRound) : current;
+
   let countdownText: string | undefined;
   let progress: number | undefined;
   let countdownStartsAt: string | undefined;
   let countdownEndsAt: string | undefined;
-  if (current.endsAt) {
-    const totalMs = current.endsAt.getTime() - current.startsAt.getTime();
-    const remainingMs = current.endsAt.getTime() - now.getTime();
+  if (countdownWindow.endsAt) {
+    const totalMs = countdownWindow.endsAt.getTime() - countdownWindow.startsAt.getTime();
+    const remainingMs = countdownWindow.endsAt.getTime() - now.getTime();
     countdownText = fmtCountdown(remainingMs);
     progress = totalMs > 0 ? 1 - Math.max(0, remainingMs) / totalMs : 1;
-    countdownStartsAt = current.startsAt.toISOString();
-    countdownEndsAt = current.endsAt.toISOString();
+    countdownStartsAt = countdownWindow.startsAt.toISOString();
+    countdownEndsAt = countdownWindow.endsAt.toISOString();
   }
 
-  const timeWindowText = current.endsAt ? `tot ${fmtTime(current.endsAt)}` : `vanaf ${fmtTime(current.startsAt)}`;
+  const timeWindowText = countdownWindow.endsAt
+    ? `tot ${fmtTime(countdownWindow.endsAt)}`
+    : `vanaf ${fmtTime(countdownWindow.startsAt)}`;
   const subLabel =
     event.status === "poulefase"
       ? `Ronde ${event.currentPouleRound} van ${pouleRoundsCount}`
