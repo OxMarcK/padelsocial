@@ -49,8 +49,12 @@ function MatchVideoCard({ row }: { row: MatchVideoRow }) {
         row.accent ? ACCENT_BORDER[row.accent] : "border-l-transparent"
       }`}
     >
+      {/* Miniature of CourtCard's court illustration (components/mint/court-card.tsx) — an
+          inset white outline + net, not just a flat blue block with a stray line, so this
+          thumbnail actually reads as "a padel court" the same way the live event page does. */}
       <div className="relative h-14 w-20 flex-none overflow-hidden rounded-xl bg-glass-blue">
-        <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-white/50" />
+        <div className="absolute inset-1.5 rounded-md border border-white/90" />
+        <div className="absolute inset-y-1.5 left-1/2 w-px -translate-x-1/2 bg-white" />
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-black/25">
             <svg width="11" height="13" viewBox="0 0 11 13" fill="none" aria-hidden="true">
