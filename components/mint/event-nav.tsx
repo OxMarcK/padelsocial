@@ -45,8 +45,11 @@ const ITEMS = [
  * instead of the dark court-night one, with the active item as a solid
  * dark-ink filled circle (white icon) rather than a plain lime-colored icon
  * on transparent — everything else (scroll-shrink behavior, routes) unchanged.
+ * `active` is optional: a page one level below these three (e.g. a single
+ * team's detail page, reached from Teams) isn't itself any of the three tabs,
+ * so it renders the nav with nothing lit up rather than falsely claiming Teams.
  */
-export function EventNav({ slug, active }: { slug: string; active: "event" | "standen" | "teams" }) {
+export function EventNav({ slug, active }: { slug: string; active?: "event" | "standen" | "teams" }) {
   const [compact, setCompact] = useState(false);
 
   useEffect(() => {

@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
-import Link from "next/link";
 import { repo } from "@/lib/data";
 import { groupStandingsByPoule } from "@/lib/standings";
 import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
@@ -79,12 +78,6 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
         </div>
       </header>
       <main className="mx-auto flex max-w-md flex-col gap-6 px-5 py-8">
-      <Link
-        href={`/${event.slug}/teams`}
-        className="inline-flex w-fit items-center gap-1.5 font-mint text-sm font-bold text-mint-ink-muted hover:text-mint-ink"
-      >
-        <span aria-hidden>&lt;</span> Teams
-      </Link>
       <TeamResultCard
         slug={event.slug}
         teamId={team.id}
@@ -129,7 +122,7 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
 
       <MatchVideoSection title="Wedstrijden" rows={videoRows} />
 
-      <EventNav slug={event.slug} active="teams" />
+      <EventNav slug={event.slug} />
       </main>
     </div>
   );
