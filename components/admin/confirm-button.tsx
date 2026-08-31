@@ -20,7 +20,7 @@ export function ConfirmButton({
   icon?: string;
   confirmText: string;
   action: () => Promise<void>;
-  variant?: "primary" | "secondary" | "danger";
+  variant?: "primary" | "secondary" | "ghost" | "danger";
   size?: "md" | "sm";
   /** Shown for a few seconds after the action resolves, instead of instantly collapsing back
    * to the plain button — a click needs a visible outcome, not just a spinner that disappears. */
@@ -60,8 +60,12 @@ export function ConfirmButton({
     );
   }
 
+  // "ghost" is only meant to de-emphasize the idle trigger (a secondary action sitting
+  // next to a primary one) — once you're in the confirm step, "Bevestigen" needs its own
+  // real weight so it doesn't read as identical to the "Annuleren" button beside it.
+  const confirmVariant = variant === "ghost" ? "secondary" : variant;
   const boxClasses =
-    variant === "danger" ? "border-clay-orange bg-clay-orange/10" : "border-mint-lime bg-mint-lime/15";
+    confirmVariant === "danger" ? "border-clay-orange bg-clay-orange/10" : "border-mint-lime bg-mint-lime/15";
 
   return (
     <div className={`flex w-full flex-col gap-3 rounded-2xl border ${size === "sm" ? "p-3" : "p-4"} ${boxClasses}`}>
@@ -69,7 +73,7 @@ export function ConfirmButton({
       <div className="flex gap-2">
         <Button
           type="button"
-          variant={variant}
+          variant={confirmVariant}
           size={size}
           disabled={pending}
           onClick={() =>

@@ -2,7 +2,7 @@ import "server-only";
 import { generatePouleSchedule } from "../poule-scheduler";
 import { resolveBracketMatches, resolveTop8, computeTop8Ranking, type MatchResult } from "../bracket-engine";
 import { computeStandings } from "../standings";
-import { nextStatus } from "../phases";
+import { nextStatus, prevStatus } from "../phases";
 import type { Match, PadelEvent, Placement, Poule, PouleLabel, Team } from "../types";
 import type { CreateEventInput, DataRepo, NewTeamInput, Top8State } from "./repo";
 import { supabaseAdmin } from "./supabase/admin";
@@ -232,6 +232,16 @@ export const supabaseRepo: DataRepo = {
     const next = nextStatus(event.status);
     if (!next) return event;
     const { data, error } = await client.from("events").update({ status: next }).eq("id", eventId).select().single();
+    if (error) raise(error);
+    return mapEvent(data);
+  },
+
+  async regressPhase(eventId) {
+    const client = supabaseAdmin();
+    const event = await fetchEvent(client, eventId);
+    const prev = prevStatus(event.status);
+    if (!prev) return event;
+    const { data, error } = await client.from("events").update({ status: prev }).eq("id", eventId).select().single();
     if (error) raise(error);
     return mapEvent(data);
   },

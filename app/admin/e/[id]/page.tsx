@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
 import { computeSchedule, phaseIndicatorData } from "@/lib/schedule";
-import { PHASE_META, bracketRoundForStatus, highestStartedBracketRound, nextStatus } from "@/lib/phases";
+import { PHASE_META, bracketRoundForStatus, highestStartedBracketRound, nextStatus, prevStatus } from "@/lib/phases";
 import { Field } from "@/components/ui/field";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
@@ -24,6 +24,7 @@ import {
   randomizePoules,
   recomputePlacements,
   recordScore,
+  regressPhase,
   renameTeam,
   savePoulesManual,
   updateEventDetails,
@@ -59,6 +60,7 @@ export default async function AdminEventPage({
   const teamNameById = Object.fromEntries(teams.map((t) => [t.id, t.name]));
   const meta = PHASE_META[event.status];
   const next = nextStatus(event.status);
+  const previous = prevStatus(event.status);
 
   const pouleMatches = matches.filter((m) => m.phase === "poule");
   const schedulePreview =
@@ -174,6 +176,20 @@ export default async function AdminEventPage({
                 successMessage="Doorgezet naar de volgende fase."
               />
             )}
+          </div>
+        ) : null}
+
+        {previous ? (
+          <div className={meta.advanceCta && next ? "mt-2" : "mt-4"}>
+            <ConfirmButton
+              key={`back-${event.status}`}
+              label={`← Terug naar ${PHASE_META[previous].label}`}
+              confirmText={`Terug naar ${PHASE_META[previous].label}? Gescoorde wedstrijden, de gepubliceerde top 8 en de eindstand blijven bewaard — je kan gewoon weer vooruit. Dit is direct zichtbaar op de publieke pagina's.`}
+              action={regressPhase.bind(null, event.id, event.status)}
+              variant="ghost"
+              size="sm"
+              successMessage={`Terug naar ${PHASE_META[previous].label}.`}
+            />
           </div>
         ) : null}
       </div>

@@ -284,6 +284,28 @@ export async function advancePhase(eventId: string, expectedStatus: EventStatus)
   revalidatePath(`/e`);
 }
 
+/**
+ * The other direction: step back one phase to fix something — a wrong top-8
+ * seed after kwartfinales already started, a score that needs correcting
+ * before the round it belongs to is reachable again, or a phase advanced by
+ * mistake. Same expectedStatus staleness guard as advancePhase. Nothing but
+ * status changes here (see DataRepo.regressPhase) — published top8, match
+ * scores and placements all stay put, so stepping back just re-opens the
+ * editing UI for that phase; stepping forward again re-derives everything
+ * downstream the normal way.
+ */
+export async function regressPhase(eventId: string, expectedStatus: EventStatus) {
+  await requireAdmin();
+  const event = await repo.getEvent(eventId);
+  if (event?.status !== expectedStatus) {
+    revalidatePath(path(eventId));
+    return;
+  }
+  await repo.regressPhase(eventId);
+  revalidatePath(path(eventId));
+  revalidatePath(`/e`);
+}
+
 export async function publishTop8Override(eventId: string, formData: FormData) {
   await requireAdmin();
   const seeds = Array.from({ length: 8 }, (_, i) => String(formData.get(`seed${i + 1}`) ?? "").trim());

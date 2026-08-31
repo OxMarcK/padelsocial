@@ -1,7 +1,7 @@
 import { generatePouleSchedule } from "../poule-scheduler";
 import { resolveBracketMatches, resolveTop8, computeTop8Ranking, type MatchResult } from "../bracket-engine";
 import { computeStandings } from "../standings";
-import { nextStatus } from "../phases";
+import { nextStatus, prevStatus } from "../phases";
 import type { Match, PadelEvent, Placement, Poule, PouleLabel, PublicPlayer, Team } from "../types";
 import type { CreateEventInput, DataRepo, NewTeamInput, Top8State } from "./repo";
 
@@ -174,6 +174,15 @@ export const mockRepo: DataRepo = {
     const next = nextStatus(event.status);
     if (!next) return event;
     const updated: PadelEvent = { ...event, status: next };
+    store.events.set(eventId, updated);
+    return updated;
+  },
+
+  async regressPhase(eventId) {
+    const event = requireEvent(eventId);
+    const prev = prevStatus(event.status);
+    if (!prev) return event;
+    const updated: PadelEvent = { ...event, status: prev };
     store.events.set(eventId, updated);
     return updated;
   },

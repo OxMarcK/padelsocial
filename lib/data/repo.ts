@@ -38,6 +38,17 @@ export interface DataRepo {
   updateEvent(id: string, patch: Partial<CreateEventInput> & { pointsWin?: number; pointsDraw?: number; pointsLoss?: number }): Promise<PadelEvent>;
   deleteEvent(id: string): Promise<void>;
   advancePhase(eventId: string): Promise<PadelEvent>;
+  /**
+   * Steps status back one phase (a no-op at "draft", the first phase).
+   * Nothing besides status changes — published top8, recorded match scores,
+   * and stored placements are all left exactly as they are, since the
+   * bracket/standings the admin UI shows are derived live from status +
+   * those on every read. Going back just re-exposes the editing UI for the
+   * phase being returned to; advancing forward again later re-derives
+   * everything downstream the normal way (and re-finishing recomputes
+   * placements via finishEvent, same as any other finish).
+   */
+  regressPhase(eventId: string): Promise<PadelEvent>;
   advancePouleRound(eventId: string): Promise<PadelEvent>;
   finishEvent(eventId: string): Promise<PadelEvent>;
   /**

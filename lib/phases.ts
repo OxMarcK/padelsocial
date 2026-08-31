@@ -43,6 +43,12 @@ export function nextStatus(status: EventStatus): EventStatus | null {
   return PHASE_ORDER[idx + 1] ?? null;
 }
 
+export function prevStatus(status: EventStatus): EventStatus | null {
+  const idx = PHASE_ORDER.indexOf(status);
+  if (idx <= 0) return null;
+  return PHASE_ORDER[idx - 1] ?? null;
+}
+
 export function phaseMeta(status: EventStatus): PhaseMeta {
   return PHASE_META[status];
 }
