@@ -33,19 +33,13 @@ import {
 import { normalizeSlug } from "@/lib/slug";
 
 const POULE_LABEL_OPTIONS = Array.from({ length: 8 }, (_, i) => String.fromCharCode(65 + i)); // A..H
-const TABS = [
-  { key: "teams", label: "Teams" },
-  { key: "poules", label: "Poules" },
-  { key: "scores", label: "Scores" },
-] as const;
-type TabKey = (typeof TABS)[number]["key"];
 
 export default async function AdminEventPage({
   params,
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { tab?: string; round?: string };
+  searchParams: { round?: string };
 }) {
   await requireAdmin();
   const event = await repo.getEvent(params.id);
@@ -112,10 +106,9 @@ export default async function AdminEventPage({
     .sort((a, b) => Number(!!a.videoUrl) - Number(!!b.videoUrl));
   const videosLinkedCount = scoredMatches.filter((m) => m.videoUrl).length;
 
-  const defaultTab: TabKey = pouleMatches.length > 0 ? "scores" : poules.length > 0 ? "poules" : "teams";
-  const requestedTab = searchParams.tab;
-  const tab: TabKey = TABS.some((t) => t.key === requestedTab) ? (requestedTab as TabKey) : defaultTab;
-  const tabHref = (key: TabKey) => `/admin/e/${event.id}?tab=${key}`;
+  // Open by default only while there's still setup to do — once matches exist, this is
+  // a rarely-needed section (fix a typo, re-check a poule) and stays out of the way.
+  const setupOpen = poules.length === 0 || pouleMatches.length === 0;
 
   return (
     <div
@@ -194,62 +187,58 @@ export default async function AdminEventPage({
         ) : null}
       </div>
 
-      <div className="flex gap-1 rounded-2xl bg-white p-1 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
-        {TABS.map((t) => (
-          <Link
-            key={t.key}
-            href={tabHref(t.key)}
-            className={`flex-1 rounded-xl py-2 text-center font-mint text-sm font-bold ${
-              tab === t.key ? "bg-mint-lime text-mint-lime-ink" : "text-mint-ink-muted"
-            }`}
-          >
-            {t.label}
-          </Link>
-        ))}
-      </div>
-
-      {tab === "teams" ? (
-        <Section title="Teams" subtitle={`${teams.length} teams`}>
-          <ActionForm action={addTeamsBulk.bind(null, event.id)} className="flex flex-col gap-2" resetOnSuccess>
-            <textarea
-              name="bulk"
-              rows={4}
-              placeholder={"Team naam | Speler 1 | Speler 2\nSanne & Joep | Sanne | Joep"}
-              className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-sm text-mint-ink placeholder:text-mint-ink-muted/60"
-            />
-            <SaveButton label="Teams toevoegen" savedLabel="Toegevoegd" />
-          </ActionForm>
-          {teams.length > 0 ? (
-            <div className="mt-3 flex flex-col gap-1.5">
-              {teams.map((t) => (
-                <div key={t.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-mint-net/10 px-3 py-2 text-sm">
-                  <ActionForm action={renameTeam.bind(null, event.id, t.id)} className="flex min-w-0 flex-1 items-center gap-2">
-                    <input
-                      name="name"
-                      defaultValue={t.name}
-                      className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+      <details className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]" open={setupOpen}>
+        <summary className="cursor-pointer px-4 py-4 font-mint text-lg font-bold text-mint-ink">
+          Teams &amp; poules
+          <span className="ml-2 font-mint text-xs font-normal text-mint-ink-muted">
+            {teams.length} team{teams.length === 1 ? "" : "s"}
+            {poules.length > 0 ? ` · ${poules.length} poule${poules.length === 1 ? "" : "s"}` : ""}
+            {pouleMatches.length > 0 ? " · schema gegenereerd" : ""}
+          </span>
+        </summary>
+        <div className="flex flex-col gap-6 border-t border-mint-net/15 px-4 pb-4 pt-4">
+          <div className="flex flex-col gap-3">
+            <h3 className="font-mint text-sm font-bold text-mint-ink-muted">Teams</h3>
+            <ActionForm action={addTeamsBulk.bind(null, event.id)} className="flex flex-col gap-2" resetOnSuccess>
+              <textarea
+                name="bulk"
+                rows={4}
+                placeholder={"Team naam | Speler 1 | Speler 2\nSanne & Joep | Sanne | Joep"}
+                className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-sm text-mint-ink placeholder:text-mint-ink-muted/60"
+              />
+              <SaveButton label="Teams toevoegen" savedLabel="Toegevoegd" />
+            </ActionForm>
+            {teams.length > 0 ? (
+              <div className="flex flex-col gap-1.5">
+                {teams.map((t) => (
+                  <div key={t.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-mint-net/10 px-3 py-2 text-sm">
+                    <ActionForm action={renameTeam.bind(null, event.id, t.id)} className="flex min-w-0 flex-1 items-center gap-2">
+                      <input
+                        name="name"
+                        defaultValue={t.name}
+                        className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+                      />
+                      <SaveButton variant="ghost" size="sm" />
+                    </ActionForm>
+                    <ConfirmButton
+                      label="Verwijderen"
+                      icon="✕"
+                      confirmText={`"${t.name}" verwijderen?`}
+                      action={deleteTeam.bind(null, event.id, t.id)}
+                      variant="danger"
+                      size="sm"
+                      successMessage="Team verwijderd."
                     />
-                    <SaveButton variant="ghost" size="sm" />
-                  </ActionForm>
-                  <ConfirmButton
-                    label="Verwijderen"
-                    icon="✕"
-                    confirmText={`"${t.name}" verwijderen?`}
-                    action={deleteTeam.bind(null, event.id, t.id)}
-                    variant="danger"
-                    size="sm"
-                    successMessage="Team verwijderd."
-                  />
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </Section>
-      ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
 
-      {tab === "poules" ? (
-        <>
-          <Section title="Poules" subtitle="Verdeel de teams over poules — 5 teams per poule, zoveel poules als je nodig hebt">
+          <div className="flex flex-col gap-3 border-t border-mint-net/15 pt-6">
+            <h3 className="font-mint text-sm font-bold text-mint-ink-muted">
+              Poules — verdeel de teams, 5 per poule, zoveel poules als je nodig hebt
+            </h3>
             <ActionForm action={savePoulesManual.bind(null, event.id)} className="flex flex-col gap-2">
               {teams.map((t) => {
                 const current = poules.find((p) => p.teamIds.includes(t.id))?.label ?? "";
@@ -289,10 +278,11 @@ export default async function AdminEventPage({
               </label>
               <SaveButton variant="ghost" label="Willekeurig verdelen (5 per poule)" savedLabel="Verdeeld" />
             </ActionForm>
-          </Section>
+          </div>
 
-          <Section title="Poulewedstrijden" subtitle="Configureer punten en genereer het schema">
-            <ActionForm action={updatePoints.bind(null, event.id)} className="mb-3 flex items-end gap-2">
+          <div className="flex flex-col gap-3 border-t border-mint-net/15 pt-6">
+            <h3 className="font-mint text-sm font-bold text-mint-ink-muted">Poulewedstrijden — punten en schema</h3>
+            <ActionForm action={updatePoints.bind(null, event.id)} className="flex items-end gap-2">
               <PointField label="Winst" name="win" defaultValue={event.points.win} />
               <PointField label="Gelijk" name="draw" defaultValue={event.points.draw} />
               <PointField label="Verlies" name="loss" defaultValue={event.points.loss} />
@@ -300,12 +290,12 @@ export default async function AdminEventPage({
             </ActionForm>
 
             {schedulePreview ? (
-              <p className="mb-2 text-xs text-mint-ink-muted">
+              <p className="text-xs text-mint-ink-muted">
                 {schedulePreview.matches.length} wedstrijden over {schedulePreview.roundsCount} rondes (5 banen elke
                 ronde vol — zie lib/poule-scheduler.ts voor waarom dit er {schedulePreview.roundsCount} zijn, niet 5).
               </p>
             ) : (
-              <p className="mb-2 text-xs text-mint-ink-muted">Verdeel eerst de teams over de poules.</p>
+              <p className="text-xs text-mint-ink-muted">Verdeel eerst de teams over de poules.</p>
             )}
 
             <ActionForm action={publishPouleMatches.bind(null, event.id)}>
@@ -316,120 +306,115 @@ export default async function AdminEventPage({
                 savedLabel="Gegenereerd"
               />
             </ActionForm>
-          </Section>
-        </>
+          </div>
+        </div>
+      </details>
+
+      {meta.showCourts && event.status === "poulefase" && pouleMatches.length > 0 ? (
+        <Section title="Scores invoeren" subtitle={`Ronde ${viewedRound} van ${pouleRoundsCount}`}>
+          <div className="flex gap-1 rounded-xl bg-mint-net/10 p-1">
+            {Array.from({ length: pouleRoundsCount }, (_, i) => i + 1).map((r) => (
+              <Link
+                key={r}
+                href={`/admin/e/${event.id}?round=${r}`}
+                className={`flex-1 rounded-lg py-1.5 text-center font-mint text-xs font-bold ${
+                  viewedRound === r ? "bg-mint-lime text-mint-lime-ink" : "text-mint-ink-muted"
+                }`}
+              >
+                Ronde {r}
+              </Link>
+            ))}
+          </div>
+          <MatchBoard matches={viewedRoundMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
+          {viewedRound === event.currentPouleRound ? (
+            missingScores > 0 ? (
+              <div className="mt-3">
+                <ConfirmButton
+                  key={event.currentPouleRound}
+                  label="Volgende ronde binnen poulefase"
+                  confirmText={`Nog ${missingScores} wedstrijd${missingScores === 1 ? "" : "en"} niet gescoord in ronde ${event.currentPouleRound}. Toch doorgaan naar de volgende ronde?`}
+                  action={advancePouleRound.bind(null, event.id, event.currentPouleRound)}
+                  variant="secondary"
+                  successMessage="Volgende ronde gestart."
+                />
+              </div>
+            ) : (
+              <ActionForm
+                key={event.currentPouleRound}
+                action={advancePouleRound.bind(null, event.id, event.currentPouleRound)}
+                className="mt-3"
+              >
+                <SaveButton
+                  variant="ghost"
+                  label="Volgende ronde binnen poulefase"
+                  savedLabel="Volgende ronde gestart"
+                />
+              </ActionForm>
+            )
+          ) : (
+            <p className="mt-3 text-xs text-mint-ink-muted">
+              Je bekijkt een eerdere ronde. Ga naar ronde {event.currentPouleRound} om door te gaan naar de
+              volgende ronde.
+            </p>
+          )}
+        </Section>
       ) : null}
 
-      {tab === "scores" ? (
-        <>
-          {meta.showCourts && event.status === "poulefase" && pouleMatches.length > 0 ? (
-            <Section title="Scores invoeren" subtitle={`Ronde ${viewedRound} van ${pouleRoundsCount}`}>
-              <div className="mb-3 flex flex-wrap gap-2">
-                {Array.from({ length: pouleRoundsCount }, (_, i) => i + 1).map((r) => (
-                  <Link
-                    key={r}
-                    href={`/admin/e/${event.id}?tab=scores&round=${r}`}
-                    className={`flex h-9 items-center justify-center rounded-lg border px-3 text-xs font-mint font-bold ${
-                      viewedRound === r ? "border-glass-blue bg-glass-blue text-white" : "border-mint-net/25 bg-white text-mint-ink-muted"
-                    }`}
-                  >
-                    Ronde {r}
-                  </Link>
-                ))}
-              </div>
-              <MatchBoard matches={viewedRoundMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
-              {viewedRound === event.currentPouleRound ? (
-                missingScores > 0 ? (
-                  <div className="mt-3">
-                    <ConfirmButton
-                      key={event.currentPouleRound}
-                      label="Volgende ronde binnen poulefase"
-                      confirmText={`Nog ${missingScores} wedstrijd${missingScores === 1 ? "" : "en"} niet gescoord in ronde ${event.currentPouleRound}. Toch doorgaan naar de volgende ronde?`}
-                      action={advancePouleRound.bind(null, event.id, event.currentPouleRound)}
-                      variant="secondary"
-                      successMessage="Volgende ronde gestart."
-                    />
-                  </div>
-                ) : (
-                  <ActionForm
-                    key={event.currentPouleRound}
-                    action={advancePouleRound.bind(null, event.id, event.currentPouleRound)}
-                    className="mt-3"
-                  >
-                    <SaveButton
-                      variant="ghost"
-                      label="Volgende ronde binnen poulefase"
-                      savedLabel="Volgende ronde gestart"
-                    />
-                  </ActionForm>
-                )
-              ) : (
-                <p className="mt-3 text-xs text-mint-ink-muted">
-                  Je bekijkt een eerdere ronde. Ga naar ronde {event.currentPouleRound} om door te gaan naar de
-                  volgende ronde.
-                </p>
-              )}
-            </Section>
-          ) : null}
+      {event.status === "pauze_1" ? (
+        <Section title="Top 8 & plaatsingsgroep" subtitle="Controleer de seeding voordat je publiceert">
+          <Top8Editor eventId={event.id} teams={teams} published={top8} />
+        </Section>
+      ) : null}
 
-          {event.status === "pauze_1" ? (
-            <Section title="Top 8 & plaatsingsgroep" subtitle="Controleer de seeding voordat je publiceert">
-              <Top8Editor eventId={event.id} teams={teams} published={top8} />
-            </Section>
-          ) : null}
+      {catchUpBracketMatches.length > 0 ? (
+        <Section
+          title="Nog niet gescoorde wedstrijden"
+          subtitle="Deze zijn overgeslagen doordat de fase al is doorgezet — vul ze alsnog in om de volgende ronde te ontgrendelen"
+        >
+          <MatchBoard matches={catchUpBracketMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
+        </Section>
+      ) : null}
 
-          {catchUpBracketMatches.length > 0 ? (
-            <Section
-              title="Nog niet gescoorde wedstrijden"
-              subtitle="Deze zijn overgeslagen doordat de fase al is doorgezet — vul ze alsnog in om de volgende ronde te ontgrendelen"
-            >
-              <MatchBoard matches={catchUpBracketMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
-            </Section>
-          ) : null}
+      {bracketRound && currentBracketMatches.length > 0 ? (
+        <Section title="Scores invoeren" subtitle={meta.label}>
+          <MatchBoard matches={currentBracketMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
+        </Section>
+      ) : null}
 
-          {bracketRound && currentBracketMatches.length > 0 ? (
-            <Section title="Scores invoeren" subtitle={meta.label}>
-              <MatchBoard matches={currentBracketMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
-            </Section>
-          ) : null}
-
-          {scoredMatches.length > 0 ? (
-            <Section
-              title="Video's koppelen"
-              subtitle={`${videosLinkedCount} van ${scoredMatches.length} wedstrijden gekoppeld`}
-            >
-              <div className="flex max-h-[420px] flex-col gap-2 overflow-y-auto">
-                {scoredMatches.map((m) => (
-                  <ActionForm
-                    key={m.id}
-                    action={attachVideo.bind(null, event.id)}
-                    className="flex flex-col gap-1.5 rounded-xl bg-mint-net/10 p-3 text-sm"
-                  >
-                    <input type="hidden" name="matchId" value={m.id} />
-                    <div className="flex items-center gap-1.5">
-                      {m.videoUrl ? <span aria-hidden className="text-mint-lime-ink">✓</span> : null}
-                      <span className="truncate text-mint-ink-muted">{m.label}</span>
-                    </div>
-                    <span className="truncate font-semibold text-mint-ink">
-                      {m.teamAId ? teamNameById[m.teamAId] ?? "?" : "?"} vs {m.teamBId ? teamNameById[m.teamBId] ?? "?" : "?"}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="url"
-                        name="videoUrl"
-                        defaultValue={m.videoUrl ?? ""}
-                        placeholder="https://youtube.com/…"
-                        className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink placeholder:text-mint-ink-muted/60"
-                      />
-                      <SaveButton variant="ghost" size="sm" />
-                    </div>
-                  </ActionForm>
-                ))}
-              </div>
-            </Section>
-          ) : null}
-
-        </>
+      {scoredMatches.length > 0 ? (
+        <Section
+          title="Video's koppelen"
+          subtitle={`${videosLinkedCount} van ${scoredMatches.length} wedstrijden gekoppeld`}
+        >
+          <div className="flex max-h-[420px] flex-col gap-2 overflow-y-auto">
+            {scoredMatches.map((m) => (
+              <ActionForm
+                key={m.id}
+                action={attachVideo.bind(null, event.id)}
+                className="flex flex-col gap-1.5 rounded-xl bg-mint-net/10 p-3 text-sm"
+              >
+                <input type="hidden" name="matchId" value={m.id} />
+                <div className="flex items-center gap-1.5">
+                  {m.videoUrl ? <span aria-hidden className="text-mint-lime-ink">✓</span> : null}
+                  <span className="truncate text-mint-ink-muted">{m.label}</span>
+                </div>
+                <span className="truncate font-semibold text-mint-ink">
+                  {m.teamAId ? teamNameById[m.teamAId] ?? "?" : "?"} vs {m.teamBId ? teamNameById[m.teamBId] ?? "?" : "?"}
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="url"
+                    name="videoUrl"
+                    defaultValue={m.videoUrl ?? ""}
+                    placeholder="https://youtube.com/…"
+                    className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink placeholder:text-mint-ink-muted/60"
+                  />
+                  <SaveButton variant="ghost" size="sm" />
+                </div>
+              </ActionForm>
+            ))}
+          </div>
+        </Section>
       ) : null}
 
       {event.status === "finished" ? (
