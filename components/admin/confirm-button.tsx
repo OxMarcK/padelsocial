@@ -27,7 +27,7 @@ export function ConfirmButton({
 
   if (done && successMessage) {
     return (
-      <div className="flex items-center gap-2 rounded-2xl border border-lime-serve bg-lime-serve/10 px-4 py-3 text-sm text-lime-serve">
+      <div className="flex items-center gap-2 rounded-2xl border border-mint-lime bg-mint-lime/15 px-4 py-3 text-sm text-mint-lime-ink">
         <span aria-hidden>✓</span> {successMessage}
       </div>
     );
@@ -53,11 +53,11 @@ export function ConfirmButton({
   }
 
   const boxClasses =
-    variant === "danger" ? "border-clay-orange bg-clay-orange/10" : "border-lime-serve bg-lime-serve/10";
+    variant === "danger" ? "border-clay-orange bg-clay-orange/10" : "border-mint-lime bg-mint-lime/15";
 
   return (
     <div className={`flex flex-col gap-3 rounded-2xl border ${size === "sm" ? "p-3" : "p-4"} ${boxClasses}`}>
-      <p className="text-sm text-flood-white">{confirmText}</p>
+      <p className="text-sm text-mint-ink">{confirmText}</p>
       <div className="flex gap-2">
         <Button
           type="button"

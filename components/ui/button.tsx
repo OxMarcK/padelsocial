@@ -3,10 +3,11 @@ import type { ButtonHTMLAttributes } from "react";
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "md" | "sm";
 
+/** Design 6A trial: restyled for the light "mint" admin — see app/admin/e/[id]/page.tsx. */
 const VARIANT_CLASSES: Record<Variant, string> = {
-  primary: "bg-lime-serve text-court-night hover:brightness-105",
-  secondary: "bg-glass-blue text-flood-white hover:brightness-110",
-  ghost: "border border-flood-white/20 text-flood-white hover:bg-flood-white/10",
+  primary: "bg-mint-lime text-mint-lime-ink hover:brightness-105",
+  secondary: "bg-glass-blue text-white hover:brightness-110",
+  ghost: "border border-mint-net/30 bg-white text-mint-ink hover:bg-mint-net/10",
   danger: "border border-clay-orange text-clay-orange hover:bg-clay-orange/10",
 };
 
@@ -24,7 +25,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export function Button({ variant = "primary", size = "md", fullWidth, className = "", ...props }: ButtonProps) {
   return (
     <button
-      className={`rounded-2xl font-display font-bold uppercase tracking-wider transition disabled:opacity-40 disabled:cursor-not-allowed ${SIZE_CLASSES[size]} ${VARIANT_CLASSES[variant]} ${fullWidth ? "w-full" : ""} ${className}`}
+      className={`rounded-2xl font-mint font-bold uppercase tracking-wider transition disabled:opacity-40 disabled:cursor-not-allowed ${SIZE_CLASSES[size]} ${VARIANT_CLASSES[variant]} ${fullWidth ? "w-full" : ""} ${className}`}
       {...props}
     />
   );

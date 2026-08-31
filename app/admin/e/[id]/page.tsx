@@ -103,14 +103,17 @@ export default async function AdminEventPage({
   const tabHref = (key: TabKey) => `/admin/e/${event.id}?tab=${key}`;
 
   return (
-    <div className="min-h-screen bg-court-night">
+    <div
+      className="min-h-screen font-mint text-mint-ink"
+      style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
+    >
     <main className="mx-auto flex max-w-2xl flex-col gap-8 px-6 py-10">
       <div>
-        <h1 className="font-display text-4xl font-bold uppercase tracking-wide">{event.name}</h1>
-        <p className="text-sm text-ink-muted">
+        <h1 className="font-mint text-4xl font-bold text-mint-ink">{event.name}</h1>
+        <p className="text-sm text-mint-ink-muted">
           {event.date} · {event.location} · {event.courts} banen
         </p>
-        <p className="mt-2 font-display text-lg font-bold uppercase tracking-wider text-lime-serve">{meta.label}</p>
+        <p className="mt-2 font-mint text-lg font-bold text-mint-lime-ink">{meta.label}</p>
       </div>
 
       {meta.advanceCta && next ? (
@@ -134,21 +137,19 @@ export default async function AdminEventPage({
         )
       ) : null}
 
-      <details className="rounded-2xl border border-flood-white/10 bg-court-night p-4">
-        <summary className="cursor-pointer font-display text-lg font-bold uppercase tracking-wide">
-          Event bewerken
-        </summary>
+      <details className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+        <summary className="cursor-pointer font-mint text-lg font-bold text-mint-ink">Event bewerken</summary>
         <ActionForm action={updateEventDetails.bind(null, event.id)} className="mt-4 flex flex-col gap-3">
           <Field label="Naam" name="name" defaultValue={event.name} required />
           <label className="flex flex-col gap-1 text-sm">
-            <span className="text-ink-muted">Slug (voor de URL)</span>
+            <span className="text-mint-ink-muted">Slug (voor de URL)</span>
             <input
               name="slug"
               defaultValue={event.slug}
               required
-              className="rounded-xl border border-flood-white/15 bg-court-night px-3 py-2 text-flood-white"
+              className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
             />
-            <span className="text-xs text-ink-muted">
+            <span className="text-xs text-mint-ink-muted">
               Publieke link wordt event.padelsocial.nl/{event.slug} — al gedeelde links met de oude slug werken hierna niet meer.
             </span>
           </label>
@@ -159,12 +160,12 @@ export default async function AdminEventPage({
           <Field label="Locatie" name="location" defaultValue={event.location} required />
           <Field label="Aantal banen" name="courts" type="number" defaultValue={event.courts} required />
           <label className="flex flex-col gap-1 text-sm">
-            <span className="text-ink-muted">Omschrijving</span>
+            <span className="text-mint-ink-muted">Omschrijving</span>
             <textarea
               name="description"
               rows={3}
               defaultValue={event.description}
-              className="rounded-xl border border-flood-white/15 bg-court-night px-3 py-2 text-flood-white"
+              className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
             />
           </label>
           <ActionFormError />
@@ -172,23 +173,21 @@ export default async function AdminEventPage({
         </ActionForm>
       </details>
 
-      <details className="rounded-2xl border border-flood-white/10 bg-court-night p-4">
-        <summary className="cursor-pointer font-display text-lg font-bold uppercase tracking-wide">
-          Dupliceer event
-        </summary>
-        <p className="mt-2 text-xs text-ink-muted">
+      <details className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+        <summary className="cursor-pointer font-mint text-lg font-bold text-mint-ink">Dupliceer event</summary>
+        <p className="mt-2 text-xs text-mint-ink-muted">
           Maakt een nieuw event met dezelfde teams en poule-indeling — handig om een fase of het schema te testen
           zonder dit event te raken. Het nieuwe event begint bij Inchecken (nog geen wedstrijden of scores).
         </p>
         <ActionForm action={duplicateEvent.bind(null, event.id)} className="mt-4 flex flex-col gap-3">
           <Field label="Naam" name="name" defaultValue={`${event.name} (test)`} required />
           <label className="flex flex-col gap-1 text-sm">
-            <span className="text-ink-muted">Slug (voor de URL)</span>
+            <span className="text-mint-ink-muted">Slug (voor de URL)</span>
             <input
               name="slug"
               defaultValue={normalizeSlug(`${event.slug}-test`)}
               required
-              className="rounded-xl border border-flood-white/15 bg-court-night px-3 py-2 text-flood-white"
+              className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
             />
           </label>
           <ActionFormError />
@@ -196,13 +195,13 @@ export default async function AdminEventPage({
         </ActionForm>
       </details>
 
-      <div className="flex gap-2 rounded-xl border border-flood-white/10 bg-surface p-1">
+      <div className="flex gap-1 rounded-2xl bg-white p-1 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
         {TABS.map((t) => (
           <Link
             key={t.key}
             href={tabHref(t.key)}
-            className={`flex-1 rounded-lg py-2 text-center font-display text-sm font-bold uppercase tracking-wide ${
-              tab === t.key ? "bg-glass-blue text-flood-white" : "text-ink-muted"
+            className={`flex-1 rounded-xl py-2 text-center font-mint text-sm font-bold ${
+              tab === t.key ? "bg-mint-lime text-mint-lime-ink" : "text-mint-ink-muted"
             }`}
           >
             {t.label}
@@ -217,19 +216,19 @@ export default async function AdminEventPage({
               name="bulk"
               rows={4}
               placeholder={"Team naam | Speler 1 | Speler 2\nSanne & Joep | Sanne | Joep"}
-              className="rounded-xl border border-flood-white/15 bg-court-night px-3 py-2 text-sm text-flood-white placeholder:text-ink-muted"
+              className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-sm text-mint-ink placeholder:text-mint-ink-muted/60"
             />
             <SaveButton label="Teams toevoegen" savedLabel="Toegevoegd" />
           </ActionForm>
           {teams.length > 0 ? (
             <div className="mt-3 flex flex-col gap-1.5">
               {teams.map((t) => (
-                <div key={t.id} className="flex items-center gap-2 rounded-xl bg-flood-white/5 px-3 py-2 text-sm">
+                <div key={t.id} className="flex items-center gap-2 rounded-xl bg-mint-net/10 px-3 py-2 text-sm">
                   <ActionForm action={renameTeam.bind(null, event.id, t.id)} className="flex flex-1 items-center gap-2">
                     <input
                       name="name"
                       defaultValue={t.name}
-                      className="h-9 min-w-0 flex-1 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
+                      className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
                     />
                     <SaveButton variant="ghost" size="sm" />
                   </ActionForm>
@@ -256,12 +255,12 @@ export default async function AdminEventPage({
                 const current = poules.find((p) => p.teamIds.includes(t.id))?.label ?? "";
                 return (
                   <div key={t.id} className="flex items-center gap-2 text-sm">
-                    <span className="flex-1 truncate">{t.name}</span>
+                    <span className="flex-1 truncate text-mint-ink">{t.name}</span>
                     <select
                       key={current}
                       name={`poule_${t.id}`}
                       defaultValue={current}
-                      className="h-9 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
+                      className="h-9 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
                     >
                       <option value="">–</option>
                       {POULE_LABEL_OPTIONS.map((label) => (
@@ -279,13 +278,13 @@ export default async function AdminEventPage({
             </ActionForm>
             <ActionForm action={randomizePoules.bind(null, event.id)} className="mt-2 flex items-end gap-2">
               <label className="flex flex-col gap-1 text-xs">
-                <span className="text-ink-muted">Aantal poules</span>
+                <span className="text-mint-ink-muted">Aantal poules</span>
                 <input
                   type="number"
                   name="pouleCount"
                   min={1}
                   defaultValue={Math.max(1, Math.round(teams.length / 5) || 1)}
-                  className="h-9 w-20 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
+                  className="h-9 w-20 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
                 />
               </label>
               <SaveButton variant="ghost" label="Willekeurig verdelen (5 per poule)" savedLabel="Verdeeld" />
@@ -301,12 +300,12 @@ export default async function AdminEventPage({
             </ActionForm>
 
             {schedulePreview ? (
-              <p className="mb-2 text-xs text-ink-muted">
+              <p className="mb-2 text-xs text-mint-ink-muted">
                 {schedulePreview.matches.length} wedstrijden over {schedulePreview.roundsCount} rondes (5 banen elke
                 ronde vol — zie lib/poule-scheduler.ts voor waarom dit er {schedulePreview.roundsCount} zijn, niet 5).
               </p>
             ) : (
-              <p className="mb-2 text-xs text-ink-muted">Verdeel eerst de teams over de poules.</p>
+              <p className="mb-2 text-xs text-mint-ink-muted">Verdeel eerst de teams over de poules.</p>
             )}
 
             <ActionForm action={publishPouleMatches.bind(null, event.id)}>
@@ -330,8 +329,8 @@ export default async function AdminEventPage({
                   <Link
                     key={r}
                     href={`/admin/e/${event.id}?tab=scores&round=${r}`}
-                    className={`flex h-9 items-center justify-center rounded-lg border px-3 text-xs font-display font-bold uppercase tracking-wide ${
-                      viewedRound === r ? "border-glass-blue bg-glass-blue text-flood-white" : "border-flood-white/15 text-ink-muted"
+                    className={`flex h-9 items-center justify-center rounded-lg border px-3 text-xs font-mint font-bold ${
+                      viewedRound === r ? "border-glass-blue bg-glass-blue text-white" : "border-mint-net/25 bg-white text-mint-ink-muted"
                     }`}
                   >
                     Ronde {r}
@@ -365,7 +364,7 @@ export default async function AdminEventPage({
                   </ActionForm>
                 )
               ) : (
-                <p className="mt-3 text-xs text-ink-muted">
+                <p className="mt-3 text-xs text-mint-ink-muted">
                   Je bekijkt een eerdere ronde. Ga naar ronde {event.currentPouleRound} om door te gaan naar de
                   volgende ronde.
                 </p>
@@ -403,12 +402,12 @@ export default async function AdminEventPage({
                     <ActionForm
                       key={m.id}
                       action={attachVideo.bind(null, event.id)}
-                      className="flex flex-col gap-1.5 rounded-xl bg-flood-white/5 p-3 text-sm"
+                      className="flex flex-col gap-1.5 rounded-xl bg-mint-net/10 p-3 text-sm"
                     >
                       <input type="hidden" name="matchId" value={m.id} />
                       <div className="flex flex-col gap-0.5">
-                        <span className="truncate text-ink-muted">{m.label}</span>
-                        <span className="truncate font-semibold text-flood-white">
+                        <span className="truncate text-mint-ink-muted">{m.label}</span>
+                        <span className="truncate font-semibold text-mint-ink">
                           {m.teamAId ? teamNameById[m.teamAId] ?? "?" : "?"} vs {m.teamBId ? teamNameById[m.teamBId] ?? "?" : "?"}
                         </span>
                       </div>
@@ -418,7 +417,7 @@ export default async function AdminEventPage({
                           name="videoUrl"
                           defaultValue={m.videoUrl ?? ""}
                           placeholder="https://youtube.com/…"
-                          className="h-9 min-w-0 flex-1 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white placeholder:text-ink-muted"
+                          className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink placeholder:text-mint-ink-muted/60"
                         />
                         <SaveButton variant="ghost" size="sm" />
                       </div>
@@ -433,7 +432,7 @@ export default async function AdminEventPage({
 
       {event.status === "finished" ? (
         <Section title="Eindstand" subtitle="Herbereken de eindstand op basis van de huidige wedstrijduitslagen">
-          <p className="text-xs text-ink-muted">
+          <p className="text-xs text-mint-ink-muted">
             Nodig als het event werd afgerond terwijl de halve finales of finales nog niet (volledig) gescoord waren
             — de publieke eindstand liet dan &quot;?&quot; zien op die plekken. Werkt de eindstand bij zonder de
             afgeronde status te wijzigen.
@@ -470,10 +469,10 @@ function confirmTextFor(status: string, teamCount: number) {
 
 function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-3 rounded-2xl border border-flood-white/10 bg-court-night p-4">
+    <section className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
       <div>
-        <h2 className="font-display text-xl font-bold uppercase tracking-wide">{title}</h2>
-        {subtitle ? <p className="text-xs text-ink-muted">{subtitle}</p> : null}
+        <h2 className="font-mint text-xl font-bold text-mint-ink">{title}</h2>
+        {subtitle ? <p className="text-xs text-mint-ink-muted">{subtitle}</p> : null}
       </div>
       {children}
     </section>
@@ -483,12 +482,12 @@ function Section({ title, subtitle, children }: { title: string; subtitle?: stri
 function PointField({ label, name, defaultValue }: { label: string; name: string; defaultValue: number }) {
   return (
     <label className="flex flex-col gap-1 text-xs">
-      <span className="text-ink-muted">{label}</span>
+      <span className="text-mint-ink-muted">{label}</span>
       <input
         type="number"
         name={name}
         defaultValue={defaultValue}
-        className="h-9 w-16 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
+        className="h-9 w-16 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
       />
     </label>
   );
@@ -509,32 +508,32 @@ async function Top8Editor({
 
   return (
     <ActionForm action={publishTop8Override.bind(null, eventId)} className="flex flex-col gap-3 text-sm">
-      <p className="text-xs text-ink-muted">
+      <p className="text-xs text-mint-ink-muted">
         Seed 1 t/m 8, beste eerst. Kwartfinales spelen 1-8, 4-5, 2-7, 3-6 (standaard bracket-seeding), zodat seed 1
         en 2 elkaar pas in de finale kunnen treffen.
       </p>
       {state.top8.seeds.map((teamId, i) => (
         <div key={i} className="flex items-center gap-2">
-          <span className="w-16 flex-none text-ink-muted">Seed {i + 1}</span>
+          <span className="w-16 flex-none text-mint-ink-muted">Seed {i + 1}</span>
           <input
             name={`seed${i + 1}`}
             defaultValue={teamId}
-            className="h-9 flex-1 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
+            className="h-9 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
           />
-          <span className="w-32 flex-none truncate text-xs text-ink-muted">{name(teamId)}</span>
+          <span className="w-32 flex-none truncate text-xs text-mint-ink-muted">{name(teamId)}</span>
         </div>
       ))}
       <label className="flex flex-col gap-1">
-        <span className="text-ink-muted">
+        <span className="text-mint-ink-muted">
           Overige teams (plek 9+), beste naar slechtste — bepaalt direct de eindstand (team-id&apos;s, komma-gescheiden)
         </span>
         <input
           name="placementSeeds"
           defaultValue={state.placementSeeds.join(",")}
-          className="h-9 rounded-lg border border-flood-white/15 bg-court-night px-2 text-flood-white"
+          className="h-9 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
         />
       </label>
-      <p className="text-xs text-ink-muted">{state.placementSeeds.map((id) => name(id)).join(" · ")}</p>
+      <p className="text-xs text-mint-ink-muted">{state.placementSeeds.map((id) => name(id)).join(" · ")}</p>
       <ActionFormError />
       <SaveButton label={published ? "Bijwerken" : "Publiceren"} savedLabel={published ? "Bijgewerkt" : "Gepubliceerd"} />
     </ActionForm>

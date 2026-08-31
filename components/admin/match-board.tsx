@@ -17,7 +17,7 @@ export function MatchBoard({
   const [selectedId, setSelectedId] = useState(sorted[0]?.id);
   const selected = sorted.find((m) => m.id === selectedId) ?? sorted[0];
 
-  if (!selected) return <p className="text-sm text-ink-muted">Geen wedstrijden in deze ronde.</p>;
+  if (!selected) return <p className="text-sm text-mint-ink-muted">Geen wedstrijden in deze ronde.</p>;
 
   return (
     <div className="flex flex-col gap-3">
@@ -32,13 +32,13 @@ export function MatchBoard({
               onClick={() => setSelectedId(m.id)}
               className={`flex h-14 flex-col items-center justify-center gap-0.5 rounded-xl border ${
                 active
-                  ? "border-glass-blue bg-glass-blue text-flood-white"
+                  ? "border-glass-blue bg-glass-blue text-white"
                   : done
-                    ? "border-transparent bg-lime-serve/10 text-lime-serve"
-                    : "border-flood-white/15 bg-flood-white/5 text-ink-muted"
+                    ? "border-transparent bg-mint-lime/15 text-mint-lime-ink"
+                    : "border-mint-net/20 bg-white text-mint-ink-muted"
               }`}
             >
-              <span className="font-display text-xl font-bold leading-none">{m.courtNumber}</span>
+              <span className="font-mint text-xl font-bold leading-none">{m.courtNumber}</span>
               <span className="text-[9px] font-semibold uppercase tracking-wider">{done ? "klaar" : "open"}</span>
             </button>
           );

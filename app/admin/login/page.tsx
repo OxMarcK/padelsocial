@@ -20,39 +20,43 @@ async function requestLink(formData: FormData) {
   redirect("/admin/login?sent=1");
 }
 
+/** Design 6A trial: admin restyled for the light "mint" palette — no canvas reference for these screens, extrapolates the established tokens directly onto the existing layout. */
 export default function AdminLoginPage({ searchParams }: { searchParams: { sent?: string; error?: string } }) {
   return (
-    <div className="min-h-screen bg-court-night">
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
-      <Logo size="lg" />
-      <div>
-        <h1 className="font-display text-3xl font-bold uppercase tracking-wide">Admin</h1>
-        <p className="mt-1 text-sm text-ink-muted">Log in met je e-mailadres — je krijgt een inloglink.</p>
-      </div>
-      {searchParams.sent ? (
-        <div className="rounded-2xl border border-lime-serve bg-lime-serve/10 p-4 text-sm">
-          Check je e-mail voor de inloglink.
+    <div
+      className="min-h-screen font-mint text-mint-ink"
+      style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
+    >
+      <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
+        <Logo variant="light" size="lg" />
+        <div>
+          <h1 className="font-mint text-3xl font-bold text-mint-ink">Admin</h1>
+          <p className="mt-1 text-sm text-mint-ink-muted">Log in met je e-mailadres — je krijgt een inloglink.</p>
         </div>
-      ) : (
-        <form action={requestLink} className="flex flex-col gap-3">
-          {searchParams.error ? (
-            <div className="rounded-2xl border border-clay-orange bg-clay-orange/10 p-4 text-sm">
-              {searchParams.error}
-            </div>
-          ) : null}
-          <input
-            type="email"
-            name="email"
-            required
-            placeholder="jij@padelsocial.nl"
-            className="h-14 rounded-2xl border border-flood-white/15 bg-surface px-4 text-flood-white placeholder:text-ink-muted"
-          />
-          <Button type="submit" fullWidth>
-            Stuur inloglink
-          </Button>
-        </form>
-      )}
-    </main>
+        {searchParams.sent ? (
+          <div className="rounded-2xl border border-mint-lime bg-mint-lime/15 p-4 text-sm text-mint-lime-ink">
+            Check je e-mail voor de inloglink.
+          </div>
+        ) : (
+          <form action={requestLink} className="flex flex-col gap-3">
+            {searchParams.error ? (
+              <div className="rounded-2xl border border-clay-orange bg-clay-orange/10 p-4 text-sm text-mint-ink">
+                {searchParams.error}
+              </div>
+            ) : null}
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder="jij@padelsocial.nl"
+              className="h-14 rounded-2xl border border-mint-net/25 bg-white px-4 text-mint-ink placeholder:text-mint-ink-muted/60"
+            />
+            <Button type="submit" fullWidth>
+              Stuur inloglink
+            </Button>
+          </form>
+        )}
+      </main>
     </div>
   );
 }
