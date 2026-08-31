@@ -42,7 +42,6 @@ export interface PadelEvent {
   startTime: string;
   location: string;
   courts: number;
-  description: string;
   coverUrl: string | null;
   status: EventStatus;
   points: PointsConfig;

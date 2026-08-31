@@ -134,7 +134,6 @@ export const mockRepo: DataRepo = {
       startTime: input.startTime,
       location: input.location,
       courts: input.courts,
-      description: input.description,
       coverUrl: input.coverUrl,
       status: "draft",
       points: { win: 3, draw: 1, loss: 0 },

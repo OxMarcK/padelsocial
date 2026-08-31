@@ -7,7 +7,6 @@ export interface CreateEventInput {
   startTime: string;
   location: string;
   courts: number;
-  description: string;
   coverUrl: string | null;
 }
 

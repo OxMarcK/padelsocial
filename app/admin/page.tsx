@@ -22,7 +22,6 @@ async function createEvent(formData: FormData) {
     startTime: String(formData.get("startTime") ?? "10:30"),
     location: String(formData.get("location") ?? ""),
     courts: Number(formData.get("courts") ?? 5),
-    description: String(formData.get("description") ?? ""),
     coverUrl: null,
   });
   redirect(`/admin/e/${event.id}`);
@@ -76,14 +75,6 @@ export default async function AdminHomePage() {
             </div>
             <Field label="Locatie" name="location" required placeholder="Rotterdam" />
             <Field label="Aantal banen" name="courts" type="number" defaultValue={5} required />
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="text-mint-ink-muted">Omschrijving</span>
-              <textarea
-                name="description"
-                rows={3}
-                className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
-              />
-            </label>
             <Button type="submit" fullWidth>
               Event aanmaken
             </Button>

@@ -28,7 +28,6 @@ function mapEvent(row: any): PadelEvent {
     startTime: row.start_time,
     location: row.location,
     courts: row.courts,
-    description: row.description,
     coverUrl: row.cover_url,
     status: row.status,
     points: { win: row.points_win, draw: row.points_draw, loss: row.points_loss },
@@ -198,7 +197,6 @@ export const supabaseRepo: DataRepo = {
         start_time: input.startTime,
         location: input.location,
         courts: input.courts,
-        description: input.description,
         cover_url: input.coverUrl,
       })
       .select()
@@ -216,7 +214,6 @@ export const supabaseRepo: DataRepo = {
     if (patch.startTime !== undefined) update.start_time = patch.startTime;
     if (patch.location !== undefined) update.location = patch.location;
     if (patch.courts !== undefined) update.courts = patch.courts;
-    if (patch.description !== undefined) update.description = patch.description;
     if (patch.coverUrl !== undefined) update.cover_url = patch.coverUrl;
     if (patch.pointsWin !== undefined) update.points_win = patch.pointsWin;
     if (patch.pointsDraw !== undefined) update.points_draw = patch.pointsDraw;

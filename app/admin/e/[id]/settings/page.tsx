@@ -39,15 +39,6 @@ export default async function AdminEventSettingsPage({ params }: { params: { id:
           </div>
           <Field label="Locatie" name="location" defaultValue={event.location} required />
           <Field label="Aantal banen" name="courts" type="number" defaultValue={event.courts} required />
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-mint-ink-muted">Omschrijving</span>
-            <textarea
-              name="description"
-              rows={3}
-              defaultValue={event.description}
-              className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
-            />
-          </label>
           <ActionFormError />
           <SaveButton />
         </ActionForm>

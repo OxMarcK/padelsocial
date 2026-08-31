@@ -65,7 +65,6 @@ export async function updateEventDetails(eventId: string, formData: FormData) {
     startTime: String(formData.get("startTime") ?? ""),
     location: String(formData.get("location") ?? ""),
     courts: Number(formData.get("courts") ?? 5),
-    description: String(formData.get("description") ?? ""),
   });
   revalidatePath(path(eventId));
   revalidatePath("/");
@@ -145,7 +144,6 @@ export async function duplicateEvent(eventId: string, formData: FormData) {
     startTime: source.startTime,
     location: source.location,
     courts: source.courts,
-    description: source.description,
     coverUrl: null,
   });
   await repo.updateEvent(copy.id, {
