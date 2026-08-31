@@ -58,7 +58,13 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
 
   const videoRows = buildMatchVideoRows(
     matches.filter((m) => m.teamAId === team.id || m.teamBId === team.id),
-    { teamNameById, pouleStartsAt: pouleWindow.startsAt, windows, perspectiveTeamId: team.id }
+    {
+      teamNameById,
+      pouleStartsAt: pouleWindow.startsAt,
+      pouleChangeoverMinutes: event.schedule.pouleChangeoverMinutes,
+      windows,
+      perspectiveTeamId: team.id,
+    }
   );
 
   return (
@@ -102,7 +108,7 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
               const opp = m.teamAId === team.id ? m.teamBId : m.teamAId;
               const myScore = m.teamAId === team.id ? m.scoreA : m.scoreB;
               const oppScore = m.teamAId === team.id ? m.scoreB : m.scoreA;
-              const { startsAt, endsAt } = pouleRoundWindow(pouleWindow.startsAt, m.roundNumber);
+              const { startsAt, endsAt } = pouleRoundWindow(pouleWindow.startsAt, m.roundNumber, event.schedule.pouleChangeoverMinutes);
               return (
                 <div key={m.id} className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-sm shadow-[0_1px_3px_rgba(20,35,28,.08)]">
                   <div className="flex flex-col gap-0.5">

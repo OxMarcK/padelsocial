@@ -75,6 +75,24 @@ export async function updateEventDetails(eventId: string, formData: FormData) {
   }
 }
 
+/**
+ * Changeover/pauze durations — advisory only, drives the displayed schedule
+ * and countdown (lib/schedule.ts), never blocks or auto-advances anything.
+ * Its own action/form, same reasoning as updatePoints below: a focused save
+ * with its own pending/success state instead of getting lost in the big
+ * Event bewerken form.
+ */
+export async function updateScheduleConfig(eventId: string, formData: FormData) {
+  await requireAdmin();
+  await repo.updateEvent(eventId, {
+    pouleChangeoverMinutes: Number(formData.get("pouleChangeoverMinutes") ?? 3),
+    pauzeAfterPoulefaseMinutes: Number(formData.get("pauzeAfterPoulefaseMinutes") ?? 5),
+    pauzeAfterKwartfinaleMinutes: Number(formData.get("pauzeAfterKwartfinaleMinutes") ?? 3),
+    pauzeAfterHalveFinaleMinutes: Number(formData.get("pauzeAfterHalveFinaleMinutes") ?? 3),
+  });
+  revalidatePath(path(eventId));
+}
+
 export async function deleteEvent(eventId: string) {
   await requireAdmin();
   await repo.deleteEvent(eventId);
@@ -134,6 +152,10 @@ export async function duplicateEvent(eventId: string, formData: FormData) {
     pointsWin: source.points.win,
     pointsDraw: source.points.draw,
     pointsLoss: source.points.loss,
+    pouleChangeoverMinutes: source.schedule.pouleChangeoverMinutes,
+    pauzeAfterPoulefaseMinutes: source.schedule.pauzeAfterPoulefaseMinutes,
+    pauzeAfterKwartfinaleMinutes: source.schedule.pauzeAfterKwartfinaleMinutes,
+    pauzeAfterHalveFinaleMinutes: source.schedule.pauzeAfterHalveFinaleMinutes,
   });
 
   const teams = await repo.listTeams(eventId);

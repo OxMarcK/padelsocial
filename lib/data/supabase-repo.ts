@@ -32,6 +32,12 @@ function mapEvent(row: any): PadelEvent {
     coverUrl: row.cover_url,
     status: row.status,
     points: { win: row.points_win, draw: row.points_draw, loss: row.points_loss },
+    schedule: {
+      pouleChangeoverMinutes: row.poule_changeover_minutes,
+      pauzeAfterPoulefaseMinutes: row.pauze_after_poulefase_minutes,
+      pauzeAfterKwartfinaleMinutes: row.pauze_after_kwartfinale_minutes,
+      pauzeAfterHalveFinaleMinutes: row.pauze_after_halve_finale_minutes,
+    },
     currentPouleRound: row.current_poule_round,
     createdAt: row.created_at,
   };
@@ -215,6 +221,10 @@ export const supabaseRepo: DataRepo = {
     if (patch.pointsWin !== undefined) update.points_win = patch.pointsWin;
     if (patch.pointsDraw !== undefined) update.points_draw = patch.pointsDraw;
     if (patch.pointsLoss !== undefined) update.points_loss = patch.pointsLoss;
+    if (patch.pouleChangeoverMinutes !== undefined) update.poule_changeover_minutes = patch.pouleChangeoverMinutes;
+    if (patch.pauzeAfterPoulefaseMinutes !== undefined) update.pauze_after_poulefase_minutes = patch.pauzeAfterPoulefaseMinutes;
+    if (patch.pauzeAfterKwartfinaleMinutes !== undefined) update.pauze_after_kwartfinale_minutes = patch.pauzeAfterKwartfinaleMinutes;
+    if (patch.pauzeAfterHalveFinaleMinutes !== undefined) update.pauze_after_halve_finale_minutes = patch.pauzeAfterHalveFinaleMinutes;
     const { data, error } = await client.from("events").update(update).eq("id", id).select().single();
     if (error) raise(error);
     return mapEvent(data);

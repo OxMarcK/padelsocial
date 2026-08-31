@@ -40,13 +40,15 @@ export function buildMatchVideoRows(
     teamNameById: Record<string, string>;
     /** poulefase's own start time (windows.find(w => w.status === "poulefase")!.startsAt) — needed to place poule matches on the clock. */
     pouleStartsAt: Date;
+    /** event.schedule.pouleChangeoverMinutes — needed alongside pouleStartsAt to place poule matches on the clock. */
+    pouleChangeoverMinutes: number;
     /** Full computeSchedule(event, realRoundsCount) result — needed to place bracket-round matches on the clock. */
     windows: PhaseWindow[];
     /** Given, the score/accent/title become relative to this team instead of a neutral "A vs B". */
     perspectiveTeamId?: string;
   }
 ): MatchVideoRow[] {
-  const { teamNameById, pouleStartsAt, windows, perspectiveTeamId } = options;
+  const { teamNameById, pouleStartsAt, pouleChangeoverMinutes, windows, perspectiveTeamId } = options;
 
   return matches
     .filter((m): m is Match & { videoUrl: string; teamAId: string; teamBId: string; scoreA: number; scoreB: number } =>
@@ -60,7 +62,7 @@ export function buildMatchVideoRows(
 
       const startsAt =
         m.phase === "poule"
-          ? pouleRoundWindow(pouleStartsAt, m.roundNumber).startsAt
+          ? pouleRoundWindow(pouleStartsAt, m.roundNumber, pouleChangeoverMinutes).startsAt
           : windows.find((w) => w.status === `finale_ronde_${m.roundNumber}`)?.startsAt ?? null;
       const subtitle = startsAt ? `Baan ${m.courtNumber} · ${fmtTime(startsAt)}` : `Baan ${m.courtNumber}`;
 

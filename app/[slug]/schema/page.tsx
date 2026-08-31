@@ -109,7 +109,7 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
               </thead>
               <tbody>
                 {Array.from({ length: schedule.roundsCount }, (_, i) => i + 1).map((round) => {
-                  const { startsAt, endsAt } = pouleRoundWindow(pouleStartsAt, round);
+                  const { startsAt, endsAt } = pouleRoundWindow(pouleStartsAt, round, event.schedule.pouleChangeoverMinutes);
                   const byCourt = Object.fromEntries(schedule.matches.filter((m) => m.round === round).map((m) => [m.court, m]));
                   return (
                     <tr key={round} className="border-b border-mint-net/10 last:border-b-0">

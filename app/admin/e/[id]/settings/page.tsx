@@ -5,7 +5,7 @@ import { Field } from "@/components/ui/field";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
 import { Section } from "@/components/admin/section";
-import { deleteEvent, duplicateEvent, updateEventDetails } from "../actions";
+import { deleteEvent, duplicateEvent, updateEventDetails, updateScheduleConfig } from "../actions";
 import { normalizeSlug } from "@/lib/slug";
 
 /** Config that's touched once at setup and then rarely again — its own route so it's
@@ -50,6 +50,44 @@ export default async function AdminEventSettingsPage({ params }: { params: { id:
           </label>
           <ActionFormError />
           <SaveButton />
+        </ActionForm>
+      </Section>
+
+      <Section
+        title="Wisseltijden"
+        subtitle="Bepaalt alleen het getoonde schema en de aftelklok — het doorzetten van een ronde of fase blijft altijd iets wat jij zelf doet, dit stelt nooit iets automatisch door."
+      >
+        <ActionForm action={updateScheduleConfig.bind(null, event.id)} className="flex flex-col gap-3">
+          <Field
+            label="Tussen poule-rondes"
+            name="pouleChangeoverMinutes"
+            type="number"
+            defaultValue={event.schedule.pouleChangeoverMinutes}
+            required
+          />
+          <Field
+            label="Pauze na poulefase (voor kwartfinales)"
+            name="pauzeAfterPoulefaseMinutes"
+            type="number"
+            defaultValue={event.schedule.pauzeAfterPoulefaseMinutes}
+            required
+          />
+          <Field
+            label="Pauze na kwartfinales (voor halve finales)"
+            name="pauzeAfterKwartfinaleMinutes"
+            type="number"
+            defaultValue={event.schedule.pauzeAfterKwartfinaleMinutes}
+            required
+          />
+          <Field
+            label="Pauze na halve finales (voor de grote finale)"
+            name="pauzeAfterHalveFinaleMinutes"
+            type="number"
+            defaultValue={event.schedule.pauzeAfterHalveFinaleMinutes}
+            required
+          />
+          <ActionFormError />
+          <SaveButton label="Wisseltijden opslaan" />
         </ActionForm>
       </Section>
 

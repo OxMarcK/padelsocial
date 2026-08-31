@@ -293,6 +293,7 @@ async function ResultsView({
   const videoRows = buildMatchVideoRows(matches, {
     teamNameById,
     pouleStartsAt: windows.find((w) => w.status === "poulefase")!.startsAt,
+    pouleChangeoverMinutes: event.schedule.pouleChangeoverMinutes,
     windows,
   });
 

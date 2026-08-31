@@ -35,7 +35,18 @@ export interface DataRepo {
   getEvent(id: string): Promise<PadelEvent | null>;
   getEventBySlug(slug: string): Promise<PadelEvent | null>;
   createEvent(input: CreateEventInput): Promise<PadelEvent>;
-  updateEvent(id: string, patch: Partial<CreateEventInput> & { pointsWin?: number; pointsDraw?: number; pointsLoss?: number }): Promise<PadelEvent>;
+  updateEvent(
+    id: string,
+    patch: Partial<CreateEventInput> & {
+      pointsWin?: number;
+      pointsDraw?: number;
+      pointsLoss?: number;
+      pouleChangeoverMinutes?: number;
+      pauzeAfterPoulefaseMinutes?: number;
+      pauzeAfterKwartfinaleMinutes?: number;
+      pauzeAfterHalveFinaleMinutes?: number;
+    }
+  ): Promise<PadelEvent>;
   deleteEvent(id: string): Promise<void>;
   advancePhase(eventId: string): Promise<PadelEvent>;
   /**

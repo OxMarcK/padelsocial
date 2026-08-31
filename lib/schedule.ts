@@ -66,24 +66,32 @@ function parseStart(event: PadelEvent): Date {
 }
 
 /**
- * The changeover between poule rounds is real time on the clock — the venue's
- * actual 3-hour court booking (10:30–13:30 for the reference 15-team/3-poule
- * event) was worked out to fit a full poule phase + changeovers + the
- * knockout stage, so it has to count, not just be flavor text.
+ * Match length itself stays fixed — the venue's actual 3-hour court booking
+ * (10:30–13:30 for the reference 15-team/3-poule event) was worked out to
+ * fit a full poule phase + changeovers + the knockout stage, so it has to
+ * count, not just be flavor text. Changeover time between rounds/phases is
+ * NOT fixed — see PadelEvent.schedule (lib/types.ts): the first real event
+ * ran these too tight, so it's now a per-event setting instead of a guess.
  */
 const POULE_ROUND_MINUTES = 20;
-const POULE_CHANGEOVER_MINUTES = 2;
 /** Fixed lead-in shown as the "voor de start" window before the official start time. */
 const DRAFT_LEAD_MINUTES = 30;
+
+/** Which event.schedule field backs each pauze phase's advisory duration. */
+const PAUZE_DURATION_FIELD: Partial<Record<EventStatus, keyof PadelEvent["schedule"]>> = {
+  pauze_1: "pauzeAfterPoulefaseMinutes",
+  pauze_2: "pauzeAfterKwartfinaleMinutes",
+  pauze_3: "pauzeAfterHalveFinaleMinutes",
+};
 
 /**
  * Advisory schedule assuming every phase runs exactly on time — used only
  * for the phase-indicator's clock/progress bar text. Actual transitions
  * stay admin-triggered (spec §2.3.A): nothing here auto-advances anything.
  * Poulefase duration is `pouleRoundsCount * POULE_ROUND_MINUTES +
- * (pouleRoundsCount - 1) * POULE_CHANGEOVER_MINUTES`, not a hardcoded total —
- * see the doc comment on lib/poule-scheduler.ts for why the round count
- * varies with poule/court shape rather than being a fixed number.
+ * (pouleRoundsCount - 1) * event.schedule.pouleChangeoverMinutes`, not a
+ * hardcoded total — see the doc comment on lib/poule-scheduler.ts for why
+ * the round count varies with poule/court shape rather than being fixed.
  */
 export function computeSchedule(event: PadelEvent, pouleRoundsCount: number): PhaseWindow[] {
   const start = parseStart(event);
@@ -98,15 +106,16 @@ export function computeSchedule(event: PadelEvent, pouleRoundsCount: number): Ph
     }
     if (status === "poulefase") {
       const rounds = Math.max(pouleRoundsCount, 1);
-      const minutes = rounds * POULE_ROUND_MINUTES + (rounds - 1) * POULE_CHANGEOVER_MINUTES;
+      const minutes = rounds * POULE_ROUND_MINUTES + (rounds - 1) * event.schedule.pouleChangeoverMinutes;
       const endsAt = new Date(cursor.getTime() + minutes * 60_000);
       windows.push({ status, startsAt: cursor, endsAt });
       cursor = endsAt;
       continue;
     }
-    const meta = PHASE_META[status];
-    if (meta.durationMinutes) {
-      const endsAt = new Date(cursor.getTime() + meta.durationMinutes * 60_000);
+    const pauzeField = PAUZE_DURATION_FIELD[status];
+    const durationMinutes = pauzeField ? event.schedule[pauzeField] : PHASE_META[status].durationMinutes;
+    if (durationMinutes) {
+      const endsAt = new Date(cursor.getTime() + durationMinutes * 60_000);
       windows.push({ status, startsAt: cursor, endsAt });
       cursor = endsAt;
     } else {
@@ -117,8 +126,8 @@ export function computeSchedule(event: PadelEvent, pouleRoundsCount: number): Ph
 }
 
 /** Estimated wall-clock window for a single poule round, given when the poulefase itself starts. */
-export function pouleRoundWindow(pouleStartsAt: Date, round: number): { startsAt: Date; endsAt: Date } {
-  const offsetMinutes = Math.max(round - 1, 0) * (POULE_ROUND_MINUTES + POULE_CHANGEOVER_MINUTES);
+export function pouleRoundWindow(pouleStartsAt: Date, round: number, changeoverMinutes: number): { startsAt: Date; endsAt: Date } {
+  const offsetMinutes = Math.max(round - 1, 0) * (POULE_ROUND_MINUTES + changeoverMinutes);
   const startsAt = new Date(pouleStartsAt.getTime() + offsetMinutes * 60_000);
   const endsAt = new Date(startsAt.getTime() + POULE_ROUND_MINUTES * 60_000);
   return { startsAt, endsAt };
@@ -178,7 +187,9 @@ export function phaseIndicatorData(event: PadelEvent, pouleRoundsCount: number, 
   // than going negative, so a round running over just reads "time's up"
   // instead of something nonsensical.
   const countdownWindow =
-    event.status === "poulefase" ? pouleRoundWindow(current.startsAt, event.currentPouleRound) : current;
+    event.status === "poulefase"
+      ? pouleRoundWindow(current.startsAt, event.currentPouleRound, event.schedule.pouleChangeoverMinutes)
+      : current;
 
   let countdownText: string | undefined;
   let progress: number | undefined;
@@ -212,7 +223,7 @@ export function phaseIndicatorData(event: PadelEvent, pouleRoundsCount: number, 
     : "Prijsuitreiking bij de bar.";
   const nextLine =
     event.status === "poulefase" && event.currentPouleRound < pouleRoundsCount
-      ? `${POULE_CHANGEOVER_MINUTES} minuten pauze om te wisselen, dan ronde ${event.currentPouleRound + 1}.`
+      ? `${event.schedule.pouleChangeoverMinutes} minuten pauze om te wisselen, dan ronde ${event.currentPouleRound + 1}.`
       : nextPhaseLine;
 
   return { phaseLabel: meta.label, subLabel, timeWindowText, nextLine, kind, countdownText, progress, countdownStartsAt, countdownEndsAt };

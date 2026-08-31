@@ -16,6 +16,24 @@ export interface PointsConfig {
   loss: number;
 }
 
+/**
+ * How much changeover time to plan between phases — advisory only (drives the
+ * displayed schedule/countdown; actual progression is always admin-triggered,
+ * see lib/schedule.ts). Editable per event because the right number depends
+ * on the venue/format: the first real event ran these too tight, so instead
+ * of guessing a better global constant this is now the organizer's call.
+ */
+export interface ScheduleConfig {
+  /** Between poule rounds. */
+  pouleChangeoverMinutes: number;
+  /** The "Pauze" before kwartfinales start, right after poulefase ends. */
+  pauzeAfterPoulefaseMinutes: number;
+  /** The "Pauze" before halve finales start, right after kwartfinales end. */
+  pauzeAfterKwartfinaleMinutes: number;
+  /** The "Pauze" before de grote finale starts, right after halve finales end. */
+  pauzeAfterHalveFinaleMinutes: number;
+}
+
 export interface PadelEvent {
   id: string;
   slug: string;
@@ -28,6 +46,7 @@ export interface PadelEvent {
   coverUrl: string | null;
   status: EventStatus;
   points: PointsConfig;
+  schedule: ScheduleConfig;
   /** Wall-clock round within the poulefase (1-based). Poulefase has no break
    *  between rounds, so this advances independently of `status`. */
   currentPouleRound: number;

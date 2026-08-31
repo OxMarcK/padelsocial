@@ -138,6 +138,15 @@ export const mockRepo: DataRepo = {
       coverUrl: input.coverUrl,
       status: "draft",
       points: { win: 3, draw: 1, loss: 0 },
+      // Defaults nudged up from the original fixed 2/4/2/2 constants — the first real
+      // event ran those too tight (see PadelEvent.schedule doc comment). Still just a
+      // starting point: the organizer edits these per event in Instellingen.
+      schedule: {
+        pouleChangeoverMinutes: 3,
+        pauzeAfterPoulefaseMinutes: 5,
+        pauzeAfterKwartfinaleMinutes: 3,
+        pauzeAfterHalveFinaleMinutes: 3,
+      },
       currentPouleRound: 1,
       createdAt: new Date().toISOString(),
     };
@@ -154,6 +163,12 @@ export const mockRepo: DataRepo = {
         win: patch.pointsWin ?? event.points.win,
         draw: patch.pointsDraw ?? event.points.draw,
         loss: patch.pointsLoss ?? event.points.loss,
+      },
+      schedule: {
+        pouleChangeoverMinutes: patch.pouleChangeoverMinutes ?? event.schedule.pouleChangeoverMinutes,
+        pauzeAfterPoulefaseMinutes: patch.pauzeAfterPoulefaseMinutes ?? event.schedule.pauzeAfterPoulefaseMinutes,
+        pauzeAfterKwartfinaleMinutes: patch.pauzeAfterKwartfinaleMinutes ?? event.schedule.pauzeAfterKwartfinaleMinutes,
+        pauzeAfterHalveFinaleMinutes: patch.pauzeAfterHalveFinaleMinutes ?? event.schedule.pauzeAfterHalveFinaleMinutes,
       },
     };
     store.events.set(id, updated);
