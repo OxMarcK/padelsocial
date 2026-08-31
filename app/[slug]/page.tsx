@@ -299,11 +299,11 @@ async function ResultsView({
   });
 
   return (
-    <Shell event={event} headerLabel={null}>
+    <Shell event={event} headerLabel="Eindstand">
       <div>
-        <h2 className="font-mint text-4xl font-bold text-mint-ink">Eindstand</h2>
+        <h2 className="font-mint text-4xl font-bold text-mint-ink">{event.name}</h2>
         <p className="text-sm text-mint-ink-muted">
-          {event.name} · {event.date} · {teams.length} teams
+          {event.date} · {teams.length} teams
         </p>
       </div>
 
