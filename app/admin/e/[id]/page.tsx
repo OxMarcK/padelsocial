@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
+import { getEventCached } from "@/lib/data/cached";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
 import { computeSchedule, phaseIndicatorData } from "@/lib/schedule";
 import { PHASE_META, bracketRoundForStatus, highestStartedBracketRound, nextStatus, prevStatus } from "@/lib/phases";
@@ -26,7 +27,7 @@ export default async function AdminEventScoresPage({
   searchParams: { round?: string };
 }) {
   await requireAdmin();
-  const event = await repo.getEvent(params.id);
+  const event = await getEventCached(params.id);
   if (!event) notFound();
 
   const [teams, poules, matches, top8] = await Promise.all([

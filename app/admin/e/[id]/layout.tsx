@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
-import { repo } from "@/lib/data";
+import { getEventCached } from "@/lib/data/cached";
 import { AdminNav } from "@/components/admin/admin-nav";
 
 /**
@@ -17,7 +17,7 @@ export default async function AdminEventLayout({
   params: { id: string };
 }) {
   await requireAdmin();
-  const event = await repo.getEvent(params.id);
+  const event = await getEventCached(params.id);
   if (!event) notFound();
 
   return (

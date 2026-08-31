@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
+import { getEventCached } from "@/lib/data/cached";
 import { generatePouleSchedule } from "@/lib/poule-scheduler";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, SaveButton } from "@/components/admin/action-form";
@@ -13,7 +14,7 @@ const POULE_LABEL_OPTIONS = Array.from({ length: 8 }, (_, i) => String.fromCharC
  * instead of competing for space with the stepper/phase card on the main Scores page. */
 export default async function AdminEventTeamsPage({ params }: { params: { id: string } }) {
   await requireAdmin();
-  const event = await repo.getEvent(params.id);
+  const event = await getEventCached(params.id);
   if (!event) notFound();
 
   const [teams, poules, matches] = await Promise.all([

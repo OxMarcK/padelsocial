@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
-import { repo } from "@/lib/data";
+import { getEventCached } from "@/lib/data/cached";
 import { Field } from "@/components/ui/field";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
@@ -12,7 +12,7 @@ import { normalizeSlug } from "@/lib/slug";
  * out of the way of the Scores page an admin actually lives in during the event. */
 export default async function AdminEventSettingsPage({ params }: { params: { id: string } }) {
   await requireAdmin();
-  const event = await repo.getEvent(params.id);
+  const event = await getEventCached(params.id);
   if (!event) notFound();
 
   return (
