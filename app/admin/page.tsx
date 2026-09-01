@@ -40,6 +40,14 @@ export default async function AdminHomePage() {
       <main className="mx-auto flex max-w-2xl flex-col gap-8 px-6 py-10">
         <h1 className="font-mint text-4xl font-bold text-mint-ink">Events</h1>
 
+        <Link
+          href="/admin/sessies"
+          className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 shadow-[0_1px_3px_rgba(20,35,28,.08)] hover:brightness-[.98]"
+        >
+          <span className="font-mint text-lg font-bold text-mint-ink">Sessies</span>
+          <span className="text-mint-ink-muted">→</span>
+        </Link>
+
         <div className="flex flex-col gap-2">
           {events.length === 0 ? (
             <p className="text-sm text-mint-ink-muted">Nog geen events. Maak er hieronder een aan.</p>

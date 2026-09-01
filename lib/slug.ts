@@ -1,5 +1,7 @@
 // Public events live at /[slug] — these top-level segments are already taken by the app itself.
-const RESERVED_SLUGS = new Set(["admin", "auth"]);
+// "sessies" is the weekly-session sign-up feature's own top-level route (app/sessies/[slug]) —
+// reserved so a tournament event can never claim that slug and shadow it.
+const RESERVED_SLUGS = new Set(["admin", "auth", "sessies"]);
 
 export function normalizeSlug(input: string): string {
   return input
