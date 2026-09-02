@@ -33,9 +33,13 @@ export default async function AdminMembersPage() {
             <textarea
               name="bulk"
               rows={4}
-              placeholder={"Naam | e-mail | telefoon\nSanne Jansen | sanne@mail.nl | 0612345678"}
+              placeholder={"Eén naam per regel is genoeg:\nSanne Jansen\nJoep de Boer"}
               className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-sm text-mint-ink placeholder:text-mint-ink-muted/60"
             />
+            <p className="text-xs text-mint-ink-muted">
+              E-mail en telefoon zijn optioneel — voeg ze toe met &quot;|&quot; als je ze hebt: Sanne Jansen |
+              sanne@mail.nl | 0612345678. Anders is een naam per regel genoeg.
+            </p>
             <SaveButton label="Leden toevoegen" savedLabel="Toegevoegd" />
           </ActionForm>
           {members.length > 0 ? (
