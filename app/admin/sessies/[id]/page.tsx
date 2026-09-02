@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { requireAdmin } from "@/lib/require-admin";
 import { sessionsRepo } from "@/lib/data/sessions";
 import { sessionCapacity, activeReservations, fmtClockTime } from "@/lib/sessions";
@@ -7,6 +8,7 @@ import { Field } from "@/components/ui/field";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
 import { Section } from "@/components/admin/section";
+import { ShareLink } from "@/components/sessions/share-link";
 import type { SessionStatus } from "@/lib/session-types";
 import { cancelReservation, deleteSession, markReservationPaid, setSessionStatus, updateSessionDetails } from "../actions";
 
@@ -49,6 +51,10 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
   const nextStatus = STATUS_ORDER[STATUS_ORDER.indexOf(session.status) + 1] ?? null;
   const cta = STATUS_CTA[session.status];
 
+  const host = headers().get("host");
+  const proto = process.env.NODE_ENV === "development" ? "http" : "https";
+  const shareUrl = host ? `${proto}://${host}/sessies/${session.slug}` : `/sessies/${session.slug}`;
+
   return (
     <div
       className="min-h-screen font-mint text-mint-ink"
@@ -64,6 +70,8 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
             {session.date} · {session.startTime} · {session.location} · {session.courts} banen
           </p>
         </div>
+
+        <ShareLink url={shareUrl} title={session.title} />
 
         <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
           <div className="flex items-center justify-between">
