@@ -2,10 +2,20 @@
  * aanmeldpagina — same visual language as components/mint/court-card.tsx
  * (blue court, white inset outline, net line), reimplemented here rather
  * than imported/shared (sessions stays isolated from the tournament side).
- * Each court shows 4 circular slot placeholders, 2 on each side of the
- * net; filled slots (based on a simple sequential fill across courts,
- * since reservations aren't assigned to a specific court/side) turn
- * tennis-ball lime, the rest stay outlined placeholders. */
+ * Each court shows 4 slot placeholders positioned like a real padel serve
+ * formation: per team-half, one player at the net (front) and one behind
+ * the service line (back), diagonally offset from each other — mirrored
+ * on the other half so the whole court reads as a criss-cross. Filled
+ * slots (based on a simple sequential fill across courts, since
+ * reservations aren't assigned to a specific court/side) turn tennis-ball
+ * lime, the rest stay outlined placeholders. */
+const SLOT_POSITIONS = [
+  { left: "14%", top: "72%" }, // left team — back (server), near the baseline
+  { left: "38%", top: "28%" }, // left team — front (net), diagonal from the server
+  { left: "62%", top: "72%" }, // right team — front (net), mirrored
+  { left: "86%", top: "28%" }, // right team — back (server), mirrored
+] as const;
+
 export function CourtSpots({ courts, takenCount }: { courts: number; takenCount: number }) {
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -36,19 +46,18 @@ function CourtSpotCard({ courtNumber, filled }: { courtNumber: number; filled: n
       {/* Only the middle pair straddling the net gets a subtle horizontal center line. */}
       <div className={`absolute left-1/4 right-1/4 top-1/2 h-px -translate-y-1/2 ${active ? "bg-white/45" : "bg-glass-blue/10"}`} />
 
-      <div className="absolute inset-0 flex items-center justify-between px-4 pb-3">
-        <div className="flex gap-1.5">
-          <Dot filled={filled >= 1} active={active} />
-          <Dot filled={filled >= 2} active={active} />
-        </div>
-        <div className="flex gap-1.5">
-          <Dot filled={filled >= 3} active={active} />
-          <Dot filled={filled >= 4} active={active} />
-        </div>
-      </div>
+      {SLOT_POSITIONS.map((pos, i) => (
+        <span
+          key={i}
+          className="absolute -translate-x-1/2 -translate-y-1/2"
+          style={{ left: pos.left, top: pos.top }}
+        >
+          <Dot filled={filled >= i + 1} active={active} />
+        </span>
+      ))}
 
       <span
-        className={`absolute bottom-2 left-3 font-mint text-xs font-bold uppercase tracking-wide ${
+        className={`absolute left-3 top-2 font-mint text-xs font-bold uppercase tracking-wide ${
           active ? "text-white" : "text-glass-blue/40"
         }`}
       >
@@ -59,10 +68,10 @@ function CourtSpotCard({ courtNumber, filled }: { courtNumber: number; filled: n
 }
 
 function Dot({ filled, active }: { filled: boolean; active: boolean }) {
-  if (filled) return <span className="h-3 w-3 rounded-full bg-mint-lime" />;
+  if (filled) return <span className="block h-3 w-3 rounded-full bg-mint-lime" />;
   return (
     <span
-      className={`h-3 w-3 rounded-full border-2 ${active ? "border-white/60" : "border-glass-blue/25"}`}
+      className={`block h-3 w-3 rounded-full border-2 ${active ? "border-white/60" : "border-glass-blue/25"}`}
     />
   );
 }
