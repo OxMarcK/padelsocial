@@ -3,6 +3,7 @@ import { sessionsRepo } from "@/lib/data/sessions";
 import { activeReservations, sessionCapacity } from "@/lib/sessions";
 import { Logo } from "@/components/logo";
 import { SignupForm } from "@/components/sessions/signup-form";
+import { CourtSpots } from "@/components/sessions/court-spots";
 import { reserveSpotAction } from "./actions";
 
 const STATUS_MESSAGE: Record<"draft" | "closed" | "done", string> = {
@@ -54,11 +55,8 @@ export default async function SessionSignupPage({ params }: { params: { slug: st
               {taken} van {capacity} bezet
             </span>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-mint-net/20">
-            <div
-              className="h-full rounded-full bg-mint-lime transition-[width] duration-500"
-              style={{ width: `${Math.min(100, Math.round((taken / capacity) * 100))}%` }}
-            />
+          <div className="mt-3">
+            <CourtSpots courts={session.courts} takenCount={taken} />
           </div>
         </div>
 
