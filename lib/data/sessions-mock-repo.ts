@@ -6,11 +6,18 @@ function uid(prefix: string) {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36).slice(-4)}`;
 }
 
-const store = {
-  sessions: new Map<string, Session>(),
-  members: new Map<string, Member>(),
-  reservations: new Map<string, Reservation>(),
-};
+class SessionsMockStore {
+  sessions = new Map<string, Session>();
+  members = new Map<string, Member>();
+  reservations = new Map<string, Reservation>();
+}
+
+// module-singleton so state survives across requests within the same dev server
+// process — without this, separate route bundles (e.g. the opengraph-image route)
+// each get their own fresh, empty store instead of sharing one (mirrors the same
+// fix already applied to lib/data/mock-repo.ts).
+const store: SessionsMockStore = (globalThis as any).__padelSocialSessionsMockStore ?? new SessionsMockStore();
+(globalThis as any).__padelSocialSessionsMockStore = store;
 
 function requireSession(id: string): Session {
   const session = store.sessions.get(id);
