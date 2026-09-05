@@ -126,16 +126,23 @@ export default async function LandingPage() {
         </div>
       </header>
       <main className="mx-auto flex max-w-2xl flex-col gap-10 px-5 py-8">
-        {sessionFirst ? (
-          <>
-            {sessionRows}
-            {tournamentHero}
-          </>
+        {upcoming || nextSession ? (
+          <section className="flex flex-col gap-4">
+            <h2 className="font-mint text-2xl font-bold text-[#0E2318]">Aankomend</h2>
+            {sessionFirst ? (
+              <>
+                {sessionRows}
+                {tournamentHero}
+              </>
+            ) : (
+              <>
+                {tournamentHero}
+                {sessionRows}
+              </>
+            )}
+          </section>
         ) : (
-          <>
-            {tournamentHero}
-            {sessionRows}
-          </>
+          tournamentHero
         )}
 
         {pastWithTeamCounts.length > 0 ? (
@@ -168,9 +175,9 @@ function DateChip({ date }: { date: string }) {
   const day = d.getDate();
   const month = d.toLocaleDateString("nl-NL", { month: "short" }).replace(".", "");
   return (
-    <div className="flex flex-none flex-col items-center justify-center rounded-xl bg-mint-net/20 px-3 py-2">
-      <span className="font-mint text-xl font-bold leading-none text-mint-ink">{day}</span>
-      <span className="font-mint text-[10px] font-bold uppercase tracking-wider text-mint-ink-muted">{month}</span>
+    <div className="flex flex-none flex-col items-center justify-center rounded-xl bg-mint-lime px-3 py-2">
+      <span className="font-mint text-xl font-bold leading-none text-mint-lime-ink">{day}</span>
+      <span className="font-mint text-[10px] font-bold uppercase tracking-wider text-mint-lime-ink">{month}</span>
     </div>
   );
 }
