@@ -88,11 +88,15 @@ export default async function LandingPage() {
   const [events, sessions] = await Promise.all([repo.listEvents(), sessionsRepo.listSessions()]);
   const upcoming = events.find(isPubliclyVisible);
   const past = events.filter((e) => e.status === "finished");
-  const upcomingSession = sessions.filter(isUpcomingPublicSession).sort((a, b) => a.date.localeCompare(b.date))[0] ?? null;
-  // Whichever of the two is chronologically sooner goes on top — sessions recur
-  // weekly and tournaments are the rare big thing, but "what's happening next"
-  // should still read top-to-bottom in date order.
-  const sessionFirst = upcoming && upcomingSession ? upcomingSession.date < upcoming.date : Boolean(upcomingSession);
+  // Every not-yet-passed session shows, not just the soonest one — unlike a
+  // tournament (a rare one-off, hence the single big hero), sessions recur
+  // weekly, so there can legitimately be several open/full ones at once (e.g.
+  // next week's already open for signup while this week's is still closed/full).
+  const upcomingSessions = sessions.filter(isUpcomingPublicSession).sort((a, b) => a.date.localeCompare(b.date));
+  const nextSession = upcomingSessions[0] ?? null;
+  // Whichever of the two is chronologically sooner goes on top — "what's
+  // happening next" should read top-to-bottom in date order.
+  const sessionFirst = upcoming && nextSession ? nextSession.date < upcoming.date : Boolean(nextSession);
 
   const pastWithTeamCounts = await Promise.all(
     past.map(async (e) => ({ event: e, teamCount: (await repo.listTeams(e.id)).length }))
@@ -131,30 +135,36 @@ export default async function LandingPage() {
         Bekijk event
       </Link>
     </section>
-  ) : upcomingSession ? null : (
+  ) : nextSession ? null : (
     // Only show this fallback when there's neither an event nor a session to
     // point at — with a session row already on the page, "no event" alone
     // would read as a false negative.
     <p className="text-sm text-mint-ink-muted">Nog geen aankomend event gepland.</p>
   );
 
-  const sessionRow = upcomingSession ? (
-    <Link
-      href={`/${upcomingSession.slug}`}
-      className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-[0_1px_3px_rgba(20,35,28,.08)] hover:brightness-95"
-    >
-      <DateChip date={upcomingSession.date} />
-      <div className="min-w-0 flex-1">
-        <div className="truncate font-mint text-lg font-bold text-mint-ink">{upcomingSession.title}</div>
-        <div className="truncate text-xs text-mint-ink-muted">
-          {upcomingSession.startTime} · {upcomingSession.location}
-        </div>
+  const sessionRows =
+    upcomingSessions.length > 0 ? (
+      <div className="flex flex-col gap-2">
+        {upcomingSessions.map((s) => (
+          <Link
+            key={s.id}
+            href={`/${s.slug}`}
+            className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-[0_1px_3px_rgba(20,35,28,.08)] hover:brightness-95"
+          >
+            <DateChip date={s.date} />
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-mint text-lg font-bold text-mint-ink">{s.title}</div>
+              <div className="truncate text-xs text-mint-ink-muted">
+                {s.startTime} · {s.location}
+              </div>
+            </div>
+            <span className="flex-none font-mint text-xs font-bold uppercase tracking-wider text-mint-lime-ink">
+              {s.status === "open" ? "Open" : "Vol"}
+            </span>
+          </Link>
+        ))}
       </div>
-      <span className="flex-none font-mint text-xs font-bold uppercase tracking-wider text-mint-lime-ink">
-        {upcomingSession.status === "open" ? "Open" : "Vol"}
-      </span>
-    </Link>
-  ) : null;
+    ) : null;
 
   return (
     <div
@@ -169,13 +179,13 @@ export default async function LandingPage() {
       <main className="mx-auto flex max-w-2xl flex-col gap-10 px-5 py-8">
         {sessionFirst ? (
           <>
-            {sessionRow}
+            {sessionRows}
             {tournamentHero}
           </>
         ) : (
           <>
             {tournamentHero}
-            {sessionRow}
+            {sessionRows}
           </>
         )}
 
