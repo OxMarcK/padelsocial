@@ -5,6 +5,7 @@ import { sessionsRepo } from "@/lib/data/sessions";
 import type { PadelEvent } from "@/lib/types";
 import type { Session } from "@/lib/session-types";
 import { Logo } from "@/components/logo";
+import { buildShareMetadata, fmtDateShort } from "@/lib/share-metadata";
 
 const OG_DESCRIPTION = "Volg live de standen, je baanindeling en de knock-out.";
 
@@ -51,31 +52,11 @@ function fmtEventDateLong(date: string): string {
   return new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { weekday: "long", day: "numeric", month: "long" });
 }
 
-/** Short date for share-card titles, e.g. "zo 30 aug, 10:30". */
-function fmtEventDateShort(date: string, startTime: string): string {
-  const short = new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-  return `${short}, ${startTime}`;
-}
-
 export async function generateMetadata(): Promise<Metadata> {
   const events = await repo.listEvents();
   const upcoming = events.find(isPubliclyVisible);
-  const title = upcoming ? `${upcoming.name} - ${fmtEventDateShort(upcoming.date, upcoming.startTime)}` : "Padel Social";
-
-  // Next merges `openGraph`/`twitter` shallowly against the root layout's metadata —
-  // returning just {title, description} here would silently drop the image/card-type
-  // set there, so restate them explicitly.
-  const OG_IMAGE = "/social/padel-social-og-thumb-whatsapp.png";
-  return {
-    title,
-    description: OG_DESCRIPTION,
-    openGraph: { title, description: OG_DESCRIPTION, images: [OG_IMAGE], locale: "nl_NL", type: "website" },
-    twitter: { card: "summary_large_image", title, description: OG_DESCRIPTION, images: [OG_IMAGE] },
-  };
+  const title = upcoming ? `${upcoming.name} - ${fmtDateShort(upcoming.date, upcoming.startTime)}` : "Padel Social";
+  return buildShareMetadata(title, OG_DESCRIPTION);
 }
 
 function countdownLabel(days: number): string {
