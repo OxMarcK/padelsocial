@@ -4,6 +4,7 @@ import { activeReservations, sessionCapacity } from "@/lib/sessions";
 import { Logo } from "@/components/logo";
 import { SignupForm } from "@/components/sessions/signup-form";
 import { CourtSpots } from "@/components/sessions/court-spots";
+import { GoodToKnow } from "@/components/sessions/good-to-know";
 import { reserveSpotAction } from "./actions";
 
 const STATUS_MESSAGE: Record<"draft" | "closed" | "done", string> = {
@@ -42,7 +43,7 @@ export default async function SessionSignupPage({ params }: { params: { slug: st
 
       <main className="mx-auto flex max-w-md flex-col gap-6 px-5 py-8">
         <div>
-          <h2 className="font-mint text-3xl font-bold text-mint-ink">{session.title}</h2>
+          <h2 className="font-mint text-3xl font-bold text-[#0E2318]">{session.title}</h2>
           <p className="text-sm text-mint-ink-muted">
             {session.date} · {session.startTime} · {session.location} · {session.courts} banen
           </p>
@@ -50,7 +51,7 @@ export default async function SessionSignupPage({ params }: { params: { slug: st
 
         <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
           <div className="flex items-center justify-between">
-            <span className="font-mint text-sm font-bold text-mint-ink">Plekken</span>
+            <span className="font-mint text-sm font-bold text-[#0E2318]">Plekken</span>
             <span className="font-mint text-sm font-bold tabular-nums text-mint-ink-muted">
               {taken} van {capacity} bezet
             </span>
@@ -67,6 +68,8 @@ export default async function SessionSignupPage({ params }: { params: { slug: st
             <p className="text-sm text-mint-ink-muted">{STATUS_MESSAGE[session.status]}</p>
           )}
         </div>
+
+        <GoodToKnow />
       </main>
     </div>
   );

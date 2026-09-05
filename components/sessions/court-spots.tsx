@@ -21,18 +21,18 @@ export function CourtSpots({ courts, takenCount }: { courts: number; takenCount:
     <div className="grid grid-cols-2 gap-3">
       {Array.from({ length: courts }, (_, i) => {
         const filled = Math.min(4, Math.max(0, takenCount - i * 4));
-        return <CourtSpotCard key={i} courtNumber={i + 1} filled={filled} />;
+        return <CourtSpotCard key={i} filled={filled} />;
       })}
     </div>
   );
 }
 
-function CourtSpotCard({ courtNumber, filled }: { courtNumber: number; filled: number }) {
+function CourtSpotCard({ filled }: { filled: number }) {
   const active = filled > 0;
 
   return (
     <div
-      className={`relative aspect-[4/3] overflow-hidden rounded-2xl ${
+      className={`relative aspect-[3/2] overflow-hidden rounded-2xl ${
         active ? "bg-glass-blue" : "bg-glass-blue/10"
       }`}
     >
@@ -55,14 +55,6 @@ function CourtSpotCard({ courtNumber, filled }: { courtNumber: number; filled: n
           <Dot filled={filled >= i + 1} active={active} />
         </span>
       ))}
-
-      <span
-        className={`absolute left-3 top-2 font-mint text-xs font-bold uppercase tracking-wide ${
-          active ? "text-white" : "text-glass-blue/40"
-        }`}
-      >
-        Baan {courtNumber}
-      </span>
     </div>
   );
 }
