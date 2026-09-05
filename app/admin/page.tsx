@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
@@ -25,6 +26,7 @@ async function createEvent(formData: FormData) {
     courts: Number(formData.get("courts") ?? 5),
     coverUrl: null,
   });
+  revalidatePath("/");
   redirect(`/admin/e/${event.id}`);
 }
 

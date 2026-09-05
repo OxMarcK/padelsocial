@@ -179,6 +179,7 @@ export async function duplicateEvent(eventId: string, formData: FormData) {
     }
   }
 
+  revalidatePath("/");
   redirect(`/admin/e/${copy.id}`);
 }
 

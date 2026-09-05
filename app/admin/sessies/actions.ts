@@ -29,6 +29,7 @@ export async function createSession(formData: FormData) {
     tikkieUrl: String(formData.get("tikkieUrl") ?? "").trim() || null,
   });
   revalidatePath("/admin/sessies");
+  revalidatePath("/");
   redirect(path(session.id));
 }
 
@@ -51,6 +52,7 @@ export async function updateSessionDetails(sessionId: string, formData: FormData
   });
   revalidatePath(path(sessionId));
   revalidatePath("/admin/sessies");
+  revalidatePath("/");
   if (session && session.slug !== requestedSlug) {
     revalidatePath(`/${session.slug}`);
     revalidatePath(`/${requestedSlug}`);
@@ -63,6 +65,7 @@ export async function setSessionStatus(sessionId: string, status: SessionStatus)
   await sessionsRepo.updateSession(sessionId, { status });
   revalidatePath(path(sessionId));
   revalidatePath("/admin/sessies");
+  revalidatePath("/");
   if (session) revalidatePath(`/${session.slug}`);
 }
 
@@ -70,6 +73,7 @@ export async function deleteSession(sessionId: string) {
   await requireAdmin();
   await sessionsRepo.deleteSession(sessionId);
   revalidatePath("/admin/sessies");
+  revalidatePath("/");
   redirect("/admin/sessies");
 }
 
