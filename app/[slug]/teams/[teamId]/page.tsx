@@ -95,7 +95,7 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
 
       {pouleMatches.length > 0 && event.status !== "finished" ? (
         <section className="flex flex-col gap-2">
-          <h2 className="font-mint text-lg font-bold text-mint-ink">Poule Schema</h2>
+          <h2 className="font-mint text-lg font-bold text-[#0E2318]">Poule Schema</h2>
           <div className="flex flex-col gap-1.5">
             {pouleMatches.map((m) => {
               const opp = m.teamAId === team.id ? m.teamBId : m.teamAId;

@@ -21,7 +21,7 @@ export function MatchVideoSection({ title, rows }: { title: string; rows: MatchV
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="font-mint text-lg font-bold text-mint-ink">{title}</h2>
+        <h2 className="font-mint text-lg font-bold text-[#0E2318]">{title}</h2>
         <span className="font-mint text-xs font-bold text-mint-ink-muted">{rows.length} gespeeld</span>
       </div>
       {rows.length === 0 ? (

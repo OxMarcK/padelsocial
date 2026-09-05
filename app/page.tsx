@@ -140,7 +140,7 @@ export default async function LandingPage() {
 
         {pastWithTeamCounts.length > 0 ? (
           <section className="flex flex-col gap-2">
-            <h2 className="font-mint text-2xl font-bold text-mint-ink">Vorige events</h2>
+            <h2 className="font-mint text-2xl font-bold text-[#0E2318]">Vorige events</h2>
             {pastWithTeamCounts.map(({ event: e, teamCount }) => (
               <Link
                 key={e.id}

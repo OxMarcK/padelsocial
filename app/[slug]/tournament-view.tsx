@@ -56,7 +56,7 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
         />
         {firstRoundMatches.length > 0 ? (
           <div className="flex flex-col gap-2">
-            <h2 className="font-mint text-lg font-bold text-mint-ink">Zo beginnen we</h2>
+            <h2 className="font-mint text-lg font-bold text-[#0E2318]">Zo beginnen we</h2>
             <div className="flex flex-col gap-2">
               {firstRoundMatches.map((m) => (
                 <div key={m.id} className="rounded-[24px] bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
@@ -134,7 +134,7 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
 
       {showCourts ? (
         <div className="flex flex-col gap-4">
-          <h2 className="font-mint text-3xl font-bold text-mint-ink">Nu op de baan</h2>
+          <h2 className="font-mint text-3xl font-bold text-[#0E2318]">Nu op de baan</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {currentMatches
               .sort((a, b) => a.courtNumber - b.courtNumber)
@@ -156,7 +156,7 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
 
       {restingTeamIds.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <h2 className="font-mint text-lg font-bold text-mint-ink">
+          <h2 className="font-mint text-lg font-bold text-[#0E2318]">
             Rust deze ronde <span className="text-sm font-normal text-mint-ink-muted">{restingTeamIds.length} teams</span>
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -175,7 +175,7 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
 
       {showCourts ? (
         <div className="flex flex-col gap-2">
-          <h2 className="font-mint text-2xl font-bold text-mint-ink">Live stand</h2>
+          <h2 className="font-mint text-2xl font-bold text-[#0E2318]">Live stand</h2>
           <StandingsList
             rows={combinedRows.map((r) => ({
               teamId: r.teamId,
@@ -300,7 +300,7 @@ async function ResultsView({
   return (
     <Shell event={event} headerLabel="Eindstand">
       <div>
-        <h2 className="font-mint text-4xl font-bold text-mint-ink">{event.name}</h2>
+        <h2 className="font-mint text-4xl font-bold text-[#0E2318]">{event.name}</h2>
         <p className="text-sm text-mint-ink-muted">
           {event.date} · {teams.length} teams
         </p>
@@ -343,7 +343,7 @@ async function ResultsView({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="font-mint text-lg font-bold text-mint-ink">{title}</h2>
+      <h2 className="font-mint text-lg font-bold text-[#0E2318]">{title}</h2>
       {children}
     </section>
   );
