@@ -54,7 +54,10 @@ export async function SessionSignupView({ session }: { session: Session }) {
         <div>
           <h2 className="font-mint text-3xl font-bold text-[#0E2318]">{session.title}</h2>
           <p className="text-sm text-mint-ink-muted">
-            {session.date} · {session.startTime} · {session.location} · {session.courts} banen
+            {session.date} · {session.startTime}
+          </p>
+          <p className="text-sm text-mint-ink-muted">
+            {session.location} · {session.courts} banen
           </p>
         </div>
 
