@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { PHASE_META } from "@/lib/phases";
 import { normalizeSlug, assertValidSlug } from "@/lib/slug";
+import { isSlugTaken } from "@/lib/slug-registry";
 
 async function createEvent(formData: FormData) {
   "use server";
   await requireAdmin();
   const slug = normalizeSlug(String(formData.get("slug") ?? ""));
   assertValidSlug(slug);
-  if (await repo.getEventBySlug(slug)) {
+  if (await isSlugTaken(slug)) {
     throw new Error(`"${slug}" is al in gebruik door een ander event.`);
   }
   const event = await repo.createEvent({

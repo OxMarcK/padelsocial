@@ -7,6 +7,7 @@ import { repo } from "@/lib/data";
 import type { NewTeamInput } from "@/lib/data/repo";
 import type { EventStatus } from "@/lib/types";
 import { normalizeSlug, assertValidSlug } from "@/lib/slug";
+import { isSlugTaken } from "@/lib/slug-registry";
 
 function path(eventId: string) {
   return `/admin/e/${eventId}`;
@@ -51,11 +52,8 @@ export async function updateEventDetails(eventId: string, formData: FormData) {
   const event = await repo.getEvent(eventId);
   const requestedSlug = normalizeSlug(String(formData.get("slug") ?? ""));
   assertValidSlug(requestedSlug);
-  if (requestedSlug !== event?.slug) {
-    const existing = await repo.getEventBySlug(requestedSlug);
-    if (existing && existing.id !== eventId) {
-      throw new Error(`"${requestedSlug}" is al in gebruik door een ander event.`);
-    }
+  if (requestedSlug !== event?.slug && (await isSlugTaken(requestedSlug, { kind: "event", id: eventId }))) {
+    throw new Error(`"${requestedSlug}" is al in gebruik door een ander event.`);
   }
 
   await repo.updateEvent(eventId, {
@@ -133,7 +131,7 @@ export async function duplicateEvent(eventId: string, formData: FormData) {
   const name = String(formData.get("name") ?? "").trim() || `${source.name} (test)`;
   const slug = normalizeSlug(String(formData.get("slug") ?? ""));
   assertValidSlug(slug);
-  if (await repo.getEventBySlug(slug)) {
+  if (await isSlugTaken(slug)) {
     throw new Error(`"${slug}" is al in gebruik door een ander event.`);
   }
 

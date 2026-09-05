@@ -1,6 +1,9 @@
-// Public events live at /[slug] — these top-level segments are already taken by the app itself.
-// "sessies" is the weekly-session sign-up feature's own top-level route (app/sessies/[slug]) —
-// reserved so a tournament event can never claim that slug and shadow it.
+// Public events AND sessions both live at /[slug] — these top-level segments are
+// already taken by the app itself. Sessions used to live at their own /sessies/[slug]
+// route; that path now just redirects into the flat /[slug] namespace (kept
+// permanently, since /sessies/* links are already shared via WhatsApp and can't be
+// recalled), so "sessies" stays reserved forever — otherwise an event or session
+// could someday claim that literal slug and collide with the redirect route.
 const RESERVED_SLUGS = new Set(["admin", "auth", "sessies"]);
 
 export function normalizeSlug(input: string): string {

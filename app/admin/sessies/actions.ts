@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { sessionsRepo } from "@/lib/data/sessions";
 import { normalizeSlug, assertValidSlug } from "@/lib/slug";
+import { isSlugTaken } from "@/lib/slug-registry";
 import type { SessionStatus } from "@/lib/session-types";
 
 function path(sessionId: string) {
@@ -15,7 +16,7 @@ export async function createSession(formData: FormData) {
   await requireAdmin();
   const slug = normalizeSlug(String(formData.get("slug") ?? ""));
   assertValidSlug(slug);
-  if (await sessionsRepo.getSessionBySlug(slug)) {
+  if (await isSlugTaken(slug)) {
     throw new Error(`"${slug}" is al in gebruik door een andere sessie.`);
   }
   const session = await sessionsRepo.createSession({
@@ -36,11 +37,8 @@ export async function updateSessionDetails(sessionId: string, formData: FormData
   const session = await sessionsRepo.getSession(sessionId);
   const requestedSlug = normalizeSlug(String(formData.get("slug") ?? ""));
   assertValidSlug(requestedSlug);
-  if (requestedSlug !== session?.slug) {
-    const existing = await sessionsRepo.getSessionBySlug(requestedSlug);
-    if (existing && existing.id !== sessionId) {
-      throw new Error(`"${requestedSlug}" is al in gebruik door een andere sessie.`);
-    }
+  if (requestedSlug !== session?.slug && (await isSlugTaken(requestedSlug, { kind: "session", id: sessionId }))) {
+    throw new Error(`"${requestedSlug}" is al in gebruik door een andere sessie.`);
   }
   await sessionsRepo.updateSession(sessionId, {
     title: String(formData.get("title") ?? ""),
@@ -54,8 +52,8 @@ export async function updateSessionDetails(sessionId: string, formData: FormData
   revalidatePath(path(sessionId));
   revalidatePath("/admin/sessies");
   if (session && session.slug !== requestedSlug) {
-    revalidatePath(`/sessies/${session.slug}`);
-    revalidatePath(`/sessies/${requestedSlug}`);
+    revalidatePath(`/${session.slug}`);
+    revalidatePath(`/${requestedSlug}`);
   }
 }
 
@@ -65,7 +63,7 @@ export async function setSessionStatus(sessionId: string, status: SessionStatus)
   await sessionsRepo.updateSession(sessionId, { status });
   revalidatePath(path(sessionId));
   revalidatePath("/admin/sessies");
-  if (session) revalidatePath(`/sessies/${session.slug}`);
+  if (session) revalidatePath(`/${session.slug}`);
 }
 
 export async function deleteSession(sessionId: string) {

@@ -53,7 +53,7 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
 
   const host = headers().get("host");
   const proto = process.env.NODE_ENV === "development" ? "http" : "https";
-  const shareUrl = host ? `${proto}://${host}/sessies/${session.slug}` : `/sessies/${session.slug}`;
+  const shareUrl = host ? `${proto}://${host}/${session.slug}` : `/${session.slug}`;
 
   return (
     <div
@@ -159,7 +159,7 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
                     className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
                   />
                   <span className="text-xs text-mint-ink-muted">
-                    Publieke link wordt event.padelsocial.nl/sessies/{session.slug}.
+                    Publieke link wordt event.padelsocial.nl/{session.slug}.
                   </span>
                 </label>
                 <div className="grid grid-cols-2 gap-3">
