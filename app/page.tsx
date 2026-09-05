@@ -154,7 +154,7 @@ export default async function LandingPage() {
                 href={`/${e.slug}`}
                 className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-[0_1px_3px_rgba(20,35,28,.08)] hover:brightness-95"
               >
-                <DateChip date={e.date} />
+                <DateChip date={e.date} upcoming={false} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-mint text-lg font-bold text-mint-ink">{e.name}</div>
                   <div className="truncate text-xs text-mint-ink-muted">
@@ -170,14 +170,14 @@ export default async function LandingPage() {
   );
 }
 
-function DateChip({ date }: { date: string }) {
+function DateChip({ date, upcoming = true }: { date: string; upcoming?: boolean }) {
   const d = new Date(`${date}T00:00:00`);
   const day = d.getDate();
   const month = d.toLocaleDateString("nl-NL", { month: "short" }).replace(".", "");
   return (
-    <div className="flex flex-none flex-col items-center justify-center rounded-xl bg-mint-lime px-3 py-2">
-      <span className="font-mint text-xl font-bold leading-none text-mint-lime-ink">{day}</span>
-      <span className="font-mint text-[10px] font-bold uppercase tracking-wider text-mint-lime-ink">{month}</span>
+    <div className={`flex flex-none flex-col items-center justify-center rounded-xl px-3 py-2 ${upcoming ? "bg-mint-lime" : "bg-mint-net/20"}`}>
+      <span className="font-mint text-xl font-bold leading-none text-[#0E2318]">{day}</span>
+      <span className="font-mint text-[10px] font-bold uppercase tracking-wider text-[#0E2318]">{month}</span>
     </div>
   );
 }
