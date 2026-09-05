@@ -61,7 +61,12 @@ export async function renderOgCard({ eyebrow, title, chips }: OgCardContent) {
           width: "100%",
           height: "100%",
           position: "relative",
-          overflow: "hidden",
+          // No overflow:hidden here — Satori clips a rotated absolutely-positioned
+          // child (the court block below) against its PRE-rotation bounding box
+          // when the parent has overflow:hidden, cutting it off well short of
+          // where it visually should bleed off-canvas. The 1200x630 ImageResponse
+          // canvas itself is the true boundary regardless, since this div is
+          // sized to exactly match it — so omitting overflow:hidden is safe here.
           display: "flex",
           background: "linear-gradient(150deg, #CFE4D7 0%, #E8F1EA 38%, #F5F8F5 68%, #DDEBE0 100%)",
           fontFamily: '"Plus Jakarta Sans"',
@@ -79,6 +84,7 @@ export async function renderOgCard({ eyebrow, title, chips }: OgCardContent) {
             borderRadius: 30,
             background: "#1E64F0",
             transform: "rotate(-7deg)",
+            transformOrigin: "center",
             overflow: "hidden",
             boxShadow: "0 34px 70px rgba(9,40,90,.28)",
             display: "flex",
@@ -97,9 +103,9 @@ export async function renderOgCard({ eyebrow, title, chips }: OgCardContent) {
             }}
           />
           <div style={{ position: "absolute", left: "50%", top: 24, bottom: 24, width: 4, marginLeft: -2, background: "#FFFFFF", display: "flex" }} />
-          <div style={{ position: "absolute", left: "26%", top: 24, bottom: 24, width: 4, background: "#FFFFFF", display: "flex" }} />
-          <div style={{ position: "absolute", left: "74%", top: 24, bottom: 24, width: 4, background: "#FFFFFF", display: "flex" }} />
-          <div style={{ position: "absolute", left: "26%", right: "26%", top: "50%", height: 4, marginTop: -2, background: "#FFFFFF", display: "flex" }} />
+          <div style={{ position: "absolute", left: "26%", top: 24, bottom: 24, width: 2, background: "rgba(255,255,255,.45)", display: "flex" }} />
+          <div style={{ position: "absolute", left: "74%", top: 24, bottom: 24, width: 2, background: "rgba(255,255,255,.45)", display: "flex" }} />
+          <div style={{ position: "absolute", left: "26%", right: "26%", top: "50%", height: 2, marginTop: -1, background: "rgba(255,255,255,.45)", display: "flex" }} />
           <div style={{ position: "absolute", left: "12%", top: "22%", width: 28, height: 28, borderRadius: "50%", background: "#D2E95C", display: "flex" }} />
           <div style={{ position: "absolute", left: "12%", bottom: "22%", width: 28, height: 28, borderRadius: "50%", background: "#D2E95C", display: "flex" }} />
           <div style={{ position: "absolute", left: 442, top: "22%", width: 28, height: 28, borderRadius: "50%", background: "#D2E95C", display: "flex" }} />
