@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
 
-/** Fallback link-preview image — used everywhere until a per-event/session
- * generated image is built (see the "dynamic og:image" follow-up). */
-export const OG_IMAGE = "/social/padel-social-og-thumb-whatsapp.png";
-
 /** Short date for share-card titles, e.g. "zo 30 aug, 10:30". */
 export function fmtDateShort(date: string, time: string): string {
   const short = new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", {
@@ -26,16 +22,17 @@ export function fmtEyebrow(date: string, time: string): string {
 }
 
 /**
- * Shared link-preview shape — same image/card type everywhere (tournaments,
- * sessions, the landing page), only title/description vary per page. A
- * neutral, dependency-free formatting helper (like lib/slug.ts), not owned by
- * either the tournament or sessions feature.
+ * Shared link-preview shape — same title/description on every consuming route.
+ * Deliberately does NOT set an `images` field: both consumers (/ and /[slug])
+ * have their own opengraph-image.tsx file, and Next only auto-attaches that
+ * file-based image when generateMetadata doesn't already specify one — an
+ * explicit `images` here would silently override it with nothing.
  */
 export function buildShareMetadata(title: string, description: string): Metadata {
   return {
     title,
     description,
-    openGraph: { title, description, images: [OG_IMAGE], locale: "nl_NL", type: "website" },
-    twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE] },
+    openGraph: { title, description, locale: "nl_NL", type: "website" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
