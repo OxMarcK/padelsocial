@@ -1,63 +1,33 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { fmtClockTime } from "@/lib/sessions";
 import type { Member, Reservation } from "@/lib/session-types";
 
 /**
- * Mobile-first: one dropdown, one big thumb-sized button, nothing else — this is
- * meant to be filled in on a phone from a WhatsApp link. Calling the action
- * directly (not a plain <form action>) so the returned Reservation can drive an
- * inline confirmation without a page reload.
+ * The "existing member" path — pick your name from the admin-managed list.
+ * Mobile-first: one dropdown, one big thumb-sized button. Reports the
+ * resulting reservation up via onReserved rather than rendering its own
+ * confirmation, so components/sessions/signup-flow.tsx can show one shared
+ * confirmation view regardless of which path (this, or first-time-form) got
+ * there.
  */
 export function SignupForm({
   sessionId,
   members,
-  tikkieUrl,
   reserveSpot,
+  onReserved,
 }: {
   sessionId: string;
   members: Member[];
-  tikkieUrl: string | null;
   reserveSpot: (sessionId: string, formData: FormData) => Promise<Reservation>;
+  onReserved: (reservation: Reservation) => void;
 }) {
   const [memberId, setMemberId] = useState(members[0]?.id ?? "");
-  const [reservation, setReservation] = useState<Reservation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   if (members.length === 0) {
     return <p className="text-sm text-mint-ink-muted">Er staan nog geen leden in het systeem.</p>;
-  }
-
-  if (reservation) {
-    return (
-      <div className="flex flex-col gap-3 rounded-2xl border border-mint-lime bg-mint-lime/15 p-4 text-sm text-mint-ink">
-        {reservation.status === "paid" ? (
-          <p>Je plek is bevestigd — tot op de baan! 🎾</p>
-        ) : (
-          <>
-            <p>
-              Je plek is gereserveerd tot{" "}
-              <span className="font-bold tabular-nums">{fmtClockTime(reservation.holdExpiresAt)}</span>. Betaal binnen
-              dat uur via Tikkie, anders vervalt je plek weer.
-            </p>
-            {tikkieUrl ? (
-              <a
-                href={tikkieUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="flex h-12 items-center justify-center rounded-2xl bg-mint-lime px-6 text-center font-mint font-bold uppercase tracking-wider text-mint-lime-ink"
-              >
-                Betaal via Tikkie
-              </a>
-            ) : (
-              <p className="text-xs text-mint-ink-muted">Er is nog geen betaallink ingesteld — vraag de organisator.</p>
-            )}
-          </>
-        )}
-      </div>
-    );
   }
 
   function submit(e: React.FormEvent) {
@@ -67,7 +37,7 @@ export function SignupForm({
     formData.set("memberId", memberId);
     startTransition(async () => {
       try {
-        setReservation(await reserveSpot(sessionId, formData));
+        onReserved(await reserveSpot(sessionId, formData));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Er ging iets mis.");
       }

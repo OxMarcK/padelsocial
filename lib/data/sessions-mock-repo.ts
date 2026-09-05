@@ -79,6 +79,7 @@ export const sessionsMockRepo: SessionsRepo = {
         name: m.name,
         email: m.email ?? null,
         phone: m.phone ?? null,
+        level: m.level ?? null,
         createdAt: new Date().toISOString(),
       };
       store.members.set(member.id, member);

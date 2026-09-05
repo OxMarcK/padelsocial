@@ -22,11 +22,17 @@ export interface Session {
   createdAt: string;
 }
 
+/** Determines which court a member starts on for the "wisselend" up/down format —
+ * not used for court assignment yet, but persisted from the moment a member
+ * signs up so it's already there once that feature is built. */
+export type MemberLevel = "beginner" | "beginner_plus" | "intermediate";
+
 export interface Member {
   id: string;
   name: string;
   email: string | null;
   phone: string | null;
+  level: MemberLevel | null;
   createdAt: string;
 }
 

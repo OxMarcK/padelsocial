@@ -32,7 +32,7 @@ function mapSession(row: any): Session {
 }
 
 function mapMember(row: any): Member {
-  return { id: row.id, name: row.name, email: row.email, phone: row.phone, createdAt: row.created_at };
+  return { id: row.id, name: row.name, email: row.email, phone: row.phone, level: row.level, createdAt: row.created_at };
 }
 
 function mapReservation(row: any): Reservation {
@@ -145,7 +145,7 @@ export const sessionsSupabaseRepo: SessionsRepo = {
     const client = supabaseAdmin();
     const { data, error } = await client
       .from("members")
-      .insert(input.map((m) => ({ name: m.name, email: m.email ?? null, phone: m.phone ?? null })))
+      .insert(input.map((m) => ({ name: m.name, email: m.email ?? null, phone: m.phone ?? null, level: m.level ?? null })))
       .select();
     if (error) raise(error);
     return (data ?? []).map(mapMember);

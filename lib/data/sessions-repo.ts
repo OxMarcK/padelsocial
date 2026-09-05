@@ -1,4 +1,4 @@
-import type { Member, Reservation, Session, SessionStatus } from "../session-types";
+import type { Member, MemberLevel, Reservation, Session, SessionStatus } from "../session-types";
 
 export interface NewSessionInput {
   slug: string;
@@ -14,6 +14,7 @@ export interface NewMemberInput {
   name: string;
   email?: string | null;
   phone?: string | null;
+  level?: MemberLevel | null;
 }
 
 /**

@@ -3,11 +3,11 @@ import { sessionsRepo } from "@/lib/data/sessions";
 import { activeReservations, sessionCapacity } from "@/lib/sessions";
 import type { Session } from "@/lib/session-types";
 import { Logo } from "@/components/logo";
-import { SignupForm } from "@/components/sessions/signup-form";
+import { SignupFlow } from "@/components/sessions/signup-flow";
 import { CourtSpots } from "@/components/sessions/court-spots";
 import { AlreadySignedUp } from "@/components/sessions/already-signed-up";
 import { GoodToKnow } from "@/components/sessions/good-to-know";
-import { reserveSpotAction } from "./session-actions";
+import { createMemberAndReserveAction, reserveSpotAction } from "./session-actions";
 
 const STATUS_MESSAGE: Record<"draft" | "closed" | "done", string> = {
   draft: "Aanmelden is nog niet open voor deze sessie.",
@@ -72,7 +72,13 @@ export async function SessionSignupView({ session }: { session: Session }) {
 
         <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
           {session.status === "open" ? (
-            <SignupForm sessionId={session.id} members={members} tikkieUrl={session.tikkieUrl} reserveSpot={reserveSpotAction} />
+            <SignupFlow
+              sessionId={session.id}
+              members={members}
+              tikkieUrl={session.tikkieUrl}
+              reserveSpot={reserveSpotAction}
+              createMemberAndReserve={createMemberAndReserveAction}
+            />
           ) : (
             <p className="text-sm text-mint-ink-muted">{STATUS_MESSAGE[session.status]}</p>
           )}
