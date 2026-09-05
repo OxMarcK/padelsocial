@@ -77,7 +77,7 @@ export function SignupForm({
   return (
     <form onSubmit={submit} className="flex flex-col gap-3">
       <label className="flex flex-col gap-1 text-sm">
-        <span className="text-[#0E2318]">Wie ben jij?</span>
+        <span className="font-mint text-lg font-bold text-[#0E2318]">Wie ben jij?</span>
         <select
           value={memberId}
           onChange={(e) => setMemberId(e.target.value)}

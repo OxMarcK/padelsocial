@@ -51,7 +51,7 @@ export default async function SessionSignupPage({ params }: { params: { slug: st
 
         <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
           <div className="flex items-center justify-between">
-            <span className="font-mint text-sm font-bold text-[#0E2318]">Plekken</span>
+            <span className="font-mint text-lg font-bold text-[#0E2318]">Plekken</span>
             <span className="font-mint text-sm font-bold tabular-nums text-mint-ink-muted">
               {taken} van {capacity} bezet
             </span>
