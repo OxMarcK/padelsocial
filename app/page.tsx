@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { repo } from "@/lib/data";
 import { sessionsRepo } from "@/lib/data/sessions";
-import type { PadelEvent } from "@/lib/types";
-import type { Session } from "@/lib/session-types";
 import { Logo } from "@/components/logo";
 import { buildShareMetadata, fmtDateShort } from "@/lib/share-metadata";
+import { isUpcomingPublicEvent, isUpcomingPublicSession } from "@/lib/upcoming";
 
 const OG_DESCRIPTION = "Volg live de standen, je baanindeling en de knock-out.";
 
@@ -17,44 +16,13 @@ function daysUntil(date: string): number {
   return Math.round((target.getTime() - today.getTime()) / 86_400_000);
 }
 
-/**
- * Any event that isn't finished yet is "upcoming" — including one still in
- * "draft" (Inchecken), regardless of how far out its date is. People should
- * be able to find the event and its schedule as soon as it exists, not only
- * once its own morning arrives (previously drafts were hidden entirely,
- * which also made a live event vanish from the landing page right when
- * people were arriving and looking for it).
- */
-function isPubliclyVisible(e: PadelEvent): boolean {
-  return e.status !== "finished";
-}
-
-function isPastDate(date: string): boolean {
-  const d = new Date(`${date}T00:00:00`);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return d.getTime() < today.getTime();
-}
-
-/**
- * A session is worth surfacing here once it's open for signup or already closed
- * (still relevant — people who signed up still want to find it) and hasn't
- * happened yet. Unlike a tournament, a "draft" session stays hidden: a concept
- * tournament is still shown per isPubliclyVisible's reasoning above, but a draft
- * session isn't something anyone can act on yet, and there's always another one
- * coming next week — no urgency to reveal it early.
- */
-function isUpcomingPublicSession(s: Session): boolean {
-  return (s.status === "open" || s.status === "closed") && !isPastDate(s.date);
-}
-
 function fmtEventDateLong(date: string): string {
   return new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { weekday: "long", day: "numeric", month: "long" });
 }
 
 export async function generateMetadata(): Promise<Metadata> {
   const events = await repo.listEvents();
-  const upcoming = events.find(isPubliclyVisible);
+  const upcoming = events.find(isUpcomingPublicEvent);
   const title = upcoming ? `${upcoming.name} - ${fmtDateShort(upcoming.date, upcoming.startTime)}` : "Padel Social";
   return buildShareMetadata(title, OG_DESCRIPTION);
 }
@@ -67,7 +35,7 @@ function countdownLabel(days: number): string {
 
 export default async function LandingPage() {
   const [events, sessions] = await Promise.all([repo.listEvents(), sessionsRepo.listSessions()]);
-  const upcoming = events.find(isPubliclyVisible);
+  const upcoming = events.find(isUpcomingPublicEvent);
   const past = events.filter((e) => e.status === "finished");
   // Every not-yet-passed session shows, not just the soonest one — unlike a
   // tournament (a rare one-off, hence the single big hero), sessions recur
