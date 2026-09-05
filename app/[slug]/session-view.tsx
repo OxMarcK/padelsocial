@@ -1,9 +1,11 @@
+import { headers } from "next/headers";
 import { sessionsRepo } from "@/lib/data/sessions";
 import { activeReservations, sessionCapacity } from "@/lib/sessions";
 import type { Session } from "@/lib/session-types";
 import { Logo } from "@/components/logo";
 import { SignupForm } from "@/components/sessions/signup-form";
 import { CourtSpots } from "@/components/sessions/court-spots";
+import { AlreadySignedUp } from "@/components/sessions/already-signed-up";
 import { GoodToKnow } from "@/components/sessions/good-to-know";
 import { reserveSpotAction } from "./session-actions";
 
@@ -25,7 +27,14 @@ export async function SessionSignupView({ session }: { session: Session }) {
   ]);
 
   const capacity = sessionCapacity(session);
-  const taken = activeReservations(reservations).length;
+  const active = activeReservations(reservations);
+  const taken = active.length;
+  const memberNameById = Object.fromEntries(members.map((m) => [m.id, m.name]));
+  const signedUpNames = active.map((r) => memberNameById[r.memberId] ?? "?");
+
+  const host = headers().get("host");
+  const proto = process.env.NODE_ENV === "development" ? "http" : "https";
+  const shareUrl = host ? `${proto}://${host}/${session.slug}` : `/${session.slug}`;
 
   return (
     <div
@@ -66,6 +75,8 @@ export async function SessionSignupView({ session }: { session: Session }) {
             <p className="text-sm text-mint-ink-muted">{STATUS_MESSAGE[session.status]}</p>
           )}
         </div>
+
+        <AlreadySignedUp names={signedUpNames} shareUrl={shareUrl} shareTitle={session.title} />
 
         <GoodToKnow />
       </main>
