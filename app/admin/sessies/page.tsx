@@ -7,8 +7,8 @@ import { createSession } from "./actions";
 
 const STATUS_LABEL: Record<string, string> = {
   draft: "Concept",
-  open: "Open voor aanmelden",
-  closed: "Gesloten",
+  open: "Open",
+  closed: "Vol",
   done: "Afgerond",
 };
 

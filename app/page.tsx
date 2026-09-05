@@ -151,7 +151,7 @@ export default async function LandingPage() {
         </div>
       </div>
       <span className="flex-none font-mint text-xs font-bold uppercase tracking-wider text-mint-lime-ink">
-        {upcomingSession.status === "open" ? "Aanmelden open" : "Gesloten"}
+        {upcomingSession.status === "open" ? "Open" : "Vol"}
       </span>
     </Link>
   ) : null;

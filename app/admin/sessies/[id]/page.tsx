@@ -14,8 +14,8 @@ import { cancelReservation, deleteSession, markReservationPaid, setSessionStatus
 
 const STATUS_LABEL: Record<SessionStatus, string> = {
   draft: "Concept",
-  open: "Open voor aanmelden",
-  closed: "Gesloten",
+  open: "Open",
+  closed: "Vol",
   done: "Afgerond",
 };
 
