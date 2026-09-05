@@ -62,7 +62,7 @@ export function FirstTimeForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          placeholder="Voor- en achternaam"
+          placeholder="Voornaam"
           className="h-14 rounded-2xl border-2 border-mint-lime bg-white px-4 text-lg text-mint-ink placeholder:text-mint-ink-muted/50 focus:outline-none"
         />
       </label>
