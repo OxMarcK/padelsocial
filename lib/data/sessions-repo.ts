@@ -35,7 +35,7 @@ export interface SessionsRepo {
 
   listMembers(): Promise<Member[]>;
   addMembersBulk(input: NewMemberInput[]): Promise<Member[]>;
-  updateMember(id: string, name: string): Promise<Member>;
+  updateMember(id: string, patch: { name: string; level?: MemberLevel | null }): Promise<Member>;
   deleteMember(id: string): Promise<void>;
 
   /** Sweeps expired holds to status "expired" before returning — always the

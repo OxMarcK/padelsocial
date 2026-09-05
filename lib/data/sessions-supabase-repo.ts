@@ -151,9 +151,11 @@ export const sessionsSupabaseRepo: SessionsRepo = {
     return (data ?? []).map(mapMember);
   },
 
-  async updateMember(id, name) {
+  async updateMember(id, patch) {
     const client = supabaseAdmin();
-    const { data, error } = await client.from("members").update({ name }).eq("id", id).select().single();
+    const update: Record<string, unknown> = { name: patch.name };
+    if (patch.level !== undefined) update.level = patch.level;
+    const { data, error } = await client.from("members").update(update).eq("id", id).select().single();
     if (error) raise(error);
     return mapMember(data);
   },

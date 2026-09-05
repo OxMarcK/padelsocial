@@ -4,7 +4,9 @@ import { sessionsRepo } from "@/lib/data/sessions";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, SaveButton } from "@/components/admin/action-form";
 import { Section } from "@/components/admin/section";
-import { addMembersBulk, deleteMember, renameMember } from "./actions";
+import { addMembersBulk, deleteMember, updateMember } from "./actions";
+
+const LEVEL_LABEL = { beginner: "Beginner", beginner_plus: "Beginner+", intermediate: "Intermediate" } as const;
 
 /**
  * The roster the public aanmeldpagina's dropdown draws from — separate from the
@@ -46,12 +48,24 @@ export default async function AdminMembersPage() {
             <div className="mt-3 flex flex-col gap-1.5">
               {members.map((m) => (
                 <div key={m.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-mint-net/10 px-3 py-2 text-sm">
-                  <ActionForm action={renameMember.bind(null, m.id)} className="flex min-w-0 flex-1 items-center gap-2">
+                  <ActionForm action={updateMember.bind(null, m.id)} className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                     <input
                       name="name"
                       defaultValue={m.name}
                       className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
                     />
+                    <select
+                      name="level"
+                      defaultValue={m.level ?? ""}
+                      className="h-9 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+                    >
+                      <option value="">Geen niveau</option>
+                      {Object.entries(LEVEL_LABEL).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
                     <SaveButton variant="ghost" size="sm" />
                   </ActionForm>
                   <ConfirmButton
