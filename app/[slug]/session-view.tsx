@@ -30,7 +30,9 @@ export async function SessionSignupView({ session }: { session: Session }) {
   const active = activeReservations(reservations);
   const taken = active.length;
   const memberNameById = Object.fromEntries(members.map((m) => [m.id, m.name]));
-  const signedUpNames = active.map((r) => memberNameById[r.memberId] ?? "?");
+  // "Al aangemeld" only lists confirmed (paid) spots — a held-but-unpaid
+  // reservation can still expire, so showing it here would overpromise.
+  const signedUpNames = active.filter((r) => r.status === "paid").map((r) => memberNameById[r.memberId] ?? "?");
 
   const host = headers().get("host");
   const proto = process.env.NODE_ENV === "development" ? "http" : "https";
