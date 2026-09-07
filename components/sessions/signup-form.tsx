@@ -22,7 +22,9 @@ export function SignupForm({
   reserveSpot: (sessionId: string, formData: FormData) => Promise<Reservation>;
   onReserved: (reservation: Reservation) => void;
 }) {
-  const [memberId, setMemberId] = useState(members[0]?.id ?? "");
+  // No member preselected — defaulting to the first name in the list made it
+  // too easy to accidentally sign up as someone else without noticing.
+  const [memberId, setMemberId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -53,6 +55,9 @@ export function SignupForm({
           onChange={(e) => setMemberId(e.target.value)}
           className="h-12 rounded-xl border border-mint-net/25 bg-white px-3 text-mint-ink"
         >
+          <option value="" disabled>
+            Selecteer je profiel
+          </option>
           {members.map((m) => (
             <option key={m.id} value={m.id}>
               {m.name}
