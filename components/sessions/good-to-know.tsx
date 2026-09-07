@@ -1,8 +1,9 @@
-/** Static explainer card for the public aanmeldpagina — how the weekly
- * "wisselend" format works. Not driven by session data (every weekly
- * session follows the same format), so this is plain copy, not a prop-driven
- * component. */
-export function GoodToKnow() {
+/** Explainer card for the public aanmeldpagina — how the weekly "wisselend"
+ * format works. Mostly static copy (every weekly session follows the same
+ * format), except the "hoogste baan" callout: since a session's baannummers
+ * are no longer assumed to be 1..N (see session-types.ts), the highest
+ * baannummer of *this* session has to be passed in rather than hardcoded. */
+export function GoodToKnow({ highestCourtNumber }: { highestCourtNumber: number }) {
   return (
     <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
       <h3 className="font-mint text-lg font-bold text-[#0E2318]">Goed om te weten</h3>
@@ -21,7 +22,7 @@ export function GoodToKnow() {
           ↑
         </span>
         <p className="text-sm text-mint-ink">
-          Winnaars schuiven een baan omhoog, verliezers omlaag. Baan 1 is de hoogste.
+          Winnaars schuiven een baan omhoog, verliezers omlaag. Baan {highestCourtNumber} is de hoogste.
         </p>
       </div>
     </div>

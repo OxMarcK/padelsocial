@@ -102,7 +102,7 @@ export async function SessionSignupView({ session }: { session: Session }) {
           showInvite={session.status !== "done"}
         />
 
-        <GoodToKnow />
+        <GoodToKnow highestCourtNumber={Math.max(...session.courtNumbers)} />
       </main>
     </div>
   );
