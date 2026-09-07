@@ -27,6 +27,7 @@ function mapSession(row: any): Session {
     courts: row.courts,
     tikkieUrl: row.tikkie_url,
     status: row.status,
+    courtVideos: row.court_videos ?? {},
     createdAt: row.created_at,
   };
 }
@@ -132,6 +133,18 @@ export const sessionsSupabaseRepo: SessionsRepo = {
     const client = supabaseAdmin();
     const { error } = await client.from("sessions").delete().eq("id", id);
     if (error) raise(error);
+  },
+
+  async setCourtVideo(id, courtNumber, videoUrl) {
+    const client = supabaseAdmin();
+    const { data: current, error: fetchError } = await client.from("sessions").select("court_videos").eq("id", id).single();
+    if (fetchError) raise(fetchError);
+    const courtVideos: Record<number, string> = { ...(current?.court_videos ?? {}) };
+    if (videoUrl) courtVideos[courtNumber] = videoUrl;
+    else delete courtVideos[courtNumber];
+    const { data, error } = await client.from("sessions").update({ court_videos: courtVideos }).eq("id", id).select().single();
+    if (error) raise(error);
+    return mapSession(data);
   },
 
   async listMembers() {

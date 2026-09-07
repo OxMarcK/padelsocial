@@ -32,6 +32,8 @@ export interface SessionsRepo {
   createSession(input: NewSessionInput): Promise<Session>;
   updateSession(id: string, patch: Partial<NewSessionInput> & { status?: SessionStatus }): Promise<Session>;
   deleteSession(id: string): Promise<void>;
+  /** Sets or clears (pass null) the video link for one court on a session. */
+  setCourtVideo(sessionId: string, courtNumber: number, videoUrl: string | null): Promise<Session>;
 
   listMembers(): Promise<Member[]>;
   addMembersBulk(input: NewMemberInput[]): Promise<Member[]>;

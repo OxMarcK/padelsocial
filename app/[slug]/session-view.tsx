@@ -6,6 +6,7 @@ import { Logo } from "@/components/logo";
 import { SignupFlow } from "@/components/sessions/signup-flow";
 import { CourtSpots } from "@/components/sessions/court-spots";
 import { AlreadySignedUp } from "@/components/sessions/already-signed-up";
+import { CourtVideos } from "@/components/sessions/court-videos";
 import { GoodToKnow } from "@/components/sessions/good-to-know";
 import { createMemberAndReserveAction, reserveSpotAction } from "./session-actions";
 
@@ -73,21 +74,31 @@ export async function SessionSignupView({ session }: { session: Session }) {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
-          {session.status === "open" ? (
-            <SignupFlow
-              sessionId={session.id}
-              members={members}
-              tikkieUrl={session.tikkieUrl}
-              reserveSpot={reserveSpotAction}
-              createMemberAndReserve={createMemberAndReserveAction}
-            />
-          ) : (
-            <p className="text-sm text-mint-ink-muted">{STATUS_MESSAGE[session.status]}</p>
-          )}
-        </div>
+        {session.status !== "done" ? (
+          <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+            {session.status === "open" ? (
+              <SignupFlow
+                sessionId={session.id}
+                members={members}
+                tikkieUrl={session.tikkieUrl}
+                reserveSpot={reserveSpotAction}
+                createMemberAndReserve={createMemberAndReserveAction}
+              />
+            ) : (
+              <p className="text-sm text-mint-ink-muted">{STATUS_MESSAGE[session.status]}</p>
+            )}
+          </div>
+        ) : null}
 
-        <AlreadySignedUp names={signedUpNames} shareUrl={shareUrl} shareTitle={session.title} />
+        {session.status === "done" ? <CourtVideos courts={session.courts} courtVideos={session.courtVideos} /> : null}
+
+        <AlreadySignedUp
+          names={signedUpNames}
+          shareUrl={shareUrl}
+          shareTitle={session.title}
+          title={session.status === "done" ? "Deelnemers" : "Al aangemeld"}
+          showInvite={session.status !== "done"}
+        />
 
         <GoodToKnow />
       </main>

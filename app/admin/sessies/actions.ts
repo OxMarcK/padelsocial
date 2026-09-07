@@ -77,6 +77,14 @@ export async function deleteSession(sessionId: string) {
   redirect("/admin/sessies");
 }
 
+export async function setCourtVideo(sessionId: string, courtNumber: number, formData: FormData) {
+  await requireAdmin();
+  const videoUrl = String(formData.get("videoUrl") ?? "").trim();
+  const session = await sessionsRepo.setCourtVideo(sessionId, courtNumber, videoUrl || null);
+  revalidatePath(path(sessionId));
+  revalidatePath(`/${session.slug}`);
+}
+
 export async function markReservationPaid(sessionId: string, reservationId: string) {
   await requireAdmin();
   await sessionsRepo.markPaid(reservationId);

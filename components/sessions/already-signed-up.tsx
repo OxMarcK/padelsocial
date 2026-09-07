@@ -20,7 +20,22 @@ function initialsFor(name: string): string {
  * share-or-copy pattern as components/sessions/share-link.tsx but as one big
  * button rather than a URL row.
  */
-export function AlreadySignedUp({ names, shareUrl, shareTitle }: { names: string[]; shareUrl: string; shareTitle: string }) {
+export function AlreadySignedUp({
+  names,
+  shareUrl,
+  shareTitle,
+  title = "Al aangemeld",
+  showInvite = true,
+}: {
+  names: string[];
+  shareUrl: string;
+  shareTitle: string;
+  /** Overridden to "Deelnemers" once the session is done — at that point
+   * these are no longer people who "signed up", they're who played. */
+  title?: string;
+  /** Hidden once the session is done — there's nothing left to join. */
+  showInvite?: boolean;
+}) {
   const [copied, setCopied] = useState(false);
 
   async function handleInvite() {
@@ -43,7 +58,7 @@ export function AlreadySignedUp({ names, shareUrl, shareTitle }: { names: string
   return (
     <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
       <div className="flex items-center justify-between">
-        <span className="font-mint text-lg font-bold text-[#0E2318]">Al aangemeld</span>
+        <span className="font-mint text-lg font-bold text-[#0E2318]">{title}</span>
         {shown.length > 0 ? (
           <div className="flex -space-x-3">
             {shown.map((name, i) => (
@@ -75,13 +90,15 @@ export function AlreadySignedUp({ names, shareUrl, shareTitle }: { names: string
         <p className="mt-3 text-sm text-mint-ink-muted">Nog niemand aangemeld — wees de eerste!</p>
       )}
 
-      <button
-        type="button"
-        onClick={handleInvite}
-        className="mt-4 h-14 w-full rounded-full bg-mint-lime font-mint text-lg font-bold text-mint-lime-ink transition hover:brightness-105"
-      >
-        {copied ? "Link gekopieerd" : "Nodig iemand uit"}
-      </button>
+      {showInvite ? (
+        <button
+          type="button"
+          onClick={handleInvite}
+          className="mt-4 h-14 w-full rounded-full bg-mint-lime font-mint text-lg font-bold text-mint-lime-ink transition hover:brightness-105"
+        >
+          {copied ? "Link gekopieerd" : "Nodig iemand uit"}
+        </button>
+      ) : null}
     </div>
   );
 }

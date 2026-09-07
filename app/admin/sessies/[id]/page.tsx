@@ -10,7 +10,14 @@ import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/acti
 import { Section } from "@/components/admin/section";
 import { ShareLink } from "@/components/sessions/share-link";
 import type { SessionStatus } from "@/lib/session-types";
-import { cancelReservation, deleteSession, markReservationPaid, setSessionStatus, updateSessionDetails } from "../actions";
+import {
+  cancelReservation,
+  deleteSession,
+  markReservationPaid,
+  setCourtVideo,
+  setSessionStatus,
+  updateSessionDetails,
+} from "../actions";
 
 const STATUS_LABEL: Record<SessionStatus, string> = {
   draft: "Concept",
@@ -141,6 +148,28 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
               })}
             </div>
           )}
+        </Section>
+
+        <Section title="Video's koppelen" subtitle="Eén video per baan — verschijnt op de publieke pagina zodra de sessie is afgerond.">
+          <div className="flex flex-col gap-1.5">
+            {Array.from({ length: session.courts }, (_, i) => i + 1).map((courtNumber) => (
+              <ActionForm
+                key={courtNumber}
+                action={setCourtVideo.bind(null, session.id, courtNumber)}
+                className="flex items-center gap-2 rounded-xl bg-mint-net/10 px-3 py-2"
+              >
+                <span className="w-16 flex-none font-mint text-sm font-bold text-mint-ink">Baan {courtNumber}</span>
+                <input
+                  type="url"
+                  name="videoUrl"
+                  defaultValue={session.courtVideos[courtNumber] ?? ""}
+                  placeholder="https://youtube.com/…"
+                  className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-sm text-mint-ink"
+                />
+                <SaveButton variant="ghost" size="sm" />
+              </ActionForm>
+            ))}
+          </div>
         </Section>
 
         <details className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">

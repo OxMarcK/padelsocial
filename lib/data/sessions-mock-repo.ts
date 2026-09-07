@@ -56,6 +56,7 @@ export const sessionsMockRepo: SessionsRepo = {
       id: uid("session"),
       ...input,
       status: "draft",
+      courtVideos: {},
       createdAt: new Date().toISOString(),
     };
     store.sessions.set(session.id, session);
@@ -72,6 +73,16 @@ export const sessionsMockRepo: SessionsRepo = {
   async deleteSession(id) {
     store.sessions.delete(id);
     for (const [rid, r] of store.reservations) if (r.sessionId === id) store.reservations.delete(rid);
+  },
+
+  async setCourtVideo(id, courtNumber, videoUrl) {
+    const session = requireSession(id);
+    const courtVideos = { ...session.courtVideos };
+    if (videoUrl) courtVideos[courtNumber] = videoUrl;
+    else delete courtVideos[courtNumber];
+    const updated: Session = { ...session, courtVideos };
+    store.sessions.set(id, updated);
+    return updated;
   },
 
   async listMembers() {

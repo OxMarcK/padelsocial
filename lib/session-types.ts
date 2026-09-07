@@ -19,6 +19,10 @@ export interface Session {
    * Tikkie the organizer already sends today) — not a per-person link. */
   tikkieUrl: string | null;
   status: SessionStatus;
+  /** Per-court video link, added after the session is done — courts have no
+   * per-match/team data like tournaments do, so this is just "baan number ->
+   * video URL", keyed by court number (1-based). */
+  courtVideos: Record<number, string>;
   createdAt: string;
 }
 
