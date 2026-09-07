@@ -9,6 +9,12 @@ import { activeReservations } from "@/lib/sessions";
 
 const OG_DESCRIPTION = "Volg live de standen, je baanindeling en de knock-out.";
 
+// Same reasoning as app/opengraph-image.tsx: no dynamic API is used here, so
+// without this Next would try to prerender the homepage during `next build`
+// — a live Supabase call that, on a bad day, can fail the whole deploy.
+// Forcing dynamic rendering moves that call to request time instead.
+export const dynamic = "force-dynamic";
+
 /** Whole calendar days from today to `date` — can be negative if the event already started. */
 function daysUntil(date: string): number {
   const target = new Date(`${date}T00:00:00`);
