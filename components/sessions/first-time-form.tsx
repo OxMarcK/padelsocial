@@ -50,7 +50,7 @@ export function FirstTimeForm({
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <div>
-        <h3 className="font-mint text-2xl font-bold text-[#0E2318]">Eerste keer hier?</h3>
+        <h3 className="font-mint text-lg font-bold text-[#0E2318]">Eerste keer hier?</h3>
         <p className="mt-1 text-sm text-mint-ink-muted">
           Alleen je naam is genoeg. De rest onthouden we voor de volgende zondag.
         </p>
