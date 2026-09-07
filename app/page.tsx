@@ -65,11 +65,14 @@ export default async function LandingPage() {
     ...pastSessions.map(async (s) => {
       const reservations = await sessionsRepo.listReservations(s.id);
       const attendeeCount = activeReservations(reservations).length;
+      // Padel is doubles — a team is 2 people, same conversion the "Plekken"
+      // court visualization already uses implicitly (courts * 4 players).
+      const teamCount = Math.floor(attendeeCount / 2);
       return {
         date: s.date,
         href: `/${s.slug}`,
         title: s.title,
-        meta: `${attendeeCount} aangemeld · ${s.location}`,
+        meta: `${teamCount} teams · ${s.location}`,
       };
     }),
   ]).then((rows) => rows.sort((a, b) => b.date.localeCompare(a.date)));
