@@ -59,7 +59,7 @@ function CourtVideoRow({ courtNumber, videoUrl }: { courtNumber: number; videoUr
       {thumbnail}
       <div className="flex flex-col gap-0.5">
         <span className="text-[15px] font-semibold text-mint-ink-muted">Baan {courtNumber}</span>
-        <span className="text-xs text-mint-ink-muted">Nog geen video</span>
+        <span className="text-xs text-mint-ink-muted">Geen video beschikbaar</span>
       </div>
     </div>
   );
