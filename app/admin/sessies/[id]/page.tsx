@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { requireAdmin } from "@/lib/require-admin";
 import { sessionsRepo } from "@/lib/data/sessions";
-import { sessionCapacity, activeReservations, fmtClockTime } from "@/lib/sessions";
+import { sessionCapacity, activeReservations, fmtClockTime, formatCourtNumbers } from "@/lib/sessions";
 import { Field } from "@/components/ui/field";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
@@ -74,7 +74,7 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
           </Link>
           <h1 className="mt-1 font-mint text-4xl font-bold text-mint-ink">{session.title}</h1>
           <p className="text-sm text-mint-ink-muted">
-            {session.date} · {session.startTime} · {session.location} · {session.courts} banen
+            {session.date} · {session.startTime} · {session.location} · baan {formatCourtNumbers(session.courtNumbers)}
           </p>
         </div>
 
@@ -152,7 +152,7 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
 
         <Section title="Video's koppelen" subtitle="Eén video per baan — verschijnt op de publieke pagina zodra de sessie is afgerond.">
           <div className="flex flex-col gap-1.5">
-            {Array.from({ length: session.courts }, (_, i) => i + 1).map((courtNumber) => (
+            {session.courtNumbers.map((courtNumber) => (
               <ActionForm
                 key={courtNumber}
                 action={setCourtVideo.bind(null, session.id, courtNumber)}
@@ -196,7 +196,13 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
                   <Field label="Starttijd" name="startTime" type="time" defaultValue={session.startTime} required />
                 </div>
                 <Field label="Locatie" name="location" defaultValue={session.location} required />
-                <Field label="Aantal banen" name="courts" type="number" defaultValue={session.courts} required />
+                <Field
+                  label="Baannummers (komma-gescheiden)"
+                  name="courtNumbers"
+                  defaultValue={formatCourtNumbers(session.courtNumbers)}
+                  placeholder="1, 2, 3, 4"
+                  required
+                />
                 <Field label="Tikkie-link" name="tikkieUrl" defaultValue={session.tikkieUrl ?? ""} placeholder="https://tikkie.me/pay/…" />
                 <ActionFormError />
                 <SaveButton />

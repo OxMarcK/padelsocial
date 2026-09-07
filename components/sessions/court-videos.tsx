@@ -3,15 +3,15 @@
  * tournament's match-video list (components/mint/match-video-list.tsx: a court
  * thumbnail with a play icon, outbound link), reimplemented here rather than
  * imported since sessions has no match/team/score data to attach, just a
- * court number. One row per court (1..session.courts), always — courts
- * without a video yet show a muted placeholder instead of a link.
+ * court number. One row per baannummer in session.courtNumbers, always —
+ * courts without a video yet show a muted placeholder instead of a link.
  */
-export function CourtVideos({ courts, courtVideos }: { courts: number; courtVideos: Record<number, string> }) {
+export function CourtVideos({ courtNumbers, courtVideos }: { courtNumbers: number[]; courtVideos: Record<number, string> }) {
   return (
     <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
       <span className="font-mint text-lg font-bold text-[#0E2318]">Baan video&apos;s</span>
       <div className="mt-3 flex flex-col gap-2.5">
-        {Array.from({ length: courts }, (_, i) => i + 1).map((courtNumber) => (
+        {courtNumbers.map((courtNumber) => (
           <CourtVideoRow key={courtNumber} courtNumber={courtNumber} videoUrl={courtVideos[courtNumber]} />
         ))}
       </div>

@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   activeReservations,
   findActiveReservationForMember,
+  formatCourtNumbers,
   isReservationExpired,
   isSessionFull,
+  parseCourtNumbers,
   sessionCapacity,
 } from "./sessions";
 import type { Reservation } from "./session-types";
@@ -23,9 +25,33 @@ function reservation(overrides: Partial<Reservation> = {}): Reservation {
 }
 
 describe("sessionCapacity", () => {
-  it("is courts times 4", () => {
-    expect(sessionCapacity({ courts: 4 })).toBe(16);
-    expect(sessionCapacity({ courts: 3 })).toBe(12);
+  it("is the number of baannummers times 4", () => {
+    expect(sessionCapacity({ courtNumbers: [1, 2, 3, 4] })).toBe(16);
+    expect(sessionCapacity({ courtNumbers: [5, 7, 12] })).toBe(12);
+  });
+});
+
+describe("parseCourtNumbers", () => {
+  it("parses a comma-separated list, trimming whitespace", () => {
+    expect(parseCourtNumbers("1, 2, 3, 4")).toEqual([1, 2, 3, 4]);
+  });
+
+  it("supports non-consecutive baannummers", () => {
+    expect(parseCourtNumbers("3,5,7,12")).toEqual([3, 5, 7, 12]);
+  });
+
+  it("dedupes and ignores non-positive/non-numeric entries", () => {
+    expect(parseCourtNumbers("1, 1, 2, abc, 0, -3")).toEqual([1, 2]);
+  });
+
+  it("returns an empty list for blank input", () => {
+    expect(parseCourtNumbers("")).toEqual([]);
+  });
+});
+
+describe("formatCourtNumbers", () => {
+  it("joins with a comma and space", () => {
+    expect(formatCourtNumbers([3, 5, 7, 12])).toBe("3, 5, 7, 12");
   });
 });
 
@@ -65,13 +91,13 @@ describe("activeReservations", () => {
 });
 
 describe("isSessionFull", () => {
-  it("is full once active reservations reach courts * 4", () => {
+  it("is full once active reservations reach baannummers.length * 4", () => {
     const now = new Date("2026-09-01T12:00:00.000Z");
     const rows = Array.from({ length: 8 }, (_, i) =>
       reservation({ id: `r${i}`, memberId: `m${i}`, holdExpiresAt: "2026-09-01T13:00:00.000Z" })
     );
-    expect(isSessionFull({ courts: 2 }, rows, now)).toBe(true);
-    expect(isSessionFull({ courts: 3 }, rows, now)).toBe(false);
+    expect(isSessionFull({ courtNumbers: [1, 2] }, rows, now)).toBe(true);
+    expect(isSessionFull({ courtNumbers: [1, 2, 3] }, rows, now)).toBe(false);
   });
 });
 

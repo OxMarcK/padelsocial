@@ -73,7 +73,13 @@ export default async function AdminSessionsPage() {
               <Field label="Starttijd" name="startTime" type="time" defaultValue="19:00" required />
             </div>
             <Field label="Locatie" name="location" required placeholder="Padelclub Rotterdam" />
-            <Field label="Aantal banen" name="courts" type="number" defaultValue={4} required />
+            <Field
+              label="Baannummers (komma-gescheiden)"
+              name="courtNumbers"
+              defaultValue="1, 2, 3, 4"
+              placeholder="1, 2, 3, 4"
+              required
+            />
             <Field label="Tikkie-link" name="tikkieUrl" placeholder="https://tikkie.me/pay/…" />
             <Button type="submit" fullWidth>
               Sessie aanmaken

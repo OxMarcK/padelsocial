@@ -22,9 +22,10 @@ export default async function Image() {
   }
 
   const isSession = "title" in featured;
+  const courtsCount = isSession ? featured.courtNumbers.length : featured.courts;
   return renderOgCard({
     eyebrow: fmtEyebrow(featured.date, featured.startTime),
     title: isSession ? featured.title : featured.name,
-    chips: [`${featured.courts} banen`, featured.location],
+    chips: [`${courtsCount} banen`, featured.location],
   });
 }

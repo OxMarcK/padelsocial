@@ -14,14 +14,18 @@ export interface Session {
   date: string;
   startTime: string;
   location: string;
-  courts: number;
+  /** The actual physical baannummers this session plays on, in order — not
+   * assumed to be 1..N, since a club's own numbering rarely starts at 1 and
+   * rarely runs consecutively (e.g. [3, 5, 7, 12]). The court *count* is
+   * simply this array's length; nothing else stores a separate number. */
+  courtNumbers: number[];
   /** One shared payment-request link for the whole session (same as the WhatsApp-group
    * Tikkie the organizer already sends today) — not a per-person link. */
   tikkieUrl: string | null;
   status: SessionStatus;
   /** Per-court video link, added after the session is done — courts have no
    * per-match/team data like tournaments do, so this is just "baan number ->
-   * video URL", keyed by court number (1-based). */
+   * video URL", keyed by the actual baannummer from courtNumbers. */
   courtVideos: Record<number, string>;
   createdAt: string;
 }

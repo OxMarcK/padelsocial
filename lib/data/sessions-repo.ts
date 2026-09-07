@@ -6,7 +6,7 @@ export interface NewSessionInput {
   date: string;
   startTime: string;
   location: string;
-  courts: number;
+  courtNumbers: number[];
   tikkieUrl: string | null;
 }
 

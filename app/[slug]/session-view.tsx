@@ -58,7 +58,7 @@ export async function SessionSignupView({ session }: { session: Session }) {
             {session.date} · {session.startTime}
           </p>
           <p className="text-sm text-mint-ink-muted">
-            {session.location} · {session.courts} banen
+            {session.location} · {session.courtNumbers.length} banen
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export async function SessionSignupView({ session }: { session: Session }) {
             </span>
           </div>
           <div className="mt-3">
-            <CourtSpots courts={session.courts} takenCount={taken} />
+            <CourtSpots courts={session.courtNumbers.length} takenCount={taken} />
           </div>
         </div>
 
@@ -90,7 +90,9 @@ export async function SessionSignupView({ session }: { session: Session }) {
           </div>
         ) : null}
 
-        {session.status === "done" ? <CourtVideos courts={session.courts} courtVideos={session.courtVideos} /> : null}
+        {session.status === "done" ? (
+          <CourtVideos courtNumbers={session.courtNumbers} courtVideos={session.courtVideos} />
+        ) : null}
 
         <AlreadySignedUp
           names={signedUpNames}

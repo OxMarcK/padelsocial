@@ -6,10 +6,19 @@ import { requireAdmin } from "@/lib/require-admin";
 import { sessionsRepo } from "@/lib/data/sessions";
 import { normalizeSlug, assertValidSlug } from "@/lib/slug";
 import { isSlugTaken } from "@/lib/slug-registry";
+import { parseCourtNumbers } from "@/lib/sessions";
 import type { SessionStatus } from "@/lib/session-types";
 
 function path(sessionId: string) {
   return `/admin/sessies/${sessionId}`;
+}
+
+function readCourtNumbers(formData: FormData): number[] {
+  const courtNumbers = parseCourtNumbers(String(formData.get("courtNumbers") ?? ""));
+  if (courtNumbers.length === 0) {
+    throw new Error("Vul minimaal één baannummer in, bijvoorbeeld \"1, 2, 3, 4\".");
+  }
+  return courtNumbers;
 }
 
 export async function createSession(formData: FormData) {
@@ -25,7 +34,7 @@ export async function createSession(formData: FormData) {
     date: String(formData.get("date") ?? ""),
     startTime: String(formData.get("startTime") ?? ""),
     location: String(formData.get("location") ?? ""),
-    courts: Number(formData.get("courts") ?? 4),
+    courtNumbers: readCourtNumbers(formData),
     tikkieUrl: String(formData.get("tikkieUrl") ?? "").trim() || null,
   });
   revalidatePath("/admin/sessies");
@@ -47,7 +56,7 @@ export async function updateSessionDetails(sessionId: string, formData: FormData
     date: String(formData.get("date") ?? ""),
     startTime: String(formData.get("startTime") ?? ""),
     location: String(formData.get("location") ?? ""),
-    courts: Number(formData.get("courts") ?? 4),
+    courtNumbers: readCourtNumbers(formData),
     tikkieUrl: String(formData.get("tikkieUrl") ?? "").trim() || null,
   });
   revalidatePath(path(sessionId));

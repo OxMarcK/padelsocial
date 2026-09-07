@@ -22,7 +22,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
     return renderOgCard({
       eyebrow: fmtEyebrow(session.date, session.startTime),
       title: session.title,
-      chips: [`${session.courts} banen`, session.location],
+      chips: [`${session.courtNumbers.length} banen`, session.location],
     });
   }
 

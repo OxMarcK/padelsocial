@@ -24,7 +24,7 @@ function mapSession(row: any): Session {
     date: row.date,
     startTime: row.start_time,
     location: row.location,
-    courts: row.courts,
+    courtNumbers: row.court_numbers ?? [],
     tikkieUrl: row.tikkie_url,
     status: row.status,
     courtVideos: row.court_videos ?? {},
@@ -104,7 +104,7 @@ export const sessionsSupabaseRepo: SessionsRepo = {
         date: input.date,
         start_time: input.startTime,
         location: input.location,
-        courts: input.courts,
+        court_numbers: input.courtNumbers,
         tikkie_url: input.tikkieUrl,
       })
       .select()
@@ -121,7 +121,7 @@ export const sessionsSupabaseRepo: SessionsRepo = {
     if (patch.date !== undefined) update.date = patch.date;
     if (patch.startTime !== undefined) update.start_time = patch.startTime;
     if (patch.location !== undefined) update.location = patch.location;
-    if (patch.courts !== undefined) update.courts = patch.courts;
+    if (patch.courtNumbers !== undefined) update.court_numbers = patch.courtNumbers;
     if (patch.tikkieUrl !== undefined) update.tikkie_url = patch.tikkieUrl;
     if (patch.status !== undefined) update.status = patch.status;
     const { data, error } = await client.from("sessions").update(update).eq("id", id).select().single();

@@ -5,10 +5,28 @@ import type { Reservation, Session } from "./session-types";
  * to be wrong in practice. */
 export const HOLD_MINUTES = 60;
 
-/** No separate capacity field — derived from courts, same pattern as the
- * tournament's `event.courts` driving its own court-count math. */
-export function sessionCapacity(session: Pick<Session, "courts">): number {
-  return session.courts * 4;
+/** No separate capacity field — derived from how many baannummers the session
+ * has, same pattern as the tournament's `event.courts` driving its own
+ * court-count math (there it's a plain count; here it's a list because the
+ * baannummers themselves can be anything, see session-types.ts). */
+export function sessionCapacity(session: Pick<Session, "courtNumbers">): number {
+  return session.courtNumbers.length * 4;
+}
+
+/** Parses the admin's comma-separated "Baannummers" input (e.g. "3, 5, 7, 12")
+ * into a deduplicated list of positive integers, preserving input order. */
+export function parseCourtNumbers(input: string): number[] {
+  const seen = new Set<number>();
+  for (const part of input.split(",")) {
+    const n = Number(part.trim());
+    if (Number.isFinite(n) && n > 0) seen.add(n);
+  }
+  return Array.from(seen);
+}
+
+/** Inverse of parseCourtNumbers, for pre-filling the admin form. */
+export function formatCourtNumbers(courtNumbers: number[]): string {
+  return courtNumbers.join(", ");
 }
 
 const ACTIVE_STATUSES: Reservation["status"][] = ["held", "paid"];
@@ -31,7 +49,7 @@ export function activeReservations(reservations: Reservation[], now: Date = new 
   return reservations.filter((r) => isActiveReservation(r) && !isReservationExpired(r, now));
 }
 
-export function isSessionFull(session: Pick<Session, "courts">, reservations: Reservation[], now: Date = new Date()): boolean {
+export function isSessionFull(session: Pick<Session, "courtNumbers">, reservations: Reservation[], now: Date = new Date()): boolean {
   return activeReservations(reservations, now).length >= sessionCapacity(session);
 }
 
