@@ -31,3 +31,11 @@ export function isUpcomingPublicEvent(e: PadelEvent): boolean {
 export function isUpcomingPublicSession(s: Session): boolean {
   return (s.status === "open" || s.status === "closed") && !isPastDate(s.date);
 }
+
+/** The flip side of isUpcomingPublicSession — a session belongs in the "Vorige
+ * events" history once its date has passed, as long as it was ever actually
+ * opened (a session left in "draft" never happened publicly, so it has no
+ * history to show). */
+export function isPastPublicSession(s: Session): boolean {
+  return s.status !== "draft" && isPastDate(s.date);
+}

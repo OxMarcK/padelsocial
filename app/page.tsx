@@ -4,7 +4,8 @@ import { repo } from "@/lib/data";
 import { sessionsRepo } from "@/lib/data/sessions";
 import { Logo } from "@/components/logo";
 import { buildShareMetadata, fmtDateShort } from "@/lib/share-metadata";
-import { isUpcomingPublicEvent, isUpcomingPublicSession } from "@/lib/upcoming";
+import { isUpcomingPublicEvent, isUpcomingPublicSession, isPastPublicSession } from "@/lib/upcoming";
+import { activeReservations } from "@/lib/sessions";
 
 const OG_DESCRIPTION = "Volg live de standen, je baanindeling en de knock-out.";
 
@@ -47,9 +48,31 @@ export default async function LandingPage() {
   // happening next" should read top-to-bottom in date order.
   const sessionFirst = upcoming && nextSession ? nextSession.date < upcoming.date : Boolean(nextSession);
 
-  const pastWithTeamCounts = await Promise.all(
-    past.map(async (e) => ({ event: e, teamCount: (await repo.listTeams(e.id)).length }))
-  );
+  const pastSessions = sessions.filter(isPastPublicSession);
+
+  // One combined "history" list — events and sessions interleaved by date,
+  // most recent first — rather than two separate lists, per the user's choice.
+  const history = await Promise.all([
+    ...past.map(async (e) => {
+      const teamCount = (await repo.listTeams(e.id)).length;
+      return {
+        date: e.date,
+        href: `/${e.slug}`,
+        title: e.name,
+        meta: `${teamCount} teams · ${e.location}`,
+      };
+    }),
+    ...pastSessions.map(async (s) => {
+      const reservations = await sessionsRepo.listReservations(s.id);
+      const attendeeCount = activeReservations(reservations).length;
+      return {
+        date: s.date,
+        href: `/${s.slug}`,
+        title: s.title,
+        meta: `${attendeeCount} aangemeld · ${s.location}`,
+      };
+    }),
+  ]).then((rows) => rows.sort((a, b) => b.date.localeCompare(a.date)));
 
   const tournamentHero = upcoming ? (
     <section className="relative flex flex-col gap-5 overflow-hidden rounded-[32px] bg-glass-blue p-6 text-white">
@@ -145,21 +168,19 @@ export default async function LandingPage() {
           tournamentHero
         )}
 
-        {pastWithTeamCounts.length > 0 ? (
+        {history.length > 0 ? (
           <section className="flex flex-col gap-2">
             <h2 className="font-mint text-2xl font-bold text-[#0E2318]">Vorige events</h2>
-            {pastWithTeamCounts.map(({ event: e, teamCount }) => (
+            {history.map((h) => (
               <Link
-                key={e.id}
-                href={`/${e.slug}`}
+                key={h.href}
+                href={h.href}
                 className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-[0_1px_3px_rgba(20,35,28,.08)] hover:brightness-95"
               >
-                <DateChip date={e.date} upcoming={false} />
+                <DateChip date={h.date} upcoming={false} />
                 <div className="min-w-0 flex-1">
-                  <div className="truncate font-mint text-lg font-bold text-mint-ink">{e.name}</div>
-                  <div className="truncate text-xs text-mint-ink-muted">
-                    {teamCount} teams · {e.location}
-                  </div>
+                  <div className="truncate font-mint text-lg font-bold text-mint-ink">{h.title}</div>
+                  <div className="truncate text-xs text-mint-ink-muted">{h.meta}</div>
                 </div>
               </Link>
             ))}
