@@ -52,7 +52,7 @@ export function FirstTimeForm({
       <div>
         <h3 className="font-mint text-lg font-bold text-[#0E2318]">Eerste keer hier?</h3>
         <p className="mt-1 text-sm text-mint-ink-muted">
-          Alleen je naam is genoeg. De rest onthouden we voor de volgende zondag.
+          Naam en e-mail zijn genoeg. De rest onthouden we voor de volgende zondag.
         </p>
       </div>
 
