@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { levelLabel } from "@/lib/sessions";
+import type { MemberLevel } from "@/lib/session-types";
 
 const AVATAR_COLORS = ["bg-[#0E2318]", "bg-mint-lime-ink", "bg-glass-blue"];
 
@@ -14,25 +16,26 @@ function initialsFor(name: string): string {
     .toUpperCase();
 }
 
+export interface SignedUpEntry {
+  name: string;
+  level: MemberLevel | null;
+}
+
 /**
- * Shows who's already signed up (name only — no "niveau"/level column yet,
- * that's a separate future feature) plus an invite CTA, reusing the same
- * share-or-copy pattern as components/sessions/share-link.tsx but as one big
- * button rather than a URL row.
+ * Shows who's already signed up — name plus their self-reported niveau —
+ * plus an invite CTA, reusing the same share-or-copy pattern as
+ * components/sessions/share-link.tsx but as one big button rather than a
+ * URL row.
  */
 export function AlreadySignedUp({
-  names,
+  entries,
   shareUrl,
   shareTitle,
-  title = "Al aangemeld",
   showInvite = true,
 }: {
-  names: string[];
+  entries: SignedUpEntry[];
   shareUrl: string;
   shareTitle: string;
-  /** Overridden to "Deelnemers" once the session is done — at that point
-   * these are no longer people who "signed up", they're who played. */
-  title?: string;
   /** Hidden once the session is done — there's nothing left to join. */
   showInvite?: boolean;
 }) {
@@ -52,21 +55,21 @@ export function AlreadySignedUp({
     }
   }
 
-  const shown = names.slice(0, 3);
-  const overflow = names.length - shown.length;
+  const shown = entries.slice(0, 3);
+  const overflow = entries.length - shown.length;
 
   return (
     <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
       <div className="flex items-center justify-between">
-        <span className="font-mint text-lg font-bold text-[#0E2318]">{title}</span>
+        <span className="font-mint text-lg font-bold text-[#0E2318]">Deelnemers</span>
         {shown.length > 0 ? (
           <div className="flex -space-x-3">
-            {shown.map((name, i) => (
+            {shown.map((entry, i) => (
               <span
                 key={i}
                 className={`flex h-10 w-10 items-center justify-center rounded-full border-2 border-white font-mint text-xs font-bold text-white ${AVATAR_COLORS[i % AVATAR_COLORS.length]}`}
               >
-                {initialsFor(name)}
+                {initialsFor(entry.name)}
               </span>
             ))}
             {overflow > 0 ? (
@@ -78,11 +81,19 @@ export function AlreadySignedUp({
         ) : null}
       </div>
 
-      {names.length > 0 ? (
+      {entries.length > 0 ? (
         <div className="mt-3 flex flex-col">
-          {names.map((name, i) => (
-            <div key={i} className={`py-3 text-base text-mint-ink ${i > 0 ? "border-t border-mint-net/15" : ""}`}>
-              {name}
+          {entries.map((entry, i) => (
+            <div
+              key={i}
+              className={`flex items-center justify-between py-3 text-base text-mint-ink ${i > 0 ? "border-t border-mint-net/15" : ""}`}
+            >
+              <span>{entry.name}</span>
+              {levelLabel(entry.level) ? (
+                <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-ink-muted">
+                  {levelLabel(entry.level)}
+                </span>
+              ) : null}
             </div>
           ))}
         </div>

@@ -1,4 +1,4 @@
-import type { Reservation, Session } from "./session-types";
+import type { MemberLevel, Reservation, Session } from "./session-types";
 
 /** Fixed for v1 — see the plan discussion: can become a per-session setting later
  * (same escalation path as the tournament's wisseltijden) if 60 minutes turns out
@@ -59,6 +59,19 @@ export function findActiveReservationForMember(
   now: Date = new Date()
 ): Reservation | null {
   return activeReservations(reservations, now).find((r) => r.memberId === memberId) ?? null;
+}
+
+/** Short label for a member's self-reported level — same wording as the
+ * "Hoe speel je?" picker in first-time-form.tsx, so a name's level here
+ * reads as the same thing they chose at sign-up. */
+const LEVEL_LABEL: Record<MemberLevel, string> = {
+  beginner: "Beginner",
+  beginner_plus: "Beginner+",
+  intermediate: "Intermediate",
+};
+
+export function levelLabel(level: MemberLevel | null): string | null {
+  return level ? LEVEL_LABEL[level] : null;
 }
 
 /** Every session runs in the Netherlands — same fixed zone as the tournament side

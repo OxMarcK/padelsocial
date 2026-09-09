@@ -30,10 +30,12 @@ export async function SessionSignupView({ session }: { session: Session }) {
   const capacity = sessionCapacity(session);
   const active = activeReservations(reservations);
   const taken = active.length;
-  const memberNameById = Object.fromEntries(members.map((m) => [m.id, m.name]));
-  // "Al aangemeld" only lists confirmed (paid) spots — a held-but-unpaid
+  const memberById = Object.fromEntries(members.map((m) => [m.id, m]));
+  // "Deelnemers" only lists confirmed (paid) spots — a held-but-unpaid
   // reservation can still expire, so showing it here would overpromise.
-  const signedUpNames = active.filter((r) => r.status === "paid").map((r) => memberNameById[r.memberId] ?? "?");
+  const signedUpEntries = active
+    .filter((r) => r.status === "paid")
+    .map((r) => ({ name: memberById[r.memberId]?.name ?? "?", level: memberById[r.memberId]?.level ?? null }));
 
   const host = headers().get("host");
   const proto = process.env.NODE_ENV === "development" ? "http" : "https";
@@ -95,10 +97,9 @@ export async function SessionSignupView({ session }: { session: Session }) {
         ) : null}
 
         <AlreadySignedUp
-          names={signedUpNames}
+          entries={signedUpEntries}
           shareUrl={shareUrl}
           shareTitle={session.title}
-          title={session.status === "done" ? "Deelnemers" : "Al aangemeld"}
           showInvite={session.status !== "done"}
         />
 
