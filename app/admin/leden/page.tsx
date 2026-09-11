@@ -47,25 +47,31 @@ export default async function AdminMembersPage() {
           {members.length > 0 ? (
             <div className="mt-3 flex flex-col gap-1.5">
               {members.map((m) => (
-                <div key={m.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-mint-net/10 px-3 py-2 text-sm">
-                  <ActionForm action={updateMember.bind(null, m.id)} className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                <div
+                  key={m.id}
+                  className="flex flex-col gap-2 rounded-xl bg-mint-net/10 px-3 py-3 text-sm sm:flex-row sm:items-center sm:py-2"
+                >
+                  <ActionForm
+                    action={updateMember.bind(null, m.id)}
+                    className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center"
+                  >
                     <input
                       name="name"
                       defaultValue={m.name}
                       placeholder="Naam"
-                      className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+                      className="h-9 w-full min-w-0 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink sm:flex-1"
                     />
                     <input
                       name="email"
                       type="email"
                       defaultValue={m.email ?? ""}
                       placeholder="E-mail"
-                      className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+                      className="h-9 w-full min-w-0 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink sm:flex-1"
                     />
                     <select
                       name="level"
                       defaultValue={m.level ?? ""}
-                      className="h-9 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+                      className="h-9 w-full rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink sm:w-auto"
                     >
                       <option value="">Geen niveau</option>
                       {Object.entries(LEVEL_LABEL).map(([value, label]) => (
