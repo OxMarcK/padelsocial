@@ -121,6 +121,10 @@ export const sessionsMockRepo: SessionsRepo = {
 
   async deleteMember(id) {
     store.members.delete(id);
+    // Mirrors the real DB's ON DELETE CASCADE on reservations.member_id (see
+    // migration 0008) — deleting a member means removing them entirely,
+    // same as deleting a session already cascades away its reservations.
+    for (const [rid, r] of store.reservations) if (r.memberId === id) store.reservations.delete(rid);
   },
 
   async listReservations(sessionId) {
