@@ -28,9 +28,10 @@ export async function addMembersBulk(formData: FormData) {
 export async function updateMember(memberId: string, formData: FormData) {
   await requireAdmin();
   const name = String(formData.get("name") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim();
   const rawLevel = String(formData.get("level") ?? "");
   const level: MemberLevel | null = MEMBER_LEVELS.includes(rawLevel as MemberLevel) ? (rawLevel as MemberLevel) : null;
-  if (name) await sessionsRepo.updateMember(memberId, { name, level });
+  if (name) await sessionsRepo.updateMember(memberId, { name, email: email || null, level });
   revalidatePath("/admin/leden");
 }
 

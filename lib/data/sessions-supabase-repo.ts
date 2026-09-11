@@ -167,6 +167,7 @@ export const sessionsSupabaseRepo: SessionsRepo = {
   async updateMember(id, patch) {
     const client = supabaseAdmin();
     const update: Record<string, unknown> = { name: patch.name };
+    if (patch.email !== undefined) update.email = patch.email;
     if (patch.level !== undefined) update.level = patch.level;
     const { data, error } = await client.from("members").update(update).eq("id", id).select().single();
     if (error) raise(error);

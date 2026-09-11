@@ -109,7 +109,12 @@ export const sessionsMockRepo: SessionsRepo = {
   async updateMember(id, patch) {
     const member = store.members.get(id);
     if (!member) throw new Error(`Member not found: ${id}`);
-    const updated = { ...member, name: patch.name, ...(patch.level !== undefined ? { level: patch.level } : {}) };
+    const updated = {
+      ...member,
+      name: patch.name,
+      ...(patch.email !== undefined ? { email: patch.email } : {}),
+      ...(patch.level !== undefined ? { level: patch.level } : {}),
+    };
     store.members.set(id, updated);
     return updated;
   },

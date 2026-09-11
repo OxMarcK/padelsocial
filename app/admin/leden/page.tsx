@@ -52,6 +52,14 @@ export default async function AdminMembersPage() {
                     <input
                       name="name"
                       defaultValue={m.name}
+                      placeholder="Naam"
+                      className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+                    />
+                    <input
+                      name="email"
+                      type="email"
+                      defaultValue={m.email ?? ""}
+                      placeholder="E-mail"
                       className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
                     />
                     <select
