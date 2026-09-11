@@ -26,18 +26,22 @@ export function SignupFlow({
   createMemberAndReserve: (sessionId: string, formData: FormData) => Promise<Reservation>;
 }) {
   const [mode, setMode] = useState<"new" | "existing">("new");
-  const [reservation, setReservation] = useState<Reservation | null>(null);
+  const [confirmed, setConfirmed] = useState<{ reservation: Reservation; name: string } | null>(null);
 
-  if (reservation) {
-    return <ReservationConfirmation reservation={reservation} tikkieUrl={tikkieUrl} />;
+  function handleReserved(reservation: Reservation, name: string) {
+    setConfirmed({ reservation, name });
+  }
+
+  if (confirmed) {
+    return <ReservationConfirmation reservation={confirmed.reservation} name={confirmed.name} tikkieUrl={tikkieUrl} />;
   }
 
   return (
     <div className="flex flex-col gap-4">
       {mode === "new" ? (
-        <FirstTimeForm sessionId={sessionId} createMemberAndReserve={createMemberAndReserve} onReserved={setReservation} />
+        <FirstTimeForm sessionId={sessionId} createMemberAndReserve={createMemberAndReserve} onReserved={handleReserved} />
       ) : (
-        <SignupForm sessionId={sessionId} members={members} reserveSpot={reserveSpot} onReserved={setReservation} />
+        <SignupForm sessionId={sessionId} members={members} reserveSpot={reserveSpot} onReserved={handleReserved} />
       )}
 
       <div className="flex items-center gap-3">

@@ -23,7 +23,11 @@ export function FirstTimeForm({
 }: {
   sessionId: string;
   createMemberAndReserve: (sessionId: string, formData: FormData) => Promise<Reservation>;
-  onReserved: (reservation: Reservation) => void;
+  /** Passes the name as typed alongside the reservation, so the confirmation
+   * screen can show it back — the one place a browser-autofill mix-up (a
+   * shared/passed-around phone silently filling in someone else's saved
+   * name) becomes visible before it's too late to fix. */
+  onReserved: (reservation: Reservation, name: string) => void;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -40,7 +44,7 @@ export function FirstTimeForm({
     formData.set("level", level);
     startTransition(async () => {
       try {
-        onReserved(await createMemberAndReserve(sessionId, formData));
+        onReserved(await createMemberAndReserve(sessionId, formData), name);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Er ging iets mis.");
       }
@@ -62,6 +66,7 @@ export function FirstTimeForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          autoComplete="off"
           placeholder="Voornaam"
           className="h-14 rounded-2xl border-2 border-mint-lime bg-white px-4 text-lg text-mint-ink placeholder:text-mint-ink-muted/50 focus:outline-none"
         />
@@ -74,6 +79,7 @@ export function FirstTimeForm({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          autoComplete="off"
           placeholder="jij@mail.nl"
           className="h-12 rounded-xl border border-mint-net/25 bg-white px-4 text-mint-ink placeholder:text-mint-ink-muted/50"
         />

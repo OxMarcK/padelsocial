@@ -20,7 +20,9 @@ export function SignupForm({
   sessionId: string;
   members: Member[];
   reserveSpot: (sessionId: string, formData: FormData) => Promise<Reservation>;
-  onReserved: (reservation: Reservation) => void;
+  /** Passes the selected name alongside the reservation so the confirmation
+   * screen can show it back — see first-time-form.tsx's onReserved for why. */
+  onReserved: (reservation: Reservation, name: string) => void;
 }) {
   // No member preselected — defaulting to the first name in the list made it
   // too easy to accidentally sign up as someone else without noticing.
@@ -39,7 +41,8 @@ export function SignupForm({
     formData.set("memberId", memberId);
     startTransition(async () => {
       try {
-        onReserved(await reserveSpot(sessionId, formData));
+        const name = members.find((m) => m.id === memberId)?.name ?? "";
+        onReserved(await reserveSpot(sessionId, formData), name);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Er ging iets mis.");
       }
