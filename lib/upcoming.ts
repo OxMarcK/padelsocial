@@ -1,11 +1,34 @@
 import type { PadelEvent } from "./types";
 import type { Session } from "./session-types";
 
+/** Today's calendar date in the club's own timezone (Europe/Amsterdam) as a
+ * YYYY-MM-DD string — matches the plain date strings events/sessions store.
+ * Comparing date strings directly sidesteps the server's own timezone
+ * entirely (Vercel runs in UTC), which matters here: CEST is two hours
+ * ahead of UTC, so a same-day comparison done in the server's local time can
+ * still think it's "yesterday" for up to two hours after midnight has
+ * already passed in Amsterdam — a session dated today then wrongly counts
+ * as still upcoming instead of history for that whole window. */
+function todayInAmsterdam(): string {
+  // Not `new Intl.DateTimeFormat("en-CA", ...).format(...)` — en-CA's
+  // YYYY-MM-DD output is a browser convention; Node's bundled ICU data
+  // doesn't reliably carry it (it can silently fall back to M/D/YYYY),
+  // which would make the string comparison below compare apples to
+  // oranges. formatToParts with explicit numeric fields sidesteps any
+  // locale's chosen order/separator entirely — we assemble the string
+  // ourselves from the extracted year/month/day parts.
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Amsterdam",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+
 export function isPastDate(date: string): boolean {
-  const d = new Date(`${date}T00:00:00`);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return d.getTime() < today.getTime();
+  return date < todayInAmsterdam();
 }
 
 /**
