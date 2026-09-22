@@ -51,6 +51,14 @@ export default async function AdminHomePage() {
           <span className="text-mint-ink-muted">→</span>
         </Link>
 
+        <Link
+          href="/admin/agenda"
+          className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 shadow-[0_1px_3px_rgba(20,35,28,.08)] hover:brightness-[.98]"
+        >
+          <span className="font-mint text-lg font-bold text-mint-ink">Agenda-hero</span>
+          <span className="text-mint-ink-muted">→</span>
+        </Link>
+
         <div className="flex flex-col gap-2">
           {events.length === 0 ? (
             <p className="text-sm text-mint-ink-muted">Nog geen events. Maak er hieronder een aan.</p>
