@@ -182,7 +182,7 @@ export default async function LandingPage() {
                 className="relative mx-auto block aspect-[719/898] w-full max-w-[430px] overflow-hidden rounded-[28px] bg-[#E7EEE9] shadow-[0_14px_34px_rgba(14,35,24,.12)] hover:shadow-[0_20px_44px_rgba(14,35,24,.2)]"
               >
                 <Image src={heroSettings.heroFlyerUrl} alt="Flyer" fill className="object-contain" />
-                <span className="absolute inset-x-3.5 bottom-3.5 flex items-center gap-2.5 rounded-[14px] bg-[#D2E95C] px-3.5 py-2.5 text-sm font-extrabold text-[#0E2318] shadow-[0_8px_20px_rgba(14,35,24,.18)]">
+                <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2.5 rounded-b-[28px] bg-[#D2E95C] px-3.5 py-3 text-sm font-extrabold text-[#0E2318] shadow-[0_8px_20px_rgba(14,35,24,.18)]">
                   Inschrijven voor dit toernooi
                 </span>
               </a>
