@@ -140,7 +140,7 @@ export default async function LandingPage() {
         <section className="mx-auto max-w-[1180px] px-6 pt-8 sm:pt-11">
           <div className="grid grid-cols-1 items-center gap-8 sm:grid-cols-2">
             <div className="flex flex-col gap-5">
-              <h1 className="text-[2.4rem] font-extrabold leading-[0.98] tracking-tight sm:text-6xl">Agenda</h1>
+              <h1 className="text-[clamp(2.4rem,5vw,3.6rem)] font-extrabold leading-[0.98] tracking-tight">Agenda</h1>
               <p className="max-w-[42ch] text-base font-medium leading-relaxed text-[#5C7266] sm:text-lg">
                 Kijk welke zondagen er openstaan, kies je speeldag en doe mee. Voor Up &amp; Down kun je je individueel inschrijven. Voor King of the Court en onze toernooien speel je met een vaste partner.
               </p>
@@ -254,7 +254,7 @@ export default async function LandingPage() {
         {/* Vorige edities */}
         {history.length > 0 ? (
           <section id="vorige" className="mx-auto flex max-w-[1180px] flex-col gap-2.5 px-6 pt-14 sm:pt-[88px]">
-            <h2 className="text-2xl font-extrabold tracking-tight sm:text-[2.1rem]">Vorige edities</h2>
+            <h2 className="text-[clamp(1.9rem,3.2vw,2.6rem)] font-extrabold tracking-tight">Vorige edities</h2>
             {history.map((h) => (
               <Link
                 key={h.href}
@@ -280,7 +280,7 @@ export default async function LandingPage() {
           <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2 sm:gap-8">
             <div className="flex flex-col gap-3.5">
               <span className="text-xs font-extrabold uppercase tracking-widest text-[#5C7266]">Nieuw hier?</span>
-              <h2 className="text-2xl font-extrabold leading-tight tracking-tight sm:text-[2.1rem]">
+              <h2 className="text-[clamp(1.9rem,3.2vw,2.6rem)] font-extrabold leading-tight tracking-tight">
                 Recreatief padel, elke zondag
               </h2>
               <p className="max-w-[46ch] text-base font-medium leading-relaxed text-[#5C7266]">
@@ -307,7 +307,7 @@ export default async function LandingPage() {
 
         {/* Formats */}
         <section className="mx-auto flex max-w-[1180px] flex-col gap-3.5 px-6 pt-14 sm:pt-[88px]">
-          <h2 className="text-xl font-extrabold tracking-tight sm:text-[1.7rem]">Formats</h2>
+          <h2 className="text-[clamp(1.9rem,3.2vw,2.6rem)] font-extrabold tracking-tight">Formats</h2>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <FormatCard
               title="Up & Down"
