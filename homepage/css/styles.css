@@ -89,6 +89,11 @@ ul { margin: 0; padding: 0; list-style: none; }
 .btn-outline-light { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.5); color: #fff; backdrop-filter: blur(2px); }
 .btn-outline-light:hover { background: rgba(255,255,255,.16); }
 .btn-sm { padding: 12px 22px; font-size: 1rem; }
+/* Matches Agenda's header WhatsApp button exactly (px-4 py-2 text-sm) —
+   standardized so both properties' header CTA reads as the same compact
+   size, rather than homepage's header button stretching the header taller
+   than Agenda's via the base .btn padding. */
+.btn-nav { padding: 8px 16px; font-size: .875rem; }
 .btn-block { width: 100%; padding: 16px; font-size: 1.05rem; }
 .arrow { transition: transform .15s ease; }
 .btn:hover .arrow { transform: translateX(3px); }
