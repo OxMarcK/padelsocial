@@ -2,8 +2,7 @@ import { headers } from "next/headers";
 import { repo } from "@/lib/data";
 import { sessionsRepo } from "@/lib/data/sessions";
 import { isUpcomingPublicEvent, isUpcomingPublicSession } from "@/lib/upcoming";
-import { fmtEyebrow } from "@/lib/share-metadata";
-import { renderOgCard, OG_SIZE } from "@/lib/og-card";
+import { renderAgendaOgCard, OG_SIZE } from "@/lib/og-card";
 
 export const runtime = "nodejs";
 export const size = OG_SIZE;
@@ -30,14 +29,15 @@ export default async function Image() {
   const featured = sessionFirst ? nextSession : (upcoming ?? nextSession);
 
   if (!featured) {
-    return renderOgCard({ eyebrow: "Elke zondag padel in Rotterdam", title: "Agenda", chips: [] });
+    return renderAgendaOgCard(null);
   }
 
   const isSession = "title" in featured;
-  const courtsCount = isSession ? featured.courtNumbers.length : featured.courts;
-  return renderOgCard({
-    eyebrow: fmtEyebrow(featured.date, featured.startTime),
+  const d = new Date(`${featured.date}T00:00:00`);
+  return renderAgendaOgCard({
+    day: String(d.getDate()),
+    month: d.toLocaleDateString("nl-NL", { month: "short" }).replace(".", "").toUpperCase(),
     title: isSession ? featured.title : featured.name,
-    chips: [`${courtsCount} banen`, featured.location],
+    meta: `${featured.startTime} · ${featured.location}`,
   });
 }

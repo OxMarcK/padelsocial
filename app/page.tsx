@@ -10,7 +10,7 @@ import { isUpcomingPublicEvent, isUpcomingPublicSession, isPastPublicSession } f
 import { activeReservations } from "@/lib/sessions";
 import { WHATSAPP_URL, INSTAGRAM_URL } from "@/lib/site-links";
 
-const OG_DESCRIPTION = "Volg live de standen, je baanindeling en de knock-out.";
+const OG_DESCRIPTION = "Kies je datum en speel mee, ook zonder vaste partner.";
 
 // Same reasoning as app/opengraph-image.tsx: no dynamic API is used here, so
 // without this Next would try to prerender the homepage during `next build`
@@ -25,7 +25,7 @@ function fmtEventDateLong(date: string): string {
 export async function generateMetadata(): Promise<Metadata> {
   const events = await repo.listEvents();
   const upcoming = events.find(isUpcomingPublicEvent);
-  const title = upcoming ? `${upcoming.name} - ${fmtDateShort(upcoming.date, upcoming.startTime)}` : "Padel Social — Agenda";
+  const title = upcoming ? `${upcoming.name} - ${fmtDateShort(upcoming.date, upcoming.startTime)}` : "Agenda — elke zondag padel in Rotterdam";
   return buildShareMetadata(title, OG_DESCRIPTION);
 }
 
