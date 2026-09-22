@@ -10,7 +10,7 @@ import { isUpcomingPublicEvent, isUpcomingPublicSession, isPastPublicSession } f
 import { activeReservations } from "@/lib/sessions";
 import { WHATSAPP_URL, INSTAGRAM_URL } from "@/lib/site-links";
 
-const OG_DESCRIPTION = "Speel individueel bij Up & Down, of meld je aan als duo voor King of the Court en onze toernooien.";
+const OG_DESCRIPTION = "Speel individueel mee bij onze sessies, of meld je aan als duo voor onze toernooien.";
 
 // Same reasoning as app/opengraph-image.tsx: no dynamic API is used here, so
 // without this Next would try to prerender the homepage during `next build`
@@ -23,12 +23,13 @@ function fmtWeekday(date: string): string {
   return weekday.charAt(0).toUpperCase() + weekday.slice(1);
 }
 
-/** Sessions don't have a dedicated "format" field — Up & Down is individual
- * signup, King of the Court (and anything else) is duo signup, and this is
- * literally what its title already says, so matching on that is enough. */
+/** Every session is individual signup and individual Tikkie payment,
+ * regardless of format — a King of the Court "duo" plays together on
+ * court, but each person registers and pays for their own spot. Up & Down
+ * spells this out explicitly since players new to it might otherwise
+ * expect to need a partner before signing up. */
 function sessionActionLabel(title: string): string {
   if (title.includes("Up & Down")) return "Individueel inschrijven";
-  if (title.includes("King of the Court")) return "Inschrijven als duo";
   return "Inschrijven";
 }
 
@@ -68,11 +69,9 @@ export default async function LandingPage() {
     ...pastSessions.map(async (s) => {
       const reservations = await sessionsRepo.listReservations(s.id);
       const attendeeCount = activeReservations(reservations).length;
-      // Up & Down is individual signup, so the real unit there is players —
-      // everything else (King of the Court, etc.) signs up as a duo.
-      const meta = s.title.includes("Up & Down")
-        ? `${attendeeCount} spelers · ${s.location}`
-        : `${Math.floor(attendeeCount / 2)} duo's · ${s.location}`;
+      // Every session reservation is one person, regardless of format —
+      // there's no pairing at the data level to divide into "duo's".
+      const meta = `${attendeeCount} spelers · ${s.location}`;
       return { date: s.date, href: `/${s.slug}`, title: s.title, meta, kind: "session" as const };
     }),
   ]).then((rows) => rows.sort((a, b) => b.date.localeCompare(a.date)));
