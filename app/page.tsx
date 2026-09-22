@@ -210,8 +210,8 @@ export default async function LandingPage() {
                     <span
                       className={
                         item.kind === "event"
-                          ? "flex-none rounded-full bg-[#D2E95C] px-3.5 py-1.5 text-sm font-bold text-[#0E2318]"
-                          : "flex-none rounded-full bg-[#F1F5EF] px-3.5 py-1.5 text-sm font-bold"
+                          ? "hidden flex-none rounded-full bg-[#D2E95C] px-3.5 py-1.5 text-sm font-bold text-[#0E2318] sm:block"
+                          : "hidden flex-none rounded-full bg-[#F1F5EF] px-3.5 py-1.5 text-sm font-bold sm:block"
                       }
                     >
                       {item.actionLabel}
