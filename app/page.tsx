@@ -240,27 +240,25 @@ export default async function LandingPage() {
 
         {/* Vorige edities */}
         {history.length > 0 ? (
-          <section id="vorige" className="mx-auto flex max-w-5xl flex-col gap-3.5 px-5 pt-9 sm:pt-16">
+          <section id="vorige" className="mx-auto flex max-w-5xl flex-col gap-2.5 px-5 pt-9 sm:pt-16">
             <h2 className="text-2xl font-extrabold tracking-tight sm:text-[2.1rem]">Vorige edities</h2>
-            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
-              {history.map((h) => (
-                <Link
-                  key={h.href}
-                  href={h.href}
-                  className={
-                    h.kind === "event"
-                      ? "flex flex-col gap-2.5 rounded-[20px] bg-[#0E2318] p-4 text-white shadow-[0_10px_24px_rgba(14,35,24,.16)] hover:bg-[#193626]"
-                      : "flex flex-col gap-2.5 rounded-[20px] bg-white p-4 shadow-[0_8px_20px_rgba(14,35,24,.06)] hover:shadow-[0_12px_26px_rgba(14,35,24,.12)]"
-                  }
-                >
-                  <span className={`text-[11px] font-extrabold uppercase tracking-widest ${h.kind === "event" ? "text-white/65" : "text-[#5C7266]"}`}>
-                    {fmtDateShort(h.date, "").replace(/,\s*$/, "")}
-                  </span>
+            {history.map((h) => (
+              <Link
+                key={h.href}
+                href={h.href}
+                className={
+                  h.kind === "event"
+                    ? "flex items-center gap-4 rounded-[22px] bg-[#0E2318] p-4 text-white shadow-[0_12px_28px_rgba(14,35,24,.18)] hover:bg-[#193626]"
+                    : "flex items-center gap-4 rounded-[22px] bg-white p-4 shadow-[0_10px_24px_rgba(14,35,24,.07)] hover:shadow-[0_14px_30px_rgba(14,35,24,.13)]"
+                }
+              >
+                <DayBadge date={h.date} tone={h.kind === "event" ? "onDark" : "light"} />
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="text-lg font-extrabold leading-tight">{h.title}</span>
-                  <span className={`text-sm font-medium ${h.kind === "event" ? "text-white/72" : "text-[#5C7266]"}`}>{h.meta}</span>
-                </Link>
-              ))}
-            </div>
+                  <span className={`text-sm font-medium leading-snug ${h.kind === "event" ? "text-white/80" : "text-[#5C7266]"}`}>{h.meta}</span>
+                </span>
+              </Link>
+            ))}
           </section>
         ) : null}
 
