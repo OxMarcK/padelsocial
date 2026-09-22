@@ -285,7 +285,7 @@ export async function renderAgendaOgCard(featured: AgendaOgFeatured | null) {
                   display: "flex",
                 }}
               >
-                Kies je datum en speel mee, ook zonder vaste partner.
+                Speel individueel bij Up &amp; Down, of als duo bij King of the Court en onze toernooien.
               </span>
             </div>
           </div>

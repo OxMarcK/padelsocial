@@ -10,7 +10,7 @@ import { isUpcomingPublicEvent, isUpcomingPublicSession, isPastPublicSession } f
 import { activeReservations } from "@/lib/sessions";
 import { WHATSAPP_URL, INSTAGRAM_URL } from "@/lib/site-links";
 
-const OG_DESCRIPTION = "Kies je datum en speel mee, ook zonder vaste partner.";
+const OG_DESCRIPTION = "Speel individueel bij Up & Down, of meld je aan als duo voor King of the Court en onze toernooien.";
 
 // Same reasoning as app/opengraph-image.tsx: no dynamic API is used here, so
 // without this Next would try to prerender the homepage during `next build`
@@ -23,10 +23,19 @@ function fmtWeekday(date: string): string {
   return weekday.charAt(0).toUpperCase() + weekday.slice(1);
 }
 
+/** Sessions don't have a dedicated "format" field — Up & Down is individual
+ * signup, King of the Court (and anything else) is duo signup, and this is
+ * literally what its title already says, so matching on that is enough. */
+function sessionActionLabel(title: string): string {
+  if (title.includes("Up & Down")) return "Individueel inschrijven";
+  if (title.includes("King of the Court")) return "Inschrijven als duo";
+  return "Inschrijven";
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const events = await repo.listEvents();
   const upcoming = events.find(isUpcomingPublicEvent);
-  const title = upcoming ? `${upcoming.name} - ${fmtDateShort(upcoming.date, upcoming.startTime)}` : "Agenda — elke zondag padel in Rotterdam";
+  const title = upcoming ? `${upcoming.name} - ${fmtDateShort(upcoming.date, upcoming.startTime)}` : "Agenda — elke zondag padel";
   return buildShareMetadata(title, OG_DESCRIPTION);
 }
 
@@ -59,8 +68,12 @@ export default async function LandingPage() {
     ...pastSessions.map(async (s) => {
       const reservations = await sessionsRepo.listReservations(s.id);
       const attendeeCount = activeReservations(reservations).length;
-      const teamCount = Math.floor(attendeeCount / 2);
-      return { date: s.date, href: `/${s.slug}`, title: s.title, meta: `${teamCount} teams · ${s.location}`, kind: "session" as const };
+      // Up & Down is individual signup, so the real unit there is players —
+      // everything else (King of the Court, etc.) signs up as a duo.
+      const meta = s.title.includes("Up & Down")
+        ? `${attendeeCount} spelers · ${s.location}`
+        : `${Math.floor(attendeeCount / 2)} duo's · ${s.location}`;
+      return { date: s.date, href: `/${s.slug}`, title: s.title, meta, kind: "session" as const };
     }),
   ]).then((rows) => rows.sort((a, b) => b.date.localeCompare(a.date)));
 
@@ -71,7 +84,7 @@ export default async function LandingPage() {
   type AgendaItem = { kind: "event" | "session"; date: string; slug: string; title: string; startTime: string; location: string; actionLabel: string };
   const agendaItems: AgendaItem[] = [
     ...(upcoming
-      ? [{ kind: "event" as const, date: upcoming.date, slug: upcoming.slug, title: upcoming.name, startTime: upcoming.startTime, location: upcoming.location, actionLabel: "Bekijk event" }]
+      ? [{ kind: "event" as const, date: upcoming.date, slug: upcoming.slug, title: upcoming.name, startTime: upcoming.startTime, location: upcoming.location, actionLabel: "Inschrijven als duo" }]
       : []),
     ...upcomingSessions.map((s) => ({
       kind: "session" as const,
@@ -80,7 +93,7 @@ export default async function LandingPage() {
       title: s.title,
       startTime: s.startTime,
       location: s.location,
-      actionLabel: s.status === "open" ? "Inschrijven" : "Vol",
+      actionLabel: s.status === "open" ? sessionActionLabel(s.title) : "Vol",
     })),
   ].sort((a, b) => a.date.localeCompare(b.date));
 
@@ -129,7 +142,7 @@ export default async function LandingPage() {
             <div className="flex flex-col gap-5">
               <h1 className="text-[2.4rem] font-extrabold leading-[0.98] tracking-tight sm:text-6xl">Agenda</h1>
               <p className="max-w-[42ch] text-base font-medium leading-relaxed text-[#43584C] sm:text-lg">
-                Kijk welke zondagen er open staan, kies je datum en speel mee. Kom je alleen? Dan zorgen wij voor een partner.
+                Kijk welke zondagen er openstaan, kies je speeldag en doe mee. Voor Up &amp; Down kun je je individueel inschrijven. Voor King of the Court en onze toernooien speel je met een vaste partner.
               </p>
 
               <div className="hidden flex-col gap-3 rounded-[22px] bg-white p-5 shadow-[0_10px_26px_rgba(14,35,24,.07)] lg:flex">
@@ -268,11 +281,12 @@ export default async function LandingPage() {
             <div className="flex flex-col gap-3.5">
               <span className="text-xs font-extrabold uppercase tracking-widest text-[#5C7266]">Nieuw hier?</span>
               <h2 className="text-2xl font-extrabold leading-tight tracking-tight sm:text-[2.1rem]">
-                Recreatief padel in Rotterdam, elke zondag
+                Recreatief padel, elke zondag
               </h2>
               <p className="max-w-[46ch] text-base font-medium leading-relaxed text-[#43584C]">
-                Je schrijft je per event in, geen lidmaatschap, geen vast team. Het Up &amp; Down systeem zorgt dat je
-                binnen een uur op je eigen niveau speelt en na afloop wordt er nagepraat.
+                Nieuw bij Padel Social? Begin met Up &amp; Down en schrijf je individueel in. Door iedere ronde van
+                partner en tegenstander te wisselen, speel je al snel met mensen van jouw niveau. Na afloop is er
+                ruimte om samen na te praten.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2.5">
@@ -297,7 +311,7 @@ export default async function LandingPage() {
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
             <FormatCard
               title="Up & Down"
-              copy="Individueel inschrijven, wisselende partner per ronde. Winnen = baan omhoog."
+              copy="Schrijf je individueel in en speel iedere ronde met een nieuwe partner. Win je, dan schuif je een baan omhoog."
               icon={
                 <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[14px] bg-[#D2E95C]">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#0E2318" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[22px] w-[22px]">
@@ -311,7 +325,7 @@ export default async function LandingPage() {
             />
             <FormatCard
               title="King of the Court"
-              copy="Met je vaste partner de hele ochtend door, tegen wisselende koppels."
+              copy="Speel de hele sessie met een vaste partner tegen verschillende duo's."
               icon={
                 <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[14px] bg-[#D2E95C]">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#0E2318" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[22px] w-[22px]">
@@ -323,7 +337,7 @@ export default async function LandingPage() {
             />
             <FormatCard
               title="Toernooi"
-              copy="Eén keer per maand: poules, knock-out en napraten met een hapje."
+              copy="Strijd als duo via de poulefase en knock-outrondes om een plek in de finale."
               icon={
                 <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[14px] bg-[#D2E95C]">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#0E2318" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[22px] w-[22px]">
@@ -359,7 +373,7 @@ export default async function LandingPage() {
             </span>
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="text-sm font-bold">WhatsApp Community</span>
-              <span className="text-xs font-medium text-[#5C7266]">Nieuwe data, banen en last-minute plekken</span>
+              <span className="text-xs font-medium text-[#5C7266]">Nieuwe speeldata, locaties en last-minute plekken</span>
             </span>
           </a>
           <a
