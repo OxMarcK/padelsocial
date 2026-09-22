@@ -34,6 +34,16 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   themeColor: "#FFFFFF",
   viewport: { width: "device-width", initialScale: 1 },
+  // Same favicon files as the homepage (homepage/assets/favicon-*.png),
+  // copied into public/ — set once here so every route under this layout
+  // (Agenda and everything nested under it) shares the same tab icon.
+  icons: {
+    icon: [
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   // Fallback link-preview card — pages with their own event context (the landing
   // page, /[slug]) override title/description via generateMetadata but inherit
   // this image and card type unless they say otherwise.
