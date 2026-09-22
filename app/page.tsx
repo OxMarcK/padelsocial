@@ -113,9 +113,9 @@ export default async function LandingPage() {
   const heroFlyerHref = heroSettings.heroFlyerLink || (agendaItems[0] ? `/${agendaItems[0].slug}` : null) || WHATSAPP_URL;
 
   return (
-    <div className="min-h-screen bg-[#F4F8F4] font-mint text-[#0E2318]">
+    <div className="min-h-screen bg-[#F5F8F5] font-mint text-[#0E2318]">
       <header className="sticky top-0 z-30 bg-white/95 shadow-[0_1px_0_rgba(14,35,24,.10)] backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center gap-4 px-5 py-3.5">
+        <div className="mx-auto flex max-w-[1180px] items-center gap-4 px-6 py-3.5">
           <Logo variant="light" size="md" />
           <a
             href={WHATSAPP_URL}
@@ -137,21 +137,21 @@ export default async function LandingPage() {
 
       <main>
         {/* Hero */}
-        <section className="mx-auto max-w-5xl px-5 pt-8 sm:pt-11">
+        <section className="mx-auto max-w-[1180px] px-6 pt-8 sm:pt-11">
           <div className="grid grid-cols-1 items-center gap-8 sm:grid-cols-2">
             <div className="flex flex-col gap-5">
               <h1 className="text-[2.4rem] font-extrabold leading-[0.98] tracking-tight sm:text-6xl">Agenda</h1>
-              <p className="max-w-[42ch] text-base font-medium leading-relaxed text-[#43584C] sm:text-lg">
+              <p className="max-w-[42ch] text-base font-medium leading-relaxed text-[#5C7266] sm:text-lg">
                 Kijk welke zondagen er openstaan, kies je speeldag en doe mee. Voor Up &amp; Down kun je je individueel inschrijven. Voor King of the Court en onze toernooien speel je met een vaste partner.
               </p>
 
-              <div className="hidden flex-col gap-3 rounded-[22px] bg-white p-5 shadow-[0_10px_26px_rgba(14,35,24,.07)] lg:flex">
+              <div className="hidden flex-col gap-3 rounded-[20px] bg-white p-5 shadow-[0_10px_26px_rgba(14,35,24,.07)] lg:flex">
                 <div className="flex items-center gap-3">
                   <span className="h-[9px] w-[9px] flex-none animate-pulse2 rounded-full bg-[#4F6E14]" />
                   <span className="text-sm font-bold">Elke zondag</span>
                   <span className="ml-auto text-xs font-bold text-[#5C7266]">2 uur spelen</span>
                 </div>
-                <div className="h-px bg-[#0E2318]/[.08]" />
+                <div className="h-px bg-[#0E2318]/[.10]" />
                 <div className="flex items-center gap-3">
                   <span className="h-[9px] w-[9px] flex-none rounded-[2px] bg-[#1E64F0]" />
                   <span className="text-sm font-bold">Ballen liggen klaar</span>
@@ -162,7 +162,7 @@ export default async function LandingPage() {
               <div className="hidden flex-wrap gap-2.5 lg:flex">
                 <a
                   href="#agenda"
-                  className="flex h-[54px] flex-1 basis-[180px] items-center justify-center gap-2 rounded-[18px] bg-[#0E2318] px-6 text-base font-bold text-white hover:bg-[#193626]"
+                  className="flex h-[54px] flex-1 basis-[180px] items-center justify-center gap-2 rounded-full bg-[#0E2318] px-6 text-base font-bold text-white hover:bg-[#193626]"
                 >
                   Naar de agenda
                 </a>
@@ -170,7 +170,7 @@ export default async function LandingPage() {
                   href={WHATSAPP_URL}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex h-[54px] flex-1 basis-[180px] items-center justify-center rounded-[18px] border-2 border-[#0E2318]/[.14] px-6 text-base font-bold hover:border-[#4F6E14]"
+                  className="flex h-[54px] flex-1 basis-[180px] items-center justify-center rounded-full border-2 border-[#0E2318]/[.10] px-6 text-base font-bold hover:border-[#4F6E14]"
                 >
                   WhatsApp Community
                 </a>
@@ -180,7 +180,7 @@ export default async function LandingPage() {
             {heroSettings.heroFlyerUrl ? (
               <a
                 href={heroFlyerHref}
-                className="relative mx-auto block aspect-[719/898] w-full max-w-[430px] overflow-hidden rounded-[26px] bg-[#E7EEE9] shadow-[0_14px_34px_rgba(14,35,24,.12)] hover:shadow-[0_20px_44px_rgba(14,35,24,.2)]"
+                className="relative mx-auto block aspect-[719/898] w-full max-w-[430px] overflow-hidden rounded-[28px] bg-[#E7EEE9] shadow-[0_14px_34px_rgba(14,35,24,.12)] hover:shadow-[0_20px_44px_rgba(14,35,24,.2)]"
               >
                 <Image src={heroSettings.heroFlyerUrl} alt="Flyer" fill className="object-contain" />
                 <span className="absolute inset-x-3.5 bottom-3.5 flex items-center gap-2.5 rounded-[14px] bg-[#D2E95C] px-3.5 py-2.5 text-sm font-extrabold text-[#0E2318] shadow-[0_8px_20px_rgba(14,35,24,.18)]">
@@ -188,7 +188,7 @@ export default async function LandingPage() {
                 </span>
               </a>
             ) : (
-              <div className="mx-auto flex aspect-[719/898] w-full max-w-[430px] flex-col items-center justify-center gap-2 rounded-[26px] bg-[#E7EEE9] text-center text-[#5C7266]">
+              <div className="mx-auto flex aspect-[719/898] w-full max-w-[430px] flex-col items-center justify-center gap-2 rounded-[28px] bg-[#E7EEE9] text-center text-[#5C7266]">
                 <span className="text-sm font-bold">Flyer volgt</span>
                 <span className="max-w-[22ch] text-xs font-medium">Zodra het volgende toernooi vaststaat, zie je de flyer hier.</span>
               </div>
@@ -197,7 +197,7 @@ export default async function LandingPage() {
         </section>
 
         {/* Agenda */}
-        <section id="agenda" className="mx-auto flex max-w-5xl flex-col gap-5 px-5 pt-9 sm:pt-14">
+        <section id="agenda" className="mx-auto flex max-w-[1180px] flex-col gap-5 px-6 pt-14 sm:pt-[88px]">
           {agendaMonths.length > 0 ? (
             agendaMonths.map(({ month, items }) => (
               <div key={month} className="flex flex-col gap-2.5">
@@ -208,8 +208,8 @@ export default async function LandingPage() {
                     href={`/${item.slug}`}
                     className={
                       item.kind === "event"
-                        ? "flex items-center gap-4 rounded-[22px] bg-[#0E2318] p-4 text-white shadow-[0_12px_28px_rgba(14,35,24,.18)] hover:bg-[#193626]"
-                        : "flex items-center gap-4 rounded-[22px] bg-white p-4 shadow-[0_10px_24px_rgba(14,35,24,.07)] hover:shadow-[0_14px_30px_rgba(14,35,24,.13)]"
+                        ? "flex items-center gap-4 rounded-[20px] bg-[#0E2318] p-4 text-white shadow-[0_12px_28px_rgba(14,35,24,.18)] hover:bg-[#193626]"
+                        : "flex items-center gap-4 rounded-[20px] bg-white p-4 shadow-[0_10px_24px_rgba(14,35,24,.07)] hover:shadow-[0_14px_30px_rgba(14,35,24,.13)]"
                     }
                   >
                     <DayBadge date={item.date} tone={item.kind === "event" ? "onDark" : "light"} />
@@ -224,7 +224,7 @@ export default async function LandingPage() {
                       className={
                         item.kind === "event"
                           ? "hidden flex-none rounded-full bg-[#D2E95C] px-3.5 py-1.5 text-sm font-bold text-[#0E2318] sm:block"
-                          : "hidden flex-none rounded-full bg-[#F1F5EF] px-3.5 py-1.5 text-sm font-bold sm:block"
+                          : "hidden flex-none rounded-full bg-[#EAF1EA] px-3.5 py-1.5 text-sm font-bold sm:block"
                       }
                     >
                       {item.actionLabel}
@@ -234,7 +234,7 @@ export default async function LandingPage() {
               </div>
             ))
           ) : (
-            <div className="flex flex-col gap-3 rounded-[22px] bg-white p-6 shadow-[0_10px_24px_rgba(14,35,24,.06)]">
+            <div className="flex flex-col gap-3 rounded-[20px] bg-white p-6 shadow-[0_10px_24px_rgba(14,35,24,.06)]">
               <span className="text-lg font-bold">Elke zondag — datum volgt</span>
               <span className="text-sm font-medium text-[#5C7266]">
                 We plannen de eerstvolgende zondag zodra de baan vaststaat — hou de WhatsApp in de gaten.
@@ -243,7 +243,7 @@ export default async function LandingPage() {
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-1 flex h-[50px] w-full items-center justify-center rounded-[16px] bg-[#0E2318] text-sm font-bold text-white hover:bg-[#193626] sm:w-fit sm:px-6"
+                className="mt-1 flex h-[50px] w-full items-center justify-center rounded-full bg-[#0E2318] text-sm font-bold text-white hover:bg-[#193626] sm:w-fit sm:px-6"
               >
                 Join onze WhatsApp Community
               </a>
@@ -253,7 +253,7 @@ export default async function LandingPage() {
 
         {/* Vorige edities */}
         {history.length > 0 ? (
-          <section id="vorige" className="mx-auto flex max-w-5xl flex-col gap-2.5 px-5 pt-9 sm:pt-16">
+          <section id="vorige" className="mx-auto flex max-w-[1180px] flex-col gap-2.5 px-6 pt-14 sm:pt-[88px]">
             <h2 className="text-2xl font-extrabold tracking-tight sm:text-[2.1rem]">Vorige edities</h2>
             {history.map((h) => (
               <Link
@@ -261,8 +261,8 @@ export default async function LandingPage() {
                 href={h.href}
                 className={
                   h.kind === "event"
-                    ? "flex items-center gap-4 rounded-[22px] bg-[#0E2318] p-4 text-white shadow-[0_12px_28px_rgba(14,35,24,.18)] hover:bg-[#193626]"
-                    : "flex items-center gap-4 rounded-[22px] bg-white p-4 shadow-[0_10px_24px_rgba(14,35,24,.07)] hover:shadow-[0_14px_30px_rgba(14,35,24,.13)]"
+                    ? "flex items-center gap-4 rounded-[20px] bg-[#0E2318] p-4 text-white shadow-[0_12px_28px_rgba(14,35,24,.18)] hover:bg-[#193626]"
+                    : "flex items-center gap-4 rounded-[20px] bg-white p-4 shadow-[0_10px_24px_rgba(14,35,24,.07)] hover:shadow-[0_14px_30px_rgba(14,35,24,.13)]"
                 }
               >
                 <DayBadge date={h.date} tone={h.kind === "event" ? "onDark" : "light"} />
@@ -276,14 +276,14 @@ export default async function LandingPage() {
         ) : null}
 
         {/* Nieuw hier? */}
-        <section className="mx-auto max-w-5xl px-5 pt-9 sm:pt-16">
+        <section className="mx-auto max-w-[1180px] px-6 pt-14 sm:pt-[88px]">
           <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2 sm:gap-8">
             <div className="flex flex-col gap-3.5">
               <span className="text-xs font-extrabold uppercase tracking-widest text-[#5C7266]">Nieuw hier?</span>
               <h2 className="text-2xl font-extrabold leading-tight tracking-tight sm:text-[2.1rem]">
                 Recreatief padel, elke zondag
               </h2>
-              <p className="max-w-[46ch] text-base font-medium leading-relaxed text-[#43584C]">
+              <p className="max-w-[46ch] text-base font-medium leading-relaxed text-[#5C7266]">
                 Nieuw bij Padel Social? Begin met Up &amp; Down en schrijf je individueel in. Door iedere ronde van
                 partner en tegenstander te wisselen, speel je al snel met mensen van jouw niveau. Na afloop is er
                 ruimte om samen na te praten.
@@ -306,7 +306,7 @@ export default async function LandingPage() {
         </section>
 
         {/* Formats */}
-        <section className="mx-auto flex max-w-5xl flex-col gap-3.5 px-5 pt-9 sm:pt-16">
+        <section className="mx-auto flex max-w-[1180px] flex-col gap-3.5 px-6 pt-14 sm:pt-[88px]">
           <h2 className="text-xl font-extrabold tracking-tight sm:text-[1.7rem]">Formats</h2>
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
             <FormatCard
@@ -355,14 +355,14 @@ export default async function LandingPage() {
         </section>
 
         {/* Community */}
-        <section className="mx-auto grid max-w-5xl grid-cols-1 gap-2.5 px-5 pt-9 sm:grid-cols-2 sm:pt-16">
+        <section className="mx-auto grid max-w-[1180px] grid-cols-1 gap-2.5 px-6 pt-14 sm:grid-cols-2 sm:pt-[88px]">
           <a
             href={WHATSAPP_URL}
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-3.5 rounded-[20px] bg-white p-4 shadow-[0_8px_20px_rgba(14,35,24,.06)] hover:shadow-[0_12px_26px_rgba(14,35,24,.12)]"
           >
-            <span className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[14px] bg-[#F1F5EF]">
+            <span className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[14px] bg-[#EAF1EA]">
               <svg viewBox="0 0 24 24" fill="none" className="h-[19px] w-[19px]" aria-hidden="true">
                 <path d="M12 3a9 9 0 0 0-7.75 13.55L3 21l4.6-1.2A9 9 0 1 0 12 3Z" stroke="#0E2318" strokeWidth="1.8" strokeLinejoin="round" />
                 <path
@@ -396,7 +396,7 @@ export default async function LandingPage() {
           </a>
         </section>
 
-        <footer className="mx-auto flex max-w-5xl flex-col gap-4 px-5 pb-10 pt-9 sm:pt-16">
+        <footer className="mx-auto flex max-w-[1180px] flex-col gap-4 px-6 pb-10 pt-14 sm:pt-[88px]">
           <div className="h-px bg-[#0E2318]/[.10]" />
           <div className="flex flex-wrap items-center gap-3.5">
             <Logo variant="light" size="sm" />
@@ -412,7 +412,7 @@ function DayBadge({ date, tone = "light" }: { date: string; tone?: "light" | "on
   const d = new Date(`${date}T00:00:00`);
   const day = d.getDate();
   const month = d.toLocaleDateString("nl-NL", { month: "short" }).replace(".", "").toUpperCase();
-  const bg = tone === "onDark" ? "bg-white" : "bg-[#F1F5EF]";
+  const bg = tone === "onDark" ? "bg-white" : "bg-[#EAF1EA]";
   return (
     <div className={`flex h-[62px] w-[60px] flex-none flex-col items-center justify-center rounded-2xl ${bg} leading-none`}>
       <span className="text-2xl font-extrabold tracking-tight text-[#0E2318]">{day}</span>
