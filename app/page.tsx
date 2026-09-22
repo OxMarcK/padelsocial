@@ -4,9 +4,10 @@ import Link from "next/link";
 import { repo } from "@/lib/data";
 import { sessionsRepo } from "@/lib/data/sessions";
 import { siteSettingsRepo } from "@/lib/data/site-settings";
+import { agendaLinksRepo } from "@/lib/data/agenda-links";
 import { Logo } from "@/components/logo";
 import { buildShareMetadata, fmtDateShort } from "@/lib/share-metadata";
-import { isUpcomingPublicEvent, isUpcomingPublicSession, isPastPublicSession } from "@/lib/upcoming";
+import { isUpcomingPublicEvent, isUpcomingPublicSession, isPastPublicSession, isPastDate } from "@/lib/upcoming";
 import { activeReservations } from "@/lib/sessions";
 import { WHATSAPP_URL, INSTAGRAM_URL } from "@/lib/site-links";
 
@@ -46,18 +47,22 @@ type HistoryRow = {
   title: string;
   meta: string;
   kind: "event" | "session";
+  external?: boolean;
 };
 
 export default async function LandingPage() {
-  const [events, sessions, heroSettings] = await Promise.all([
+  const [events, sessions, heroSettings, agendaLinks] = await Promise.all([
     repo.listEvents(),
     sessionsRepo.listSessions(),
     siteSettingsRepo.getSiteSettings(),
+    agendaLinksRepo.listAgendaLinks(),
   ]);
   const upcoming = events.find(isUpcomingPublicEvent) ?? null;
   const past = events.filter((e) => e.status === "finished");
   const upcomingSessions = sessions.filter(isUpcomingPublicSession).sort((a, b) => a.date.localeCompare(b.date));
   const pastSessions = sessions.filter(isPastPublicSession);
+  const upcomingAgendaLinks = agendaLinks.filter((l) => !isPastDate(l.date));
+  const pastAgendaLinks = agendaLinks.filter((l) => isPastDate(l.date));
 
   // One combined "history" list — events and sessions interleaved by date,
   // most recent first.
@@ -74,25 +79,65 @@ export default async function LandingPage() {
       const meta = `${attendeeCount} spelers · ${s.location}`;
       return { date: s.date, href: `/${s.slug}`, title: s.title, meta, kind: "session" as const };
     }),
+    ...pastAgendaLinks.map(async (l) => ({
+      date: l.date,
+      href: l.link,
+      title: l.title,
+      meta: l.location,
+      kind: "event" as const,
+      external: true,
+    })),
   ]).then((rows) => rows.sort((a, b) => b.date.localeCompare(a.date)));
 
   // Every upcoming event/session, oldest first — one flat list instead of a
   // "featured" item + a separate sessions list, so the agenda reads as a
   // single calendar grouped by month (matching the design hand-off) rather
   // than one card that's structurally different from the rest.
-  type AgendaItem = { kind: "event" | "session"; date: string; slug: string; title: string; startTime: string; location: string; actionLabel: string };
+  type AgendaItem = {
+    kind: "event" | "session";
+    date: string;
+    href: string;
+    title: string;
+    startTime: string;
+    location: string;
+    actionLabel: string;
+    external?: boolean;
+  };
   const agendaItems: AgendaItem[] = [
     ...(upcoming
-      ? [{ kind: "event" as const, date: upcoming.date, slug: upcoming.slug, title: upcoming.name, startTime: upcoming.startTime, location: upcoming.location, actionLabel: "Inschrijven als duo" }]
+      ? [
+          {
+            kind: "event" as const,
+            date: upcoming.date,
+            href: `/${upcoming.slug}`,
+            title: upcoming.name,
+            startTime: upcoming.startTime,
+            location: upcoming.location,
+            actionLabel: "Inschrijven als duo",
+          },
+        ]
       : []),
     ...upcomingSessions.map((s) => ({
       kind: "session" as const,
       date: s.date,
-      slug: s.slug,
+      href: `/${s.slug}`,
       title: s.title,
       startTime: s.startTime,
       location: s.location,
       actionLabel: s.status === "open" ? sessionActionLabel(s.title) : "Vol",
+    })),
+    // The exceptional case: a manually-added agenda item linking to an
+    // external page instead of an internal /{slug} — displayed with the
+    // same "event"/tournament styling per the admin's own description.
+    ...upcomingAgendaLinks.map((l) => ({
+      kind: "event" as const,
+      date: l.date,
+      href: l.link,
+      title: l.title,
+      startTime: l.startTime,
+      location: l.location,
+      actionLabel: "Meer info",
+      external: true,
     })),
   ].sort((a, b) => a.date.localeCompare(b.date));
 
@@ -109,7 +154,7 @@ export default async function LandingPage() {
   // soonest event/session, then the WhatsApp group, if no explicit link was
   // set. Always resolves to something so the flyer itself never depends on
   // whether a link was filled in.
-  const heroFlyerHref = heroSettings.heroFlyerLink || (agendaItems[0] ? `/${agendaItems[0].slug}` : null) || WHATSAPP_URL;
+  const heroFlyerHref = heroSettings.heroFlyerLink || agendaItems[0]?.href || WHATSAPP_URL;
 
   return (
     <div
@@ -205,9 +250,10 @@ export default async function LandingPage() {
               <div key={month} className="flex flex-col gap-2.5">
                 <span className="px-1 text-xs font-extrabold uppercase tracking-widest text-[#5C7266]">{month}</span>
                 {items.map((item) => (
-                  <Link
-                    key={item.slug}
-                    href={`/${item.slug}`}
+                  <AgendaRowLink
+                    key={item.href}
+                    href={item.href}
+                    external={item.external}
                     className={
                       item.kind === "event"
                         ? "flex items-center gap-4 rounded-[20px] bg-[#0E2318] p-4 text-white shadow-[0_12px_28px_rgba(14,35,24,.18)] hover:bg-[#193626]"
@@ -231,7 +277,7 @@ export default async function LandingPage() {
                     >
                       {item.actionLabel}
                     </span>
-                  </Link>
+                  </AgendaRowLink>
                 ))}
               </div>
             ))
@@ -258,9 +304,10 @@ export default async function LandingPage() {
           <section id="vorige" className="mx-auto flex max-w-[1180px] flex-col gap-2.5 px-6 pt-14 sm:pt-[88px]">
             <h2 className="text-[clamp(1.9rem,3.2vw,2.6rem)] font-extrabold tracking-tight">Vorige edities</h2>
             {history.map((h) => (
-              <Link
+              <AgendaRowLink
                 key={h.href}
                 href={h.href}
+                external={h.external}
                 className={
                   h.kind === "event"
                     ? "flex items-center gap-4 rounded-[20px] bg-[#0E2318] p-4 text-white shadow-[0_12px_28px_rgba(14,35,24,.18)] hover:bg-[#193626]"
@@ -272,7 +319,7 @@ export default async function LandingPage() {
                   <span className="text-lg font-extrabold leading-tight">{h.title}</span>
                   <span className={`text-sm font-medium leading-snug ${h.kind === "event" ? "text-white/80" : "text-[#5C7266]"}`}>{h.meta}</span>
                 </span>
-              </Link>
+              </AgendaRowLink>
             ))}
           </section>
         ) : null}
@@ -409,6 +456,35 @@ export default async function LandingPage() {
         </footer>
       </main>
     </div>
+  );
+}
+
+/** An agenda/history row links to an internal /{slug} page for a real event
+ * or session, or out to an external URL for the exceptional case of a
+ * manually-added agenda link (see lib/data/agenda-links.ts) — same visual
+ * row either way, just a plain <a target="_blank"> instead of next/link. */
+function AgendaRowLink({
+  href,
+  external,
+  className,
+  children,
+}: {
+  href: string;
+  external?: boolean;
+  className: string;
+  children: React.ReactNode;
+}) {
+  if (external) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" className={className}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
   );
 }
 

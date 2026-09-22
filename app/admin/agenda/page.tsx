@@ -2,11 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { requireAdmin } from "@/lib/require-admin";
 import { siteSettingsRepo } from "@/lib/data/site-settings";
+import { agendaLinksRepo } from "@/lib/data/agenda-links";
 import { Field } from "@/components/ui/field";
 import { Section } from "@/components/admin/section";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
 import { ConfirmButton } from "@/components/admin/confirm-button";
-import { uploadHeroFlyer, updateHeroFlyerLink, clearHeroFlyer } from "./actions";
+import { uploadHeroFlyer, updateHeroFlyerLink, clearHeroFlyer, createAgendaLink, deleteAgendaLink } from "./actions";
 
 /** Own admin route, deliberately not nested under app/admin/e/[id] — the hero flyer
  * promotes whatever the organizer wants on the landing page, independent of any one
@@ -14,6 +15,7 @@ import { uploadHeroFlyer, updateHeroFlyerLink, clearHeroFlyer } from "./actions"
 export default async function AdminAgendaPage() {
   await requireAdmin();
   const settings = await siteSettingsRepo.getSiteSettings();
+  const agendaLinks = await agendaLinksRepo.listAgendaLinks();
 
   return (
     <div
@@ -76,6 +78,47 @@ export default async function AdminAgendaPage() {
             />
             <ActionFormError />
             <SaveButton />
+          </ActionForm>
+        </Section>
+
+        <Section
+          title="Externe agenda-items"
+          subtitle="Voor het uitzonderlijke geval: een item in de agenda dat naar een externe link verwijst in plaats van een eigen toernooi- of sessiepagina. Wordt getoond in dezelfde donkere stijl als een toernooi."
+        >
+          {agendaLinks.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {agendaLinks.map((link) => (
+                <li key={link.id} className="flex flex-wrap items-center gap-3 rounded-xl bg-mint-net/10 px-3 py-2 text-sm">
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-bold text-mint-ink">{link.title}</span>
+                    <span className="block text-xs text-mint-ink-muted">
+                      {link.date} · {link.startTime} · {link.location}
+                    </span>
+                  </span>
+                  <ConfirmButton
+                    label="Verwijderen"
+                    icon="✕"
+                    confirmText={`"${link.title}" verwijderen uit de agenda?`}
+                    variant="danger"
+                    size="sm"
+                    action={deleteAgendaLink.bind(null, link.id)}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-xs text-mint-ink-muted">Nog geen externe agenda-items.</p>
+          )}
+          <ActionForm action={createAgendaLink} className="flex flex-col gap-3" resetOnSuccess>
+            <Field label="Titel" name="title" placeholder="Padel Clinic bij Partner X" required />
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Datum" name="date" type="date" required />
+              <Field label="Starttijd" name="startTime" type="time" required />
+            </div>
+            <Field label="Locatie" name="location" placeholder="Padelclub Rotterdam" required />
+            <Field label="Link" name="link" type="url" placeholder="https://..." required />
+            <ActionFormError />
+            <SaveButton label="Item toevoegen" savedLabel="Toegevoegd" />
           </ActionForm>
         </Section>
       </main>

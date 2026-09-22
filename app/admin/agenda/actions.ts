@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/require-admin";
 import { siteSettingsRepo } from "@/lib/data/site-settings";
+import { agendaLinksRepo } from "@/lib/data/agenda-links";
 import { supabaseAdmin } from "@/lib/data/supabase/admin";
 
 export async function uploadHeroFlyer(formData: FormData) {
@@ -41,6 +42,28 @@ export async function updateHeroFlyerLink(formData: FormData) {
 export async function clearHeroFlyer() {
   await requireAdmin();
   await siteSettingsRepo.updateSiteSettings({ heroFlyerUrl: null, heroFlyerLink: null });
+  revalidatePath("/admin/agenda");
+  revalidatePath("/");
+}
+
+export async function createAgendaLink(formData: FormData) {
+  await requireAdmin();
+  const title = String(formData.get("title") ?? "").trim();
+  const date = String(formData.get("date") ?? "").trim();
+  const startTime = String(formData.get("startTime") ?? "").trim();
+  const location = String(formData.get("location") ?? "").trim();
+  const link = String(formData.get("link") ?? "").trim();
+  if (!title || !date || !startTime || !location || !link) {
+    throw new Error("Vul alle velden in.");
+  }
+  await agendaLinksRepo.createAgendaLink({ title, date, startTime, location, link });
+  revalidatePath("/admin/agenda");
+  revalidatePath("/");
+}
+
+export async function deleteAgendaLink(id: string) {
+  await requireAdmin();
+  await agendaLinksRepo.deleteAgendaLink(id);
   revalidatePath("/admin/agenda");
   revalidatePath("/");
 }
