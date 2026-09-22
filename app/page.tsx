@@ -159,7 +159,7 @@ export default async function LandingPage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2.5">
+              <div className="hidden flex-wrap gap-2.5 lg:flex">
                 <a
                   href="#agenda"
                   className="flex h-[54px] flex-1 basis-[180px] items-center justify-center gap-2 rounded-[18px] bg-[#0E2318] px-6 text-base font-bold text-white hover:bg-[#193626]"
