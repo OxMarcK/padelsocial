@@ -30,7 +30,7 @@ export default async function Image() {
   const featured = sessionFirst ? nextSession : (upcoming ?? nextSession);
 
   if (!featured) {
-    return renderOgCard({ eyebrow: "", title: "Padel Social", chips: [] });
+    return renderOgCard({ eyebrow: "Elke zondag padel in Rotterdam", title: "Agenda", chips: [] });
   }
 
   const isSession = "title" in featured;

@@ -113,7 +113,7 @@ export default async function LandingPage() {
                 Kijk welke zondagen er open staan, kies je datum en speel mee. Kom je alleen? Dan zorgen wij voor een partner.
               </p>
 
-              <div className="flex flex-col gap-3 rounded-[22px] bg-white p-5 shadow-[0_10px_26px_rgba(14,35,24,.07)]">
+              <div className="hidden flex-col gap-3 rounded-[22px] bg-white p-5 shadow-[0_10px_26px_rgba(14,35,24,.07)] lg:flex">
                 <div className="flex items-center gap-3">
                   <span className="h-[9px] w-[9px] flex-none animate-pulse2 rounded-full bg-[#4F6E14]" />
                   <span className="text-sm font-bold">Elke zondag</span>
