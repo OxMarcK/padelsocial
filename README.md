@@ -4,6 +4,28 @@ Live poulefase + knock-out/placement bracket companion for padelsocial.nl events
 Built from `padel-social-event-companion-spec.md` and the Claude Design project
 *Padel Social event companion app*.
 
+## `homepage/` — static marketing site
+
+This repo also holds the static marketing homepage for **www.padelsocial.nl**,
+in [`homepage/`](homepage/). It's a plain HTML/CSS/JS site — no Next.js, no
+build step, no database — kept fully separate from the event app above (which
+runs on `event.padelsocial.nl`). It isn't deployed through this app's build or
+hosting; it's uploaded by hand via FTP straight from `homepage/`.
+
+```
+homepage/
+  index.html
+  css/styles.css
+  js/main.js       -- mobile nav, toggle groups, contact form → mailto: link
+  assets/          -- logos, photos, og-image.jpg
+```
+
+The contact form has no backend — it builds a `mailto:` link client-side in
+`main.js` and hands off to the visitor's own mail client.
+
+To preview locally: `cd homepage && python3 -m http.server 8765`, then open
+`http://localhost:8765`.
+
 ## Quick start
 
 ```bash
