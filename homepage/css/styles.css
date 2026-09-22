@@ -110,6 +110,11 @@ ul { margin: 0; padding: 0; list-style: none; }
   padding-bottom: 14px;
 }
 .brand-logo { height: 34px; width: auto; }
+/* Header logo only — matches Agenda's header logo size (Logo size="md" =
+   36px). Footer keeps the base 34px; Agenda's footer logo is smaller than
+   its header (size="sm" = 28px), so there's no reason to assume header and
+   footer should share one size here either. */
+.header-inner .brand-logo { height: 36px; }
 .main-nav { display: flex; gap: 28px; margin-left: auto; }
 .main-nav a { font-weight: 600; font-size: .95rem; color: var(--ink); }
 .main-nav a:hover { color: var(--lime-ink); }
