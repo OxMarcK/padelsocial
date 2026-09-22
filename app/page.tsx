@@ -398,11 +398,10 @@ export default async function LandingPage() {
           </a>
         </section>
 
-        <footer className="mx-auto flex max-w-[1180px] flex-col gap-4 px-6 pb-10 pt-14 sm:pt-[88px]">
-          <div className="h-px bg-[#0E2318]/[.10]" />
-          <div className="flex flex-wrap items-center gap-3.5">
-            <Logo variant="light" size="sm" />
-            <span className="ml-auto text-xs font-medium text-mint-net">© 2026 Padel Social</span>
+        <footer className="mt-14 bg-[#0E2318] py-10 sm:mt-[88px]">
+          <div className="mx-auto flex max-w-[1180px] flex-wrap items-center gap-3.5 px-6">
+            <Logo variant="dark" size="sm" />
+            <span className="ml-auto text-xs font-medium text-white/60">© 2026 Padel Social</span>
           </div>
         </footer>
       </main>
