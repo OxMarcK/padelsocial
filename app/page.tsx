@@ -116,7 +116,7 @@ export default async function LandingPage() {
       className="min-h-screen font-mint text-[#0E2318]"
       style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
     >
-      <header className="sticky top-0 z-30 bg-white/95 shadow-[0_1px_0_rgba(14,35,24,.10)] backdrop-blur">
+      <header className="sticky top-0 z-30 bg-white shadow-[0_1px_0_rgba(14,35,24,.10)]">
         <div className="mx-auto flex max-w-[1180px] items-center gap-4 px-6 py-3.5">
           <Logo variant="light" size="md" />
           <a
