@@ -289,7 +289,7 @@ export default async function LandingPage() {
                 ruimte om samen na te praten.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-2 gap-3.5">
               {["nieuw-hier-1", "nieuw-hier-2", "nieuw-hier-3", "nieuw-hier-4"].map((name) => (
                 <div key={name} className="relative aspect-square overflow-hidden rounded-[20px] bg-[#DDE8E0]">
                   <Image
@@ -308,7 +308,7 @@ export default async function LandingPage() {
         {/* Formats */}
         <section className="mx-auto flex max-w-[1180px] flex-col gap-3.5 px-6 pt-14 sm:pt-[88px]">
           <h2 className="text-xl font-extrabold tracking-tight sm:text-[1.7rem]">Formats</h2>
-          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <FormatCard
               title="Up & Down"
               copy="Schrijf je individueel in en speel iedere ronde met een nieuwe partner. Win je, dan schuif je een baan omhoog."
@@ -423,7 +423,7 @@ function DayBadge({ date, tone = "light" }: { date: string; tone?: "light" | "on
 
 function FormatCard({ title, copy, icon }: { title: string; copy: string; icon: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-3.5 rounded-[20px] bg-white p-[18px] shadow-[0_8px_20px_rgba(14,35,24,.06)]">
+    <div className="flex items-start gap-3.5 rounded-[20px] bg-white p-7 shadow-[0_8px_20px_rgba(14,35,24,.06)]">
       {icon}
       <span className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="text-[17px] font-extrabold tracking-tight">{title}</span>
