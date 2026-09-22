@@ -11,11 +11,11 @@ export function Logo({
   variant = "dark",
   className = "",
 }: {
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | number;
   variant?: "dark" | "light";
   className?: string;
 }) {
-  const heightPx = size === "xl" ? 64 : size === "lg" ? 44 : size === "sm" ? 28 : 36;
+  const heightPx = typeof size === "number" ? size : size === "xl" ? 64 : size === "lg" ? 44 : size === "sm" ? 28 : 36;
   const { src, width, height } = LOGO_FILES[variant];
   const widthPx = Math.round((width / height) * heightPx);
 

@@ -506,9 +506,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
 .footer-brand { display: flex; align-items: center; gap: 16px; }
 .footer-tagline { color: rgba(255,255,255,.6); font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.footer-links { display: flex; gap: 24px; }
-.footer-links a { color: rgba(255,255,255,.85); font-weight: 600; font-size: .9rem; }
-.footer-links a:hover { color: var(--lime); }
+.footer-copyright { color: rgba(255,255,255,.6); font-size: .75rem; font-weight: 500; }
 
 /* Responsive */
 @media (max-width: 900px) {

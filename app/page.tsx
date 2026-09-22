@@ -399,9 +399,12 @@ export default async function LandingPage() {
         </section>
 
         <footer className="mt-14 bg-[#0E2318] py-10 sm:mt-[88px]">
-          <div className="mx-auto flex max-w-[1180px] flex-wrap items-center gap-3.5 px-6">
-            <Logo variant="dark" size="sm" />
-            <span className="ml-auto text-xs font-medium text-white/60">© 2026 Padel Social</span>
+          <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-5 px-6">
+            <div className="flex items-center gap-4">
+              <Logo variant="dark" size={34} />
+              <span className="text-xs font-bold uppercase tracking-widest text-white/60">Play &middot; Connect &middot; Elevate</span>
+            </div>
+            <span className="text-xs font-medium text-white/60">© 2026 Padel Social</span>
           </div>
         </footer>
       </main>
