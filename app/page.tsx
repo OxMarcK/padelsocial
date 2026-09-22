@@ -426,7 +426,7 @@ function FormatCard({ title, copy, icon }: { title: string; copy: string; icon: 
     <div className="flex items-start gap-3.5 rounded-[20px] bg-white p-7 shadow-[0_8px_20px_rgba(14,35,24,.06)]">
       {icon}
       <span className="flex min-w-0 flex-1 flex-col gap-1">
-        <span className="text-[17px] font-extrabold tracking-tight">{title}</span>
+        <span className="text-[1.6rem] font-extrabold tracking-tight">{title}</span>
         <span className="text-sm font-medium leading-relaxed text-[#5C7266]">{copy}</span>
       </span>
     </div>
