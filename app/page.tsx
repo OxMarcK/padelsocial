@@ -400,7 +400,7 @@ export default async function LandingPage() {
           <div className="h-px bg-[#0E2318]/[.10]" />
           <div className="flex flex-wrap items-center gap-3.5">
             <Logo variant="light" size="sm" />
-            <span className="ml-auto text-xs font-medium text-[#7A8C82]">© 2026 Padel Social</span>
+            <span className="ml-auto text-xs font-medium text-mint-net">© 2026 Padel Social</span>
           </div>
         </footer>
       </main>
