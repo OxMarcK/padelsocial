@@ -18,8 +18,9 @@ const OG_DESCRIPTION = "Kies je datum en speel mee, ook zonder vaste partner.";
 // Forcing dynamic rendering moves that call to request time instead.
 export const dynamic = "force-dynamic";
 
-function fmtEventDateLong(date: string): string {
-  return new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { weekday: "long", day: "numeric", month: "long" });
+function fmtWeekday(date: string): string {
+  const weekday = new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { weekday: "long" });
+  return weekday.charAt(0).toUpperCase() + weekday.slice(1);
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -46,7 +47,6 @@ export default async function LandingPage() {
   const upcoming = events.find(isUpcomingPublicEvent) ?? null;
   const past = events.filter((e) => e.status === "finished");
   const upcomingSessions = sessions.filter(isUpcomingPublicSession).sort((a, b) => a.date.localeCompare(b.date));
-  const nextSession = upcomingSessions[0] ?? null;
   const pastSessions = sessions.filter(isPastPublicSession);
 
   // One combined "history" list — events and sessions interleaved by date,
@@ -64,21 +64,40 @@ export default async function LandingPage() {
     }),
   ]).then((rows) => rows.sort((a, b) => b.date.localeCompare(a.date)));
 
-  // Whichever of a tournament or a session is chronologically sooner is the
-  // one featured in the "Volgende event" card.
-  const heroPick: { kind: "event" | "session"; date: string; slug: string; name: string; startTime: string; location: string } | null =
-    upcoming && (!nextSession || upcoming.date <= nextSession.date)
-      ? { kind: "event", date: upcoming.date, slug: upcoming.slug, name: upcoming.name, startTime: upcoming.startTime, location: upcoming.location }
-      : nextSession
-        ? { kind: "session", date: nextSession.date, slug: nextSession.slug, name: nextSession.title, startTime: nextSession.startTime, location: nextSession.location }
-        : null;
+  // Every upcoming event/session, oldest first — one flat list instead of a
+  // "featured" item + a separate sessions list, so the agenda reads as a
+  // single calendar grouped by month (matching the design hand-off) rather
+  // than one card that's structurally different from the rest.
+  type AgendaItem = { kind: "event" | "session"; date: string; slug: string; title: string; startTime: string; location: string; actionLabel: string };
+  const agendaItems: AgendaItem[] = [
+    ...(upcoming
+      ? [{ kind: "event" as const, date: upcoming.date, slug: upcoming.slug, title: upcoming.name, startTime: upcoming.startTime, location: upcoming.location, actionLabel: "Bekijk event" }]
+      : []),
+    ...upcomingSessions.map((s) => ({
+      kind: "session" as const,
+      date: s.date,
+      slug: s.slug,
+      title: s.title,
+      startTime: s.startTime,
+      location: s.location,
+      actionLabel: s.status === "open" ? "Inschrijven" : "Vol",
+    })),
+  ].sort((a, b) => a.date.localeCompare(b.date));
+
+  const agendaMonths: { month: string; items: AgendaItem[] }[] = [];
+  for (const item of agendaItems) {
+    const month = new Date(`${item.date}T00:00:00`).toLocaleDateString("nl-NL", { month: "long" });
+    const group = agendaMonths.find((g) => g.month === month);
+    if (group) group.items.push(item);
+    else agendaMonths.push({ month, items: [item] });
+  }
 
   // The hero flyer is set by the organizer independent of which event/session
   // happens to be soonest (see app/admin/agenda) — falls back to linking the
   // soonest event/session, then the WhatsApp group, if no explicit link was
   // set. Always resolves to something so the flyer itself never depends on
   // whether a link was filled in.
-  const heroFlyerHref = heroSettings.heroFlyerLink || (heroPick ? `/${heroPick.slug}` : null) || WHATSAPP_URL;
+  const heroFlyerHref = heroSettings.heroFlyerLink || (agendaItems[0] ? `/${agendaItems[0].slug}` : null) || WHATSAPP_URL;
 
   return (
     <div className="min-h-screen bg-[#F4F8F4] font-mint text-[#0E2318]">
@@ -165,36 +184,42 @@ export default async function LandingPage() {
         </section>
 
         {/* Agenda */}
-        <section id="agenda" className="mx-auto flex max-w-5xl flex-col gap-3.5 px-5 pt-9 sm:pt-14">
-          {heroPick ? (
-            <div className="flex flex-col gap-2 rounded-[26px] bg-[#0E2318] p-6 text-white sm:grid sm:grid-cols-2 sm:items-center sm:gap-8">
-              <div className="flex flex-col gap-3">
-                <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#D2E95C]">
-                  Volgende event · {fmtEventDateLong(heroPick.date)}
-                </span>
-                <h2 className="text-[1.7rem] font-extrabold leading-[1.05] tracking-tight sm:text-3xl">{heroPick.name}</h2>
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-sm font-bold">{heroPick.startTime}</span>
-                  <span className="text-sm font-medium text-white/80">{heroPick.location}</span>
-                </div>
+        <section id="agenda" className="mx-auto flex max-w-5xl flex-col gap-5 px-5 pt-9 sm:pt-14">
+          {agendaMonths.length > 0 ? (
+            agendaMonths.map(({ month, items }) => (
+              <div key={month} className="flex flex-col gap-2.5">
+                <span className="px-1 text-xs font-extrabold uppercase tracking-widest text-[#5C7266]">{month}</span>
+                {items.map((item) => (
+                  <Link
+                    key={item.slug}
+                    href={`/${item.slug}`}
+                    className={
+                      item.kind === "event"
+                        ? "flex items-center gap-4 rounded-[22px] bg-[#0E2318] p-4 text-white shadow-[0_12px_28px_rgba(14,35,24,.18)] hover:bg-[#193626]"
+                        : "flex items-center gap-4 rounded-[22px] bg-white p-4 shadow-[0_10px_24px_rgba(14,35,24,.07)] hover:shadow-[0_14px_30px_rgba(14,35,24,.13)]"
+                    }
+                  >
+                    <DayBadge date={item.date} tone={item.kind === "event" ? "onDark" : "light"} />
+                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="text-lg font-extrabold leading-tight">{item.title}</span>
+                      <span className={`text-sm font-semibold leading-snug ${item.kind === "event" ? "text-[#D2E95C]" : "text-[#4F6E14]"}`}>
+                        {fmtWeekday(item.date)} {item.startTime}
+                      </span>
+                      <span className={`text-sm font-medium leading-snug ${item.kind === "event" ? "text-white/80" : "text-[#5C7266]"}`}>{item.location}</span>
+                    </span>
+                    <span
+                      className={
+                        item.kind === "event"
+                          ? "flex-none rounded-full bg-[#D2E95C] px-3.5 py-1.5 text-sm font-bold text-[#0E2318]"
+                          : "flex-none rounded-full bg-[#F1F5EF] px-3.5 py-1.5 text-sm font-bold"
+                      }
+                    >
+                      {item.actionLabel}
+                    </span>
+                  </Link>
+                ))}
               </div>
-              <div className="flex flex-col gap-2.5">
-                <Link
-                  href={`/${heroPick.slug}`}
-                  className="flex h-[54px] items-center justify-center gap-2.5 rounded-[18px] bg-[#D2E95C] text-base font-bold text-[#0E2318] hover:brightness-105"
-                >
-                  {heroPick.kind === "event" ? "Bekijk event" : "Inschrijven"}
-                </Link>
-                <a
-                  href={WHATSAPP_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex h-[54px] items-center justify-center rounded-[18px] border-2 border-white/[.18] bg-white/10 text-sm font-bold hover:border-[#D2E95C]"
-                >
-                  Vragen? Stel ze in de groep
-                </a>
-              </div>
-            </div>
+            ))
           ) : (
             <div className="flex flex-col gap-3 rounded-[22px] bg-white p-6 shadow-[0_10px_24px_rgba(14,35,24,.06)]">
               <span className="text-lg font-bold">Elke zondag — datum volgt</span>
@@ -211,26 +236,6 @@ export default async function LandingPage() {
               </a>
             </div>
           )}
-
-          {upcomingSessions.length > 1
-            ? upcomingSessions.slice(1).map((s) => (
-                <Link
-                  key={s.id}
-                  href={`/${s.slug}`}
-                  className="flex items-center gap-4 rounded-[22px] bg-white p-4 shadow-[0_10px_24px_rgba(14,35,24,.07)] hover:shadow-[0_14px_30px_rgba(14,35,24,.13)]"
-                >
-                  <DayBadge date={s.date} />
-                  <span className="flex min-w-0 flex-1 flex-col gap-1">
-                    <span className="text-lg font-extrabold leading-tight">{s.title}</span>
-                    <span className="text-sm font-semibold text-[#4F6E14]">{s.startTime}</span>
-                    <span className="text-sm font-medium text-[#5C7266]">{s.location}</span>
-                  </span>
-                  <span className="flex-none rounded-full bg-[#F1F5EF] px-3.5 py-1.5 text-sm font-bold">
-                    {s.status === "open" ? "Inschrijven" : "Vol"}
-                  </span>
-                </Link>
-              ))
-            : null}
         </section>
 
         {/* Vorige edities */}
@@ -391,12 +396,13 @@ export default async function LandingPage() {
   );
 }
 
-function DayBadge({ date }: { date: string }) {
+function DayBadge({ date, tone = "light" }: { date: string; tone?: "light" | "onDark" }) {
   const d = new Date(`${date}T00:00:00`);
   const day = d.getDate();
   const month = d.toLocaleDateString("nl-NL", { month: "short" }).replace(".", "").toUpperCase();
+  const bg = tone === "onDark" ? "bg-white" : "bg-[#F1F5EF]";
   return (
-    <div className="flex h-[62px] w-[60px] flex-none flex-col items-center justify-center rounded-2xl bg-[#D2E95C] leading-none">
+    <div className={`flex h-[62px] w-[60px] flex-none flex-col items-center justify-center rounded-2xl ${bg} leading-none`}>
       <span className="text-2xl font-extrabold tracking-tight text-[#0E2318]">{day}</span>
       <span className="text-[10px] font-extrabold tracking-widest text-[#3F5610]">{month}</span>
     </div>
