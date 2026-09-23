@@ -105,40 +105,47 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
               {reservations.map((r) => {
                 const status = RESERVATION_STATUS_LABEL[r.status] ?? { label: r.status, className: "bg-mint-net/20 text-mint-ink-muted" };
                 return (
-                  <div key={r.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-mint-net/10 px-3 py-2 text-sm">
-                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="truncate font-semibold text-mint-ink">{memberNameById[r.memberId] ?? "?"}</span>
-                      <span className="text-xs text-mint-ink-muted">
-                        {r.status === "held"
-                          ? `Verloopt om ${fmtClockTime(r.holdExpiresAt)}`
-                          : r.status === "paid" && r.paidAt
-                            ? `Betaald om ${fmtClockTime(r.paidAt)}`
-                            : `Gereserveerd om ${fmtClockTime(r.reservedAt)}`}
+                  <div
+                    key={r.id}
+                    className="flex flex-col gap-2 rounded-xl bg-mint-net/10 px-3 py-2 text-sm sm:flex-row sm:flex-wrap sm:items-center"
+                  >
+                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                        <span className="truncate font-semibold text-mint-ink">{memberNameById[r.memberId] ?? "?"}</span>
+                        <span className="truncate text-xs text-mint-ink-muted">
+                          {r.status === "held"
+                            ? `Verloopt om ${fmtClockTime(r.holdExpiresAt)}`
+                            : r.status === "paid" && r.paidAt
+                              ? `Betaald om ${fmtClockTime(r.paidAt)}`
+                              : `Gereserveerd om ${fmtClockTime(r.reservedAt)}`}
+                        </span>
+                      </div>
+                      <span className={`flex-none rounded-full px-2 py-0.5 font-mint text-xs font-bold ${status.className}`}>
+                        {status.label}
                       </span>
                     </div>
-                    <span className={`rounded-full px-2 py-0.5 font-mint text-xs font-bold ${status.className}`}>
-                      {status.label}
-                    </span>
-                    {r.status === "held" ? (
-                      <ConfirmButton
-                        label="Markeer betaald"
-                        confirmText={`"${memberNameById[r.memberId] ?? "?"}" markeren als betaald?`}
-                        action={markReservationPaid.bind(null, session.id, r.id)}
-                        variant="secondary"
-                        size="sm"
-                        successMessage="Gemarkeerd als betaald."
-                      />
-                    ) : null}
                     {r.status === "held" || r.status === "paid" ? (
-                      <ConfirmButton
-                        label="Annuleer"
-                        icon="✕"
-                        confirmText={`Reservering van "${memberNameById[r.memberId] ?? "?"}" annuleren?`}
-                        action={cancelReservation.bind(null, session.id, r.id)}
-                        variant="danger"
-                        size="sm"
-                        successMessage="Reservering geannuleerd."
-                      />
+                      <div className="flex flex-none items-center gap-2">
+                        {r.status === "held" ? (
+                          <ConfirmButton
+                            label="Markeer betaald"
+                            confirmText={`"${memberNameById[r.memberId] ?? "?"}" markeren als betaald?`}
+                            action={markReservationPaid.bind(null, session.id, r.id)}
+                            variant="secondary"
+                            size="sm"
+                            successMessage="Gemarkeerd als betaald."
+                          />
+                        ) : null}
+                        <ConfirmButton
+                          label="Annuleer"
+                          icon="✕"
+                          confirmText={`Reservering van "${memberNameById[r.memberId] ?? "?"}" annuleren?`}
+                          action={cancelReservation.bind(null, session.id, r.id)}
+                          variant="danger"
+                          size="sm"
+                          successMessage="Reservering geannuleerd."
+                        />
+                      </div>
                     ) : null}
                   </div>
                 );
