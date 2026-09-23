@@ -18,7 +18,7 @@ export function AdminShell({ email, children }: { email: string; children: React
       className="flex min-h-screen flex-col font-mint text-mint-ink"
       style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
     >
-      <header className="border-b border-mint-net/15">
+      <header className="sticky top-0 z-30 bg-white shadow-[0_1px_0_rgba(14,35,24,.10)]">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 px-6 py-4">
           <Link href="/admin" className="shrink-0">
             <Logo variant="light" size="sm" />
