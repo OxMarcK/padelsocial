@@ -31,12 +31,12 @@ async function sendEmail({ to, subject, html }: { to: string; subject: string; h
  * muted grey for secondary lines — see the "Magic link or OTP" template in
  * the Supabase dashboard for the sibling version of this layout.
  *
- * Explicit white backgrounds (on both <body> and the card) plus the
- * color-scheme meta tags keep this light in Gmail/Apple Mail dark mode —
- * without them, clients repaint the transparent card dark and the dark-ink
- * logo/text become unreadable. This one goes through Resend directly (full
- * control over the HTML document), unlike the Supabase auth-email template,
- * which only accepts a body fragment and can't carry a <head>. */
+ * Table layout + `bgcolor` HTML attributes (not just inline CSS) on every
+ * level, because Gmail's dark mode — especially the mobile app — rewrites
+ * inline `background-color` on divs regardless of `color-scheme` meta tags
+ * (an Apple Mail/Outlook-only technique that Gmail ignores). `bgcolor` is
+ * the one thing Gmail's dark-mode repaint reliably leaves alone, which is
+ * why this is a `<table>` rather than the more modern div layout. */
 function emailShell(bodyHtml: string): string {
   return `<!DOCTYPE html>
 <html>
@@ -46,13 +46,21 @@ function emailShell(bodyHtml: string): string {
 <meta name="color-scheme" content="light" />
 <meta name="supported-color-schemes" content="light" />
 </head>
-<body style="margin:0;padding:0;background-color:#F5F8F5;">
-<div style="background-color:#F5F8F5;padding:32px 16px;">
-<div style="max-width:420px;margin:0 auto;background-color:#ffffff;border-radius:20px;padding:32px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#0E2318;">
+<body style="margin:0;padding:0;background-color:#F5F8F5;" bgcolor="#F5F8F5">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F5F8F5;" bgcolor="#F5F8F5">
+<tr>
+<td align="center" style="padding:32px 16px;">
+<table role="presentation" width="420" cellpadding="0" cellspacing="0" border="0" style="max-width:420px;background-color:#ffffff;border-radius:20px;" bgcolor="#ffffff">
+<tr>
+<td style="padding:32px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#0E2318;" bgcolor="#ffffff">
 <img src="https://agenda.padelsocial.nl/logo/S.png" alt="Padel Social" width="140" style="display:block;height:auto;margin:0 0 28px;" />
 ${bodyHtml}
-</div>
-</div>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
 </body>
 </html>`;
 }
