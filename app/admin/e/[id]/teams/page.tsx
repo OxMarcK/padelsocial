@@ -39,7 +39,7 @@ export default async function AdminEventTeamsPage({ params }: { params: { id: st
             name="bulk"
             rows={4}
             placeholder={"Team naam | Speler 1 | Speler 2\nSanne & Joep | Sanne | Joep"}
-            className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-sm text-mint-ink placeholder:text-mint-ink-muted/60"
+            className="rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-3 py-2 text-sm text-mint-ink placeholder:text-mint-ink-muted/50"
           />
           <SaveButton label="Teams toevoegen" savedLabel="Toegevoegd" />
         </ActionForm>

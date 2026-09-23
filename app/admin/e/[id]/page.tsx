@@ -165,7 +165,7 @@ export default async function AdminEventScoresPage({
                 key={r}
                 href={`/admin/e/${event.id}?round=${r}`}
                 className={`flex-1 rounded-lg py-1.5 text-center font-mint text-xs font-bold ${
-                  viewedRound === r ? "bg-mint-lime text-mint-lime-ink" : "text-mint-ink-muted"
+                  viewedRound === r ? "bg-mint-lime text-mint-ink" : "text-mint-ink-muted"
                 }`}
               >
                 Ronde {r}

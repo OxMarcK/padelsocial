@@ -20,13 +20,15 @@ export default async function AdminEventSettingsPage({ params }: { params: { id:
       <Section title="Event bewerken">
         <ActionForm action={updateEventDetails.bind(null, event.id)} className="flex flex-col gap-3">
           <Field label="Naam" name="name" defaultValue={event.name} required />
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-mint-ink-muted">Slug (voor de URL)</span>
+          <label className="flex flex-col gap-1.5">
+            <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-ink-muted">
+              Slug (voor de URL)
+            </span>
             <input
               name="slug"
               defaultValue={event.slug}
               required
-              className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
+              className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-mint-ink"
             />
             <span className="text-xs text-mint-ink-muted">
               Publieke link wordt event.padelsocial.nl/{event.slug} — al gedeelde links met de oude slug werken
@@ -89,13 +91,15 @@ export default async function AdminEventSettingsPage({ params }: { params: { id:
         </p>
         <ActionForm action={duplicateEvent.bind(null, event.id)} className="flex flex-col gap-3">
           <Field label="Naam" name="name" defaultValue={`${event.name} (test)`} required />
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-mint-ink-muted">Slug (voor de URL)</span>
+          <label className="flex flex-col gap-1.5">
+            <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-ink-muted">
+              Slug (voor de URL)
+            </span>
             <input
               name="slug"
               defaultValue={normalizeSlug(`${event.slug}-test`)}
               required
-              className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
+              className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-mint-ink"
             />
           </label>
           <ActionFormError />

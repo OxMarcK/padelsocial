@@ -14,15 +14,15 @@ export function Field({
   defaultValue?: string | number;
 }) {
   return (
-    <label className="flex flex-col gap-1 text-sm">
-      <span className="text-mint-ink-muted">{label}</span>
+    <label className="flex flex-col gap-1.5">
+      <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-ink-muted">{label}</span>
       <input
         name={name}
         type={type}
         required={required}
         placeholder={placeholder}
         defaultValue={defaultValue}
-        className="h-11 rounded-xl border border-mint-net/25 bg-white px-3 text-mint-ink placeholder:text-mint-ink-muted/60"
+        className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-mint-ink placeholder:text-mint-ink-muted/50"
       />
     </label>
   );

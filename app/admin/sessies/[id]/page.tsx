@@ -8,6 +8,7 @@ import { Field } from "@/components/ui/field";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
 import { Section } from "@/components/admin/section";
+import { AdminShell } from "@/components/admin/admin-shell";
 import { ShareLink } from "@/components/sessions/share-link";
 import type { SessionStatus } from "@/lib/session-types";
 import {
@@ -44,7 +45,7 @@ const RESERVATION_STATUS_LABEL: Record<string, { label: string; className: strin
 };
 
 export default async function AdminSessionDetailPage({ params }: { params: { id: string } }) {
-  await requireAdmin();
+  const email = await requireAdmin();
   const session = await sessionsRepo.getSession(params.id);
   if (!session) notFound();
 
@@ -63,22 +64,18 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
   const shareUrl = host ? `${proto}://${host}/${session.slug}` : `/${session.slug}`;
 
   return (
-    <div
-      className="min-h-screen font-mint text-mint-ink"
-      style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
-    >
-      <main className="mx-auto flex max-w-2xl flex-col gap-8 px-6 py-10">
-        <div>
-          <Link href="/admin/sessies" className="font-mint text-sm font-bold text-mint-ink-muted hover:text-mint-ink">
-            ← Sessies
-          </Link>
-          <h1 className="mt-1 font-mint text-4xl font-bold text-mint-ink">{session.title}</h1>
-          <p className="text-sm text-mint-ink-muted">
-            {session.date} · {session.startTime} · {session.location} · baan {formatCourtNumbers(session.courtNumbers)}
-          </p>
-        </div>
+    <AdminShell email={email}>
+      <div>
+        <Link href="/admin/sessies" className="font-mint text-sm font-bold text-mint-ink-muted hover:text-mint-ink">
+          ← Sessies
+        </Link>
+        <h1 className="mt-1 font-mint text-4xl font-bold text-mint-ink">{session.title}</h1>
+        <p className="text-sm text-mint-ink-muted">
+          {session.date} · {session.startTime} · {session.location} · baan {formatCourtNumbers(session.courtNumbers)}
+        </p>
+      </div>
 
-        <ShareLink url={shareUrl} title={session.title} />
+      <ShareLink url={shareUrl} title={session.title} />
 
         <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
           <div className="flex items-center justify-between">
@@ -179,13 +176,15 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
               <h3 className="font-mint text-sm font-bold text-mint-ink-muted">Sessie bewerken</h3>
               <ActionForm action={updateSessionDetails.bind(null, session.id)} className="flex flex-col gap-3">
                 <Field label="Titel" name="title" defaultValue={session.title} required />
-                <label className="flex flex-col gap-1 text-sm">
-                  <span className="text-mint-ink-muted">Slug (voor de URL)</span>
+                <label className="flex flex-col gap-1.5">
+                  <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-ink-muted">
+                    Slug (voor de URL)
+                  </span>
                   <input
                     name="slug"
                     defaultValue={session.slug}
                     required
-                    className="rounded-xl border border-mint-net/25 bg-white px-3 py-2 text-mint-ink"
+                    className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-mint-ink"
                   />
                   <span className="text-xs text-mint-ink-muted">
                     Publieke link wordt event.padelsocial.nl/{session.slug}.
@@ -220,7 +219,6 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
             </div>
           </div>
         </details>
-      </main>
-    </div>
+    </AdminShell>
   );
 }

@@ -49,7 +49,7 @@ export default function AdminLoginPage({ searchParams }: { searchParams: { sent?
               name="email"
               required
               placeholder="jij@padelsocial.nl"
-              className="h-14 rounded-2xl border border-mint-net/25 bg-white px-4 text-mint-ink placeholder:text-mint-ink-muted/60"
+              className="h-14 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-mint-ink placeholder:text-mint-ink-muted/50"
             />
             <Button type="submit" fullWidth>
               Stuur inloglink

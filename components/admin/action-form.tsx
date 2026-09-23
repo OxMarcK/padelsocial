@@ -73,7 +73,7 @@ export function ActionFormError() {
 export function SaveButton({
   label = "Opslaan",
   savedLabel = "Opgeslagen",
-  variant = "secondary",
+  variant = "primary",
   size = "md",
   fullWidth = false,
   disabled = false,

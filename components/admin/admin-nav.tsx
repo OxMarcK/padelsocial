@@ -26,7 +26,7 @@ export function AdminNav({ eventId }: { eventId: string }) {
             key={t.href}
             href={href}
             className={`flex-1 rounded-xl py-2 text-center font-mint text-sm font-bold ${
-              active ? "bg-mint-lime text-mint-lime-ink" : "text-mint-ink-muted"
+              active ? "bg-mint-lime text-mint-ink" : "text-mint-ink-muted"
             }`}
           >
             {t.label}

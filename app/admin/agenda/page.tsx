@@ -1,10 +1,10 @@
-import Link from "next/link";
 import Image from "next/image";
 import { requireAdmin } from "@/lib/require-admin";
 import { siteSettingsRepo } from "@/lib/data/site-settings";
 import { agendaLinksRepo } from "@/lib/data/agenda-links";
 import { Field } from "@/components/ui/field";
 import { Section } from "@/components/admin/section";
+import { AdminShell } from "@/components/admin/admin-shell";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { uploadHeroFlyer, updateHeroFlyerLink, clearHeroFlyer, createAgendaLink, deleteAgendaLink } from "./actions";
@@ -13,24 +13,15 @@ import { uploadHeroFlyer, updateHeroFlyerLink, clearHeroFlyer, createAgendaLink,
  * promotes whatever the organizer wants on the landing page, independent of any one
  * event or session existing in the admin yet. */
 export default async function AdminAgendaPage() {
-  await requireAdmin();
+  const email = await requireAdmin();
   const settings = await siteSettingsRepo.getSiteSettings();
   const agendaLinks = await agendaLinksRepo.listAgendaLinks();
 
   return (
-    <div
-      className="min-h-screen font-mint text-mint-ink"
-      style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
-    >
-      <main className="mx-auto flex max-w-2xl flex-col gap-8 px-6 py-10">
-        <div>
-          <Link href="/admin" className="font-mint text-sm font-bold text-mint-ink-muted hover:text-mint-ink">
-            ← Events
-          </Link>
-          <h1 className="mt-1 font-mint text-4xl font-bold text-mint-ink">Agenda-hero</h1>
-        </div>
+    <AdminShell email={email}>
+      <h1 className="font-mint text-4xl font-bold text-mint-ink">Agenda-hero</h1>
 
-        <Section
+      <Section
           title="Flyer"
           subtitle="De afbeelding bovenaan de Agenda-pagina (padelsocial.nl) — los van een specifiek event."
         >
@@ -51,7 +42,7 @@ export default async function AdminAgendaPage() {
               name="flyer"
               accept="image/*"
               required
-              className="text-sm text-mint-ink file:mr-3 file:rounded-full file:border-0 file:bg-mint-lime file:px-3 file:py-1.5 file:text-sm file:font-bold file:text-mint-lime-ink"
+              className="text-sm text-mint-ink file:mr-3 file:rounded-full file:border-0 file:bg-mint-lime file:px-3 file:py-1.5 file:text-sm file:font-bold file:text-mint-ink"
             />
             <ActionFormError />
             <SaveButton label="Flyer uploaden" savedLabel="Geüpload" />
@@ -119,9 +110,8 @@ export default async function AdminAgendaPage() {
             <Field label="Link" name="link" type="url" placeholder="https://..." required />
             <ActionFormError />
             <SaveButton label="Item toevoegen" savedLabel="Toegevoegd" />
-          </ActionForm>
-        </Section>
-      </main>
-    </div>
+        </ActionForm>
+      </Section>
+    </AdminShell>
   );
 }
