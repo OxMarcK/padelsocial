@@ -29,12 +29,32 @@ async function sendEmail({ to, subject, html }: { to: string; subject: string; h
 
 /** Same visual language as the Supabase auth-email template: logo, ink text,
  * muted grey for secondary lines — see the "Magic link or OTP" template in
- * the Supabase dashboard for the sibling version of this layout. */
+ * the Supabase dashboard for the sibling version of this layout.
+ *
+ * Explicit white backgrounds (on both <body> and the card) plus the
+ * color-scheme meta tags keep this light in Gmail/Apple Mail dark mode —
+ * without them, clients repaint the transparent card dark and the dark-ink
+ * logo/text become unreadable. This one goes through Resend directly (full
+ * control over the HTML document), unlike the Supabase auth-email template,
+ * which only accepts a body fragment and can't carry a <head>. */
 function emailShell(bodyHtml: string): string {
-  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;max-width:420px;margin:0 auto;padding:32px 24px;color:#0E2318;">
-    <img src="https://agenda.padelsocial.nl/logo/S.png" alt="Padel Social" width="140" style="display:block;height:auto;margin:0 0 28px;" />
-    ${bodyHtml}
-  </div>`;
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light" />
+<meta name="supported-color-schemes" content="light" />
+</head>
+<body style="margin:0;padding:0;background-color:#F5F8F5;">
+<div style="background-color:#F5F8F5;padding:32px 16px;">
+<div style="max-width:420px;margin:0 auto;background-color:#ffffff;border-radius:20px;padding:32px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#0E2318;">
+<img src="https://agenda.padelsocial.nl/logo/S.png" alt="Padel Social" width="140" style="display:block;height:auto;margin:0 0 28px;" />
+${bodyHtml}
+</div>
+</div>
+</body>
+</html>`;
 }
 
 export async function sendPaymentConfirmedEmail({
