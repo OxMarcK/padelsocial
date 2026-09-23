@@ -25,7 +25,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export function Button({ variant = "primary", size = "md", fullWidth, className = "", ...props }: ButtonProps) {
   return (
     <button
-      className={`rounded-2xl font-mint font-bold uppercase tracking-wider transition disabled:opacity-40 disabled:cursor-not-allowed ${SIZE_CLASSES[size]} ${VARIANT_CLASSES[variant]} ${fullWidth ? "w-full" : ""} ${className}`}
+      className={`rounded-2xl font-mint font-bold transition disabled:opacity-40 disabled:cursor-not-allowed ${SIZE_CLASSES[size]} ${VARIANT_CLASSES[variant]} ${fullWidth ? "w-full" : ""} ${className}`}
       {...props}
     />
   );

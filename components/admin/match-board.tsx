@@ -39,7 +39,7 @@ export function MatchBoard({
               }`}
             >
               <span className="font-mint text-xl font-bold leading-none">{m.courtNumber}</span>
-              <span className="text-[9px] font-semibold uppercase tracking-wider">{done ? "klaar" : "open"}</span>
+              <span className="text-[9px] font-semibold">{done ? "Klaar" : "Open"}</span>
             </button>
           );
         })}

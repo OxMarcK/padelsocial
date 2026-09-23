@@ -34,7 +34,7 @@ export function AdminShell({ email, children }: { email: string; children: React
         <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-5 text-xs text-mint-ink-muted">
           <span>{email}</span>
           <form action={signOutAdmin}>
-            <button type="submit" className="font-mint text-xs font-bold uppercase tracking-wider hover:text-[#0E2318]">
+            <button type="submit" className="font-mint text-xs font-bold hover:text-[#0E2318]">
               Uitloggen
             </button>
           </form>

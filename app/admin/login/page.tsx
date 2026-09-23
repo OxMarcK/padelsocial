@@ -27,35 +27,37 @@ export default function AdminLoginPage({ searchParams }: { searchParams: { sent?
       className="min-h-screen font-mint text-[#0E2318]"
       style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
     >
-      <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
-        <Logo variant="light" size="lg" />
-        <div>
-          <h1 className="font-mint text-3xl font-bold text-[#0E2318]">Admin</h1>
-          <p className="mt-1 text-sm text-mint-ink-muted">Log in met je e-mailadres — je krijgt een inloglink.</p>
-        </div>
-        {searchParams.sent ? (
-          <div className="rounded-2xl border border-mint-lime bg-mint-lime/15 p-4 text-sm text-mint-lime-ink">
-            Check je e-mail voor de inloglink.
+      <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6">
+        <div className="flex flex-col gap-6 rounded-[20px] bg-white p-6 shadow-[0_10px_24px_rgba(14,35,24,.07)]">
+          <Logo variant="light" size="lg" />
+          <div>
+            <h1 className="font-mint text-3xl font-bold text-[#0E2318]">Admin</h1>
+            <p className="mt-1 text-sm text-mint-ink-muted">Log in met je e-mailadres.</p>
           </div>
-        ) : (
-          <form action={requestLink} className="flex flex-col gap-3">
-            {searchParams.error ? (
-              <div className="rounded-2xl border border-clay-orange bg-clay-orange/10 p-4 text-sm text-[#0E2318]">
-                {searchParams.error}
-              </div>
-            ) : null}
-            <input
-              type="email"
-              name="email"
-              required
-              placeholder="jij@padelsocial.nl"
-              className="h-14 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-[#0E2318] placeholder:text-mint-ink-muted/50"
-            />
-            <Button type="submit" fullWidth>
-              Stuur inloglink
-            </Button>
-          </form>
-        )}
+          {searchParams.sent ? (
+            <div className="rounded-2xl border border-mint-lime bg-mint-lime/15 p-4 text-sm text-mint-lime-ink">
+              Check je e-mail voor de inloglink.
+            </div>
+          ) : (
+            <form action={requestLink} className="flex flex-col gap-3">
+              {searchParams.error ? (
+                <div className="rounded-2xl border border-clay-orange bg-clay-orange/10 p-4 text-sm text-[#0E2318]">
+                  {searchParams.error}
+                </div>
+              ) : null}
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="jij@padelsocial.nl"
+                className="h-14 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-[#0E2318] placeholder:text-mint-ink-muted/50"
+              />
+              <Button type="submit" fullWidth>
+                Stuur inloglink
+              </Button>
+            </form>
+          )}
+        </div>
       </main>
     </div>
   );
