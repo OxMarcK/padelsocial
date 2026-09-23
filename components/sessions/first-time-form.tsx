@@ -61,19 +61,19 @@ export function FirstTimeForm({
       </div>
 
       <label className="flex flex-col gap-1.5">
-        <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-lime-ink">Jouw naam</span>
+        <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-ink-muted">Naam</span>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
           autoComplete="off"
           placeholder="Voornaam"
-          className="h-14 rounded-[14px] border-2 border-mint-lime bg-white px-4 text-lg text-[#0E2318] placeholder:text-mint-ink-muted/50 focus:outline-none"
+          className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-[#0E2318] placeholder:text-mint-ink-muted/50 focus:outline-none"
         />
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-lime-ink">Jouw e-mail</span>
+        <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-ink-muted">E-mail</span>
         <input
           type="email"
           value={email}
@@ -81,12 +81,13 @@ export function FirstTimeForm({
           required
           autoComplete="off"
           placeholder="jij@mail.nl"
-          className="h-12 rounded-[14px] border border-mint-net/25 bg-white px-4 text-[#0E2318] placeholder:text-mint-ink-muted/50"
+          className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-[#0E2318] placeholder:text-mint-ink-muted/50"
         />
       </label>
 
       <div className="flex flex-col gap-1.5">
-        <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-lime-ink">Hoe speel je?</span>
+        <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-ink-muted">Hoe speel je?</span>
+        <p className="mb-1 text-xs text-mint-ink-muted">Bepaalt op welke baan je begint</p>
         <div className="grid grid-cols-3 gap-1.5">
           {LEVELS.map((l) => {
             const active = level === l.value;
@@ -104,7 +105,6 @@ export function FirstTimeForm({
             );
           })}
         </div>
-        <p className="text-xs text-mint-ink-muted">Bepaalt op welke baan je begint — daarna schuif je zelf omhoog.</p>
       </div>
 
       {error ? <p className="text-xs text-clay-orange">{error}</p> : null}

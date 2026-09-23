@@ -56,7 +56,7 @@ export function SignupForm({
         <select
           value={memberId}
           onChange={(e) => setMemberId(e.target.value)}
-          className="h-12 rounded-[14px] border border-mint-net/25 bg-white px-3 text-[#0E2318]"
+          className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-3 text-[#0E2318]"
         >
           <option value="" disabled>
             Selecteer je profiel
