@@ -73,7 +73,7 @@ export default async function AdminMembersPage() {
   return (
     <AdminShell email={email}>
       <div>
-        <h1 className="font-mint text-4xl font-bold text-[#0E2318]">Profielen</h1>
+        <h1 className="font-mint text-4xl font-extrabold tracking-tight text-[#0E2318]">Profielen</h1>
         <p className="text-sm text-mint-ink-muted">Dit is de lijst waaruit de aanmeldpagina kiest.</p>
       </div>
 

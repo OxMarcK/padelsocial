@@ -71,7 +71,7 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
         <Link href="/admin/sessies" className="font-mint text-sm font-bold text-mint-ink-muted hover:text-[#0E2318]">
           ← Sessies
         </Link>
-        <h1 className="mt-1 font-mint text-4xl font-bold text-[#0E2318]">{session.title}</h1>
+        <h1 className="mt-1 font-mint text-4xl font-extrabold tracking-tight text-[#0E2318]">{session.title}</h1>
       </div>
 
       <details className="group rounded-[20px] bg-white shadow-[0_10px_24px_rgba(14,35,24,.07)] open:shadow-[0_14px_30px_rgba(14,35,24,.13)]">
@@ -88,7 +88,7 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
         </summary>
         <div className="flex flex-col gap-6 border-t border-mint-net/15 px-4 pb-4 pt-4">
           <div className="flex flex-col gap-3">
-            <h3 className="font-mint text-sm font-bold text-mint-ink-muted">Sessie bewerken</h3>
+            <h3 className="font-mint text-sm font-extrabold tracking-tight text-mint-ink-muted">Sessie bewerken</h3>
             <ActionForm action={updateSessionDetails.bind(null, session.id)} className="flex flex-col gap-3">
               <Field label="Titel" name="title" defaultValue={session.title} required />
               <label className="flex flex-col gap-1.5">
@@ -122,7 +122,7 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
           </div>
 
           <div className="flex flex-col gap-3 border-t border-mint-net/15 pt-6">
-            <h3 className="font-mint text-sm font-bold text-clay-orange">Gevarenzone</h3>
+            <h3 className="font-mint text-sm font-extrabold tracking-tight text-clay-orange">Gevarenzone</h3>
             <ConfirmButton
               label="Sessie verwijderen"
               confirmText={`"${session.title}" permanent verwijderen? Alle reserveringen gaan verloren.`}

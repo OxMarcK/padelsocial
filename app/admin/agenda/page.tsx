@@ -43,7 +43,7 @@ export default async function AdminAgendaPage() {
 
   return (
     <AdminShell email={email}>
-      <h1 className="font-mint text-4xl font-bold text-[#0E2318]">Extra</h1>
+      <h1 className="font-mint text-4xl font-extrabold tracking-tight text-[#0E2318]">Extra</h1>
 
       <details className="group rounded-[20px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)] open:shadow-[0_4px_14px_rgba(20,35,28,.1)]">
         <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-2.5">
@@ -116,7 +116,7 @@ export default async function AdminAgendaPage() {
       </details>
 
       <div className="flex flex-col gap-2">
-        <h2 className="font-mint text-2xl font-bold text-[#0E2318]">Externe agenda item</h2>
+        <h2 className="font-mint text-2xl font-extrabold tracking-tight text-[#0E2318]">Externe agenda item</h2>
 
         <details className="group rounded-[20px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)] open:shadow-[0_4px_14px_rgba(20,35,28,.1)]">
           <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-2.5">

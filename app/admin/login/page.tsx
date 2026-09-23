@@ -29,7 +29,7 @@ export default function AdminLoginPage({ searchParams }: { searchParams: { sent?
         <div className="flex flex-col gap-6 rounded-[20px] bg-white p-6 shadow-[0_10px_24px_rgba(14,35,24,.07)]">
           <Logo variant="light" size="lg" />
           <div>
-            <h1 className="font-mint text-3xl font-bold text-[#0E2318]">Admin</h1>
+            <h1 className="font-mint text-3xl font-extrabold tracking-tight text-[#0E2318]">Admin</h1>
             <p className="mt-1 text-sm text-mint-ink-muted">Log in met je e-mailadres.</p>
           </div>
           {searchParams.sent ? (

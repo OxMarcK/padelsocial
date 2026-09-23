@@ -75,7 +75,7 @@ export default async function AdminHomePage() {
 
   return (
     <AdminShell email={email}>
-      <h1 className="font-mint text-4xl font-bold text-[#0E2318]">Events</h1>
+      <h1 className="font-mint text-4xl font-extrabold tracking-tight text-[#0E2318]">Events</h1>
 
       <div className="flex flex-col gap-2">
         <details className="group rounded-[20px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)] open:shadow-[0_4px_14px_rgba(20,35,28,.1)]">
@@ -105,7 +105,7 @@ export default async function AdminHomePage() {
 
       {history.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <h2 className="font-mint text-2xl font-bold text-[#0E2318]">Vorige edities</h2>
+          <h2 className="font-mint text-2xl font-extrabold tracking-tight text-[#0E2318]">Vorige edities</h2>
           {history.map((e) => (
             <EventRow key={e.id} event={e} />
           ))}

@@ -24,7 +24,7 @@ export default async function AdminEventLayout({
   return (
     <AdminShell email={email}>
       <div>
-        <h1 className="font-mint text-4xl font-bold text-[#0E2318]">{event.name}</h1>
+        <h1 className="font-mint text-4xl font-extrabold tracking-tight text-[#0E2318]">{event.name}</h1>
         <p className="text-sm text-mint-ink-muted">
           {event.date} · {event.location} · {event.courts} banen
         </p>
