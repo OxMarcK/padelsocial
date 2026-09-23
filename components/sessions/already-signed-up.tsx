@@ -105,7 +105,7 @@ export function AlreadySignedUp({
         <button
           type="button"
           onClick={handleInvite}
-          className="mt-4 h-14 w-full rounded-full bg-mint-lime font-mint text-lg font-bold text-mint-lime-ink transition hover:brightness-105"
+          className="mt-4 flex h-[54px] w-full items-center justify-center rounded-full bg-mint-lime font-mint text-base font-bold text-[#0E2318] transition hover:brightness-105"
         >
           {copied ? "Link gekopieerd" : "Nodig iemand uit"}
         </button>

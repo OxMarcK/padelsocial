@@ -72,7 +72,7 @@ export function SignupForm({
       <button
         type="submit"
         disabled={pending || !memberId}
-        className="h-12 rounded-full bg-mint-lime font-mint font-bold uppercase tracking-wider text-mint-lime-ink transition disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-[54px] items-center justify-center rounded-full bg-mint-lime font-mint text-base font-bold text-[#0E2318] transition disabled:cursor-not-allowed disabled:opacity-40"
       >
         {pending ? "Bezig…" : "Meld je aan"}
       </button>

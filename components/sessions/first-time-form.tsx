@@ -113,7 +113,7 @@ export function FirstTimeForm({
       <button
         type="submit"
         disabled={pending || !name.trim() || !email.trim()}
-        className="h-14 rounded-full bg-mint-lime font-mint text-lg font-bold text-mint-lime-ink transition disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-[54px] items-center justify-center rounded-full bg-mint-lime font-mint text-base font-bold text-[#0E2318] transition disabled:cursor-not-allowed disabled:opacity-40"
       >
         {pending ? "Bezig…" : "Meld je aan"}
       </button>

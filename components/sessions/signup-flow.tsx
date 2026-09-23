@@ -53,7 +53,7 @@ export function SignupFlow({
       <button
         type="button"
         onClick={() => setMode(mode === "new" ? "existing" : "new")}
-        className="h-12 rounded-full bg-mint-lime/30 font-mint text-sm font-bold text-mint-lime-ink transition hover:brightness-95"
+        className="flex h-[54px] items-center justify-center rounded-full border-2 border-[#0E2318]/[.10] font-mint text-base font-bold text-[#0E2318] transition hover:border-[#4F6E14]"
       >
         {mode === "new" ? "Ik heb al een clubprofiel" : "Eerste keer hier?"}
       </button>

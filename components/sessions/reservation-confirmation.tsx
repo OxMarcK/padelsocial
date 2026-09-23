@@ -36,7 +36,7 @@ export function ReservationConfirmation({
               href={tikkieUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex h-12 items-center justify-center rounded-full bg-mint-lime px-6 text-center font-mint font-bold uppercase tracking-wider text-mint-lime-ink"
+              className="flex h-[54px] items-center justify-center rounded-full bg-mint-lime px-6 text-center font-mint text-base font-bold text-[#0E2318]"
             >
               Betaal via Tikkie
             </a>
