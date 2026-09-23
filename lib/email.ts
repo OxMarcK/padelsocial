@@ -31,13 +31,14 @@ async function sendEmail({ to, subject, html }: { to: string; subject: string; h
  * muted grey for secondary lines — see the "Magic link or OTP" template in
  * the Supabase dashboard for the sibling version of this layout.
  *
- * Table layout + `bgcolor` HTML attributes (not just inline CSS) on every
- * level, because Gmail's dark mode — especially the mobile app — rewrites
- * inline `background-color` on divs regardless of `color-scheme` meta tags
- * (an Apple Mail/Outlook-only technique that Gmail ignores). `bgcolor` is
- * the one thing Gmail's dark-mode repaint reliably leaves alone, which is
- * why this is a `<table>` rather than the more modern div layout. */
+ * Gmail's dark mode (especially the mobile app) repaints flat background
+ * colors dark regardless of `color-scheme` meta tags, `bgcolor` attributes,
+ * or inline CSS — all three were tried and all three got overridden. What
+ * Gmail's color-flip doesn't touch is an actual background *image*, so the
+ * white fill here is a repeating 1×1 white PNG (public/email/white-pixel.png)
+ * rather than a color, on both the page and the card. */
 function emailShell(bodyHtml: string): string {
+  const whitePixel = "https://agenda.padelsocial.nl/email/white-pixel.png";
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -46,13 +47,13 @@ function emailShell(bodyHtml: string): string {
 <meta name="color-scheme" content="light" />
 <meta name="supported-color-schemes" content="light" />
 </head>
-<body style="margin:0;padding:0;background-color:#F5F8F5;" bgcolor="#F5F8F5">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F5F8F5;" bgcolor="#F5F8F5">
+<body style="margin:0;padding:0;background-color:#F5F8F5;" bgcolor="#F5F8F5" background="${whitePixel}">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" background="${whitePixel}" style="background-color:#F5F8F5;background-image:url('${whitePixel}');" bgcolor="#F5F8F5">
 <tr>
 <td align="center" style="padding:32px 16px;">
-<table role="presentation" width="420" cellpadding="0" cellspacing="0" border="0" style="max-width:420px;background-color:#ffffff;border-radius:20px;" bgcolor="#ffffff">
+<table role="presentation" width="420" cellpadding="0" cellspacing="0" border="0" background="${whitePixel}" style="max-width:420px;background-color:#ffffff;background-image:url('${whitePixel}');border-radius:20px;" bgcolor="#ffffff">
 <tr>
-<td style="padding:32px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#0E2318;" bgcolor="#ffffff">
+<td background="${whitePixel}" style="padding:32px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#0E2318;background-color:#ffffff;background-image:url('${whitePixel}');" bgcolor="#ffffff">
 <img src="https://agenda.padelsocial.nl/logo/S.png" alt="Padel Social" width="140" style="display:block;height:auto;margin:0 0 28px;" />
 ${bodyHtml}
 </td>
