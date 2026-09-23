@@ -1,9 +1,14 @@
-/** Explainer card for the public aanmeldpagina — how the weekly "wisselend"
- * format works. Mostly static copy (every weekly session follows the same
- * format), except the "hoogste baan" callout: since a session's baannummers
- * are no longer assumed to be 1..N (see session-types.ts), the highest
- * baannummer of *this* session has to be passed in rather than hardcoded. */
-export function GoodToKnow({ highestCourtNumber }: { highestCourtNumber: number }) {
+/** Explainer card for the public aanmeldpagina — how the promotion/relegation
+ * ladder works. The court-promotion mechanic (winners up, losers down) is the
+ * same for every weekly format, but the partner chip isn't: Up & Down swaps
+ * partners every round, King of the Court keeps the same duo all session —
+ * same title-based format detection app/page.tsx's sessionActionLabel
+ * already uses for signup-button copy. The "hoogste baan" callout takes
+ * highestCourtNumber as a prop rather than hardcoding it,
+ * since a session's baannummers are no longer assumed to be 1..N (see
+ * session-types.ts). */
+export function GoodToKnow({ title, highestCourtNumber }: { title: string; highestCourtNumber: number }) {
+  const fixedPartner = title.includes("King of the Court");
   return (
     <div className="rounded-[20px] bg-white p-4 shadow-[0_8px_20px_rgba(14,35,24,.06)]">
       <h3 className="font-mint text-lg font-bold text-[#0E2318]">Goed om te weten</h3>
@@ -13,7 +18,7 @@ export function GoodToKnow({ highestCourtNumber }: { highestCourtNumber: number 
           Elke ronde · 20 min
         </span>
         <span className="rounded-full bg-mint-lime/40 px-4 py-2 font-mint text-sm font-bold text-mint-lime-ink">
-          Wisselende partner
+          {fixedPartner ? "Vaste partner" : "Wisselende partner"}
         </span>
       </div>
 
