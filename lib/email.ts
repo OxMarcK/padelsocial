@@ -46,6 +46,15 @@ function emailShell(bodyHtml: string): string {
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="color-scheme" content="light" />
 <meta name="supported-color-schemes" content="light" />
+<style>
+/* Gmail's dark mode also flips any near-black inline text color (like our
+   #0E2318 ink) to near-white — even inside a forced-white card — regardless
+   of the color-scheme meta tag above. When dark mode repaints an element it
+   tags it with data-ogsc; this selector uses that tag to force our original
+   color straight back. Mid-grey text (#5C7266) is under Gmail's flip
+   threshold and doesn't need this. */
+[data-ogsc] .ps-ink { color: #0E2318 !important; }
+</style>
 </head>
 <body style="margin:0;padding:0;background-color:#F5F8F5;" bgcolor="#F5F8F5" background="${whitePixel}">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" background="${whitePixel}" style="background-color:#F5F8F5;background-image:url('${whitePixel}');" bgcolor="#F5F8F5">
@@ -83,8 +92,8 @@ export async function sendPaymentConfirmedEmail({
 }): Promise<void> {
   const dayMonth = new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { day: "numeric", month: "long" });
   const html = emailShell(`
-    <h2 style="margin:0 0 12px;font-size:22px;font-weight:800;">Betaling ontvangen</h2>
-    <p style="margin:0 0 24px;font-size:15px;line-height:1.5;color:#5C7266;">Hoi ${memberName}, we hebben je betaling voor <strong style="color:#0E2318;">${sessionTitle}</strong> ontvangen. Tot dan!</p>
+    <h2 class="ps-ink" style="margin:0 0 12px;font-size:22px;font-weight:800;color:#0E2318;">Betaling ontvangen</h2>
+    <p style="margin:0 0 24px;font-size:15px;line-height:1.5;color:#5C7266;">Hoi ${memberName}, we hebben je betaling voor <strong class="ps-ink" style="color:#0E2318;">${sessionTitle}</strong> ontvangen. Tot dan!</p>
     <p style="margin:0;font-size:14px;line-height:1.6;color:#5C7266;">${fmtWeekday(date)} ${dayMonth}, ${startTime}<br/>${location}</p>
   `);
   await sendEmail({ to, subject: `Betaling ontvangen — ${sessionTitle}`, html });
