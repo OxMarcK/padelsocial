@@ -31,48 +31,26 @@ async function sendEmail({ to, subject, html }: { to: string; subject: string; h
  * muted grey for secondary lines — see the "Magic link or OTP" template in
  * the Supabase dashboard for the sibling version of this layout.
  *
- * Gmail's dark mode (especially the mobile app) repaints flat background
- * colors dark regardless of `color-scheme` meta tags, `bgcolor` attributes,
- * or inline CSS — all three were tried and all three got overridden. What
- * Gmail's color-flip doesn't touch is an actual background *image*, so the
- * white fill here is a repeating 1×1 white PNG (public/email/white-pixel.png)
- * rather than a color, on both the page and the card. */
+ * Deliberately simple: no forced light-mode background or text-color
+ * overrides for the page itself — Gmail's dark mode auto-inverts our plain
+ * ink-on-white design into a readable light-on-dark one just fine, the same
+ * way it does for any other plain-CSS email. The one thing that inversion
+ * can't fix is the logo — a raster image with dark ink baked into the
+ * pixels, which goes illegible on a dark background because Gmail can't
+ * recolor image content. So just the logo sits in its own small white box
+ * (a background *image* — a repeating 1×1 white PNG at
+ * public/email/white-pixel.png — rather than a background-color, since
+ * Gmail's dark mode repaints flat colors but leaves actual images alone). */
 function emailShell(bodyHtml: string): string {
   const whitePixel = "https://agenda.padelsocial.nl/email/white-pixel.png";
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="color-scheme" content="light" />
-<meta name="supported-color-schemes" content="light" />
-<style>
-/* Gmail's dark mode also flips any near-black inline text color (like our
-   #0E2318 ink) to near-white — even inside a forced-white card — regardless
-   of the color-scheme meta tag above. When dark mode repaints an element it
-   tags it with data-ogsc; this selector uses that tag to force our original
-   color straight back. Mid-grey text (#5C7266) is under Gmail's flip
-   threshold and doesn't need this. */
-[data-ogsc] .ps-ink { color: #0E2318 !important; }
-</style>
-</head>
-<body style="margin:0;padding:0;background-color:#F5F8F5;" bgcolor="#F5F8F5" background="${whitePixel}">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" background="${whitePixel}" style="background-color:#F5F8F5;background-image:url('${whitePixel}');" bgcolor="#F5F8F5">
-<tr>
-<td align="center" style="padding:32px 16px;">
-<table role="presentation" width="420" cellpadding="0" cellspacing="0" border="0" background="${whitePixel}" style="max-width:420px;background-color:#ffffff;background-image:url('${whitePixel}');border-radius:20px;" bgcolor="#ffffff">
-<tr>
-<td background="${whitePixel}" style="padding:32px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#0E2318;background-color:#ffffff;background-image:url('${whitePixel}');" bgcolor="#ffffff">
-<img src="https://agenda.padelsocial.nl/logo/S.png" alt="Padel Social" width="140" style="display:block;height:auto;margin:0 0 28px;" />
-${bodyHtml}
-</td>
-</tr>
-</table>
-</td>
-</tr>
-</table>
-</body>
-</html>`;
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;max-width:420px;margin:0 auto;padding:32px 24px;color:#0E2318;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" background="${whitePixel}" style="background-color:#ffffff;background-image:url('${whitePixel}');border-radius:14px;margin:0 0 28px;" bgcolor="#ffffff">
+      <tr><td style="padding:12px 16px;">
+        <img src="https://agenda.padelsocial.nl/logo/S.png" alt="Padel Social" width="140" style="display:block;height:auto;" />
+      </td></tr>
+    </table>
+    ${bodyHtml}
+  </div>`;
 }
 
 export async function sendPaymentConfirmedEmail({
@@ -92,8 +70,8 @@ export async function sendPaymentConfirmedEmail({
 }): Promise<void> {
   const dayMonth = new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { day: "numeric", month: "long" });
   const html = emailShell(`
-    <h2 class="ps-ink" style="margin:0 0 12px;font-size:22px;font-weight:800;color:#0E2318;">Betaling ontvangen</h2>
-    <p style="margin:0 0 24px;font-size:15px;line-height:1.5;color:#5C7266;">Hoi ${memberName}, we hebben je betaling voor <strong class="ps-ink" style="color:#0E2318;">${sessionTitle}</strong> ontvangen. Tot dan!</p>
+    <h2 style="margin:0 0 12px;font-size:22px;font-weight:800;">Betaling ontvangen</h2>
+    <p style="margin:0 0 24px;font-size:15px;line-height:1.5;color:#5C7266;">Hoi ${memberName}, we hebben je betaling voor <strong style="color:#0E2318;">${sessionTitle}</strong> ontvangen. Tot dan!</p>
     <p style="margin:0;font-size:14px;line-height:1.6;color:#5C7266;">${fmtWeekday(date)} ${dayMonth}, ${startTime}<br/>${location}</p>
   `);
   await sendEmail({ to, subject: `Betaling ontvangen — ${sessionTitle}`, html });
