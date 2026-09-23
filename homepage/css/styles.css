@@ -505,6 +505,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .site-footer { background: var(--ink); padding: 40px 0; }
 .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
 .footer-brand { display: flex; align-items: center; gap: 16px; }
+.footer-brand .brand-logo { height: 46px; }
 .footer-tagline { color: rgba(255,255,255,.6); font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .footer-copyright { color: rgba(255,255,255,.6); font-size: .75rem; font-weight: 500; }
 
@@ -529,6 +530,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   .photo-grid { grid-template-columns: 1fr 1fr; }
   .form-grid { grid-template-columns: 1fr; }
   .cta-banner { flex-direction: column; align-items: flex-start; }
-  .footer-inner { flex-direction: column; align-items: flex-start; }
+  .footer-inner { flex-direction: column; align-items: center; text-align: center; gap: 28px; }
+  .footer-brand { flex-direction: column; gap: 14px; }
   .formats-deco { height: 440px; width: 170%; left: -288px; }
 }

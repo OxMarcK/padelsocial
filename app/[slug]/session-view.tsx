@@ -5,6 +5,7 @@ import { fmtWeekday } from "@/lib/share-metadata";
 import type { Session } from "@/lib/session-types";
 import { Logo } from "@/components/logo";
 import { DayBadge } from "@/components/day-badge";
+import { SiteFooter } from "@/components/site-footer";
 import { SignupFlow } from "@/components/sessions/signup-flow";
 import { CourtSpots } from "@/components/sessions/court-spots";
 import { AlreadySignedUp } from "@/components/sessions/already-signed-up";
@@ -113,6 +114,8 @@ export async function SessionSignupView({ session }: { session: Session }) {
 
         <GoodToKnow title={session.title} highestCourtNumber={Math.max(...session.courtNumbers)} />
       </main>
+
+      <SiteFooter />
     </div>
   );
 }

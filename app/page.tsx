@@ -7,6 +7,7 @@ import { siteSettingsRepo } from "@/lib/data/site-settings";
 import { agendaLinksRepo } from "@/lib/data/agenda-links";
 import { Logo } from "@/components/logo";
 import { DayBadge } from "@/components/day-badge";
+import { SiteFooter } from "@/components/site-footer";
 import { buildShareMetadata, fmtDateShort, fmtWeekday } from "@/lib/share-metadata";
 import { isUpcomingPublicEvent, isUpcomingPublicSession, isPastPublicSession, isPastDate } from "@/lib/upcoming";
 import { activeReservations } from "@/lib/sessions";
@@ -441,15 +442,7 @@ export default async function LandingPage() {
           </a>
         </section>
 
-        <footer className="mt-14 bg-[#0E2318] py-10 sm:mt-[88px]">
-          <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-5 px-6">
-            <div className="flex items-center gap-4">
-              <Logo variant="dark" size={34} />
-              <span className="text-xs font-bold uppercase tracking-widest text-white/60">Play &middot; Connect &middot; Elevate</span>
-            </div>
-            <span className="text-xs font-medium text-white/60">© 2026 Padel Social</span>
-          </div>
-        </footer>
+        <SiteFooter />
       </main>
     </div>
   );
