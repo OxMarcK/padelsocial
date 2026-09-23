@@ -72,10 +72,11 @@ export async function sendPaymentConfirmedEmail({
   startTime: string;
   location: string;
 }): Promise<void> {
+  const dayMonth = new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { day: "numeric", month: "long" });
   const html = emailShell(`
     <h2 style="margin:0 0 12px;font-size:22px;font-weight:800;">Betaling ontvangen</h2>
     <p style="margin:0 0 24px;font-size:15px;line-height:1.5;color:#5C7266;">Hoi ${memberName}, we hebben je betaling voor <strong style="color:#0E2318;">${sessionTitle}</strong> ontvangen. Tot dan!</p>
-    <p style="margin:0;font-size:14px;line-height:1.6;color:#5C7266;">${fmtWeekday(date)} ${startTime}<br/>${location}</p>
+    <p style="margin:0;font-size:14px;line-height:1.6;color:#5C7266;">${fmtWeekday(date)} ${dayMonth}, ${startTime}<br/>${location}</p>
   `);
   await sendEmail({ to, subject: `Betaling ontvangen — ${sessionTitle}`, html });
 }
