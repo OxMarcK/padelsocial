@@ -8,7 +8,7 @@
  */
 export function CourtVideos({ courtNumbers, courtVideos }: { courtNumbers: number[]; courtVideos: Record<number, string> }) {
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+    <div className="rounded-[20px] bg-white p-4 shadow-[0_8px_20px_rgba(14,35,24,.06)]">
       <span className="font-mint text-lg font-bold text-[#0E2318]">Baan video&apos;s</span>
       <div className="mt-3 flex flex-col gap-2.5">
         {courtNumbers.map((courtNumber) => (
@@ -49,7 +49,7 @@ function CourtVideoRow({ courtNumber, videoUrl }: { courtNumber: number; videoUr
         className="flex items-center gap-3 rounded-[24px] bg-mint-net/10 py-2.5 pl-3 pr-4 transition-colors hover:brightness-95"
       >
         {thumbnail}
-        <span className="text-[15px] font-semibold text-mint-ink">Baan {courtNumber}</span>
+        <span className="text-[15px] font-semibold text-[#0E2318]">Baan {courtNumber}</span>
       </a>
     );
   }

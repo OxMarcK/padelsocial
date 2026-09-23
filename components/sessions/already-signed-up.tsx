@@ -59,7 +59,7 @@ export function AlreadySignedUp({
   const overflow = entries.length - shown.length;
 
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+    <div className="rounded-[20px] bg-white p-4 shadow-[0_8px_20px_rgba(14,35,24,.06)]">
       <div className="flex items-center justify-between">
         <span className="font-mint text-lg font-bold text-[#0E2318]">Deelnemers</span>
         {shown.length > 0 ? (
@@ -73,7 +73,7 @@ export function AlreadySignedUp({
               </span>
             ))}
             {overflow > 0 ? (
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-mint-net/40 font-mint text-xs font-bold text-mint-ink">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-mint-net/40 font-mint text-xs font-bold text-[#0E2318]">
                 +{overflow}
               </span>
             ) : null}
@@ -86,7 +86,7 @@ export function AlreadySignedUp({
           {entries.map((entry, i) => (
             <div
               key={i}
-              className={`flex items-center justify-between py-3 text-base text-mint-ink ${i > 0 ? "border-t border-mint-net/15" : ""}`}
+              className={`flex items-center justify-between py-3 text-base text-[#0E2318] ${i > 0 ? "border-t border-mint-net/15" : ""}`}
             >
               <span>{entry.name}</span>
               {levelLabel(entry.level) ? (

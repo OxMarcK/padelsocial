@@ -68,7 +68,7 @@ export function FirstTimeForm({
           required
           autoComplete="off"
           placeholder="Voornaam"
-          className="h-14 rounded-2xl border-2 border-mint-lime bg-white px-4 text-lg text-mint-ink placeholder:text-mint-ink-muted/50 focus:outline-none"
+          className="h-14 rounded-[14px] border-2 border-mint-lime bg-white px-4 text-lg text-[#0E2318] placeholder:text-mint-ink-muted/50 focus:outline-none"
         />
       </label>
 
@@ -81,7 +81,7 @@ export function FirstTimeForm({
           required
           autoComplete="off"
           placeholder="jij@mail.nl"
-          className="h-12 rounded-xl border border-mint-net/25 bg-white px-4 text-mint-ink placeholder:text-mint-ink-muted/50"
+          className="h-12 rounded-[14px] border border-mint-net/25 bg-white px-4 text-[#0E2318] placeholder:text-mint-ink-muted/50"
         />
       </label>
 
@@ -95,7 +95,7 @@ export function FirstTimeForm({
                 key={l.value}
                 type="button"
                 onClick={() => setLevel(l.value)}
-                className={`flex flex-col items-center gap-0.5 rounded-2xl border px-2 py-3 text-center transition ${
+                className={`flex flex-col items-center gap-0.5 rounded-full border px-2 py-3 text-center transition ${
                   active ? "border-[#0E2318] bg-[#0E2318]" : "border-mint-net/25 bg-white"
                 }`}
               >

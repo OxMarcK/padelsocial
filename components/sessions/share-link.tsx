@@ -24,13 +24,13 @@ export function ShareLink({ url, title }: { url: string; title: string }) {
 
   return (
     <div className="flex items-center gap-2 rounded-xl bg-mint-net/10 px-3 py-2 text-sm">
-      <a href={url} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate font-medium text-mint-ink hover:underline">
+      <a href={url} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate font-medium text-[#0E2318] hover:underline">
         {url.replace(/^https?:\/\//, "")}
       </a>
       <button
         type="button"
         onClick={handleShare}
-        className="flex-none rounded-lg bg-white px-3 py-1.5 font-mint text-xs font-bold text-mint-ink shadow-[0_1px_3px_rgba(20,35,28,.08)] hover:brightness-95"
+        className="flex-none rounded-lg bg-white px-3 py-1.5 font-mint text-xs font-bold text-[#0E2318] shadow-[0_8px_20px_rgba(14,35,24,.06)] hover:brightness-95"
       >
         {copied ? "Gekopieerd" : "Deel"}
       </button>

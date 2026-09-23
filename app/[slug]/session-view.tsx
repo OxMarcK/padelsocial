@@ -43,17 +43,17 @@ export async function SessionSignupView({ session }: { session: Session }) {
 
   return (
     <div
-      className="min-h-screen font-mint text-mint-ink"
+      className="min-h-screen font-mint text-[#0E2318]"
       style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
     >
-      <header className="sticky top-0 z-10 bg-white">
-        <div className="mx-auto flex max-w-md items-center justify-between gap-3 px-5 py-4">
-          <Logo variant="light" />
-          <h1 className="min-w-0 truncate font-mint text-2xl font-bold text-mint-ink">Sessie</h1>
+      <header className="sticky top-0 z-30 bg-white shadow-[0_1px_0_rgba(14,35,24,.10)]">
+        <div className="mx-auto flex max-w-md items-center justify-between gap-3 px-6 py-3.5">
+          <Logo variant="light" size="md" />
+          <h1 className="min-w-0 truncate font-mint text-2xl font-bold text-[#0E2318]">Sessie</h1>
         </div>
       </header>
 
-      <main className="mx-auto flex max-w-md flex-col gap-6 px-5 py-8">
+      <main className="mx-auto flex max-w-md flex-col gap-6 px-6 py-8">
         <div>
           <h2 className="font-mint text-3xl font-bold text-[#0E2318]">{session.title}</h2>
           <p className="text-sm text-mint-ink-muted">
@@ -64,7 +64,7 @@ export async function SessionSignupView({ session }: { session: Session }) {
           </p>
         </div>
 
-        <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+        <div className="rounded-[20px] bg-white p-4 shadow-[0_8px_20px_rgba(14,35,24,.06)]">
           <div className="flex items-center justify-between">
             <span className="font-mint text-lg font-bold text-[#0E2318]">Plekken</span>
             <span className="font-mint text-sm font-bold tabular-nums text-mint-ink-muted">
@@ -77,7 +77,7 @@ export async function SessionSignupView({ session }: { session: Session }) {
         </div>
 
         {session.status !== "done" ? (
-          <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+          <div className="rounded-[20px] bg-white p-4 shadow-[0_8px_20px_rgba(14,35,24,.06)]">
             {session.status === "open" ? (
               <SignupFlow
                 sessionId={session.id}

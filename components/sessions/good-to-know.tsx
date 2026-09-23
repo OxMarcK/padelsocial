@@ -5,7 +5,7 @@
  * baannummer of *this* session has to be passed in rather than hardcoded. */
 export function GoodToKnow({ highestCourtNumber }: { highestCourtNumber: number }) {
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+    <div className="rounded-[20px] bg-white p-4 shadow-[0_8px_20px_rgba(14,35,24,.06)]">
       <h3 className="font-mint text-lg font-bold text-[#0E2318]">Goed om te weten</h3>
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -21,7 +21,7 @@ export function GoodToKnow({ highestCourtNumber }: { highestCourtNumber: number 
         <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-mint-lime/40 text-mint-lime-ink">
           ↑
         </span>
-        <p className="text-sm text-mint-ink">
+        <p className="text-sm text-mint-ink-muted">
           Winnaars schuiven een baan omhoog, verliezers omlaag. Baan {highestCourtNumber} is de hoogste.
         </p>
       </div>

@@ -56,7 +56,7 @@ export function SignupForm({
         <select
           value={memberId}
           onChange={(e) => setMemberId(e.target.value)}
-          className="h-12 rounded-xl border border-mint-net/25 bg-white px-3 text-mint-ink"
+          className="h-12 rounded-[14px] border border-mint-net/25 bg-white px-3 text-[#0E2318]"
         >
           <option value="" disabled>
             Selecteer je profiel
@@ -72,7 +72,7 @@ export function SignupForm({
       <button
         type="submit"
         disabled={pending || !memberId}
-        className="h-12 rounded-2xl bg-mint-lime font-mint font-bold uppercase tracking-wider text-mint-lime-ink transition disabled:cursor-not-allowed disabled:opacity-40"
+        className="h-12 rounded-full bg-mint-lime font-mint font-bold uppercase tracking-wider text-mint-lime-ink transition disabled:cursor-not-allowed disabled:opacity-40"
       >
         {pending ? "Bezig…" : "Meld je aan"}
       </button>

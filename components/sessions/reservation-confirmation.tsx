@@ -16,7 +16,7 @@ export function ReservationConfirmation({
   tikkieUrl: string | null;
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-mint-lime bg-mint-lime/15 p-4 text-sm text-mint-ink">
+    <div className="flex flex-col gap-3 rounded-[20px] border border-mint-lime bg-mint-lime/15 p-4 text-sm text-[#0E2318]">
       {name ? (
         <p className="font-mint text-base font-bold text-[#0E2318]">
           Aangemeld als {name} — niet jouw naam? Vernieuw de pagina en probeer opnieuw.
@@ -36,7 +36,7 @@ export function ReservationConfirmation({
               href={tikkieUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex h-12 items-center justify-center rounded-2xl bg-mint-lime px-6 text-center font-mint font-bold uppercase tracking-wider text-mint-lime-ink"
+              className="flex h-12 items-center justify-center rounded-full bg-mint-lime px-6 text-center font-mint font-bold uppercase tracking-wider text-mint-lime-ink"
             >
               Betaal via Tikkie
             </a>
