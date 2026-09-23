@@ -3,10 +3,10 @@
 import { useState, useTransition } from "react";
 import type { MemberLevel, Reservation } from "@/lib/session-types";
 
-const LEVELS: { value: MemberLevel; label: string; caption: string }[] = [
-  { value: "beginner", label: "Beginner", caption: "< 10 keer" },
-  { value: "beginner_plus", label: "Beginner+", caption: "Speelt vaker" },
-  { value: "intermediate", label: "Intermediate", caption: "Competitie" },
+const LEVELS: { value: MemberLevel; label: string }[] = [
+  { value: "beginner", label: "Beginner" },
+  { value: "beginner_plus", label: "Beginner+" },
+  { value: "intermediate", label: "Intermediate" },
 ];
 
 /**
@@ -95,12 +95,11 @@ export function FirstTimeForm({
                 key={l.value}
                 type="button"
                 onClick={() => setLevel(l.value)}
-                className={`flex flex-col items-center gap-0.5 rounded-full border px-2 py-3 text-center transition ${
+                className={`flex items-center justify-center rounded-full border px-2 py-3 text-center transition ${
                   active ? "border-[#0E2318] bg-[#0E2318]" : "border-mint-net/25 bg-white"
                 }`}
               >
                 <span className={`font-mint text-sm font-bold ${active ? "text-white" : "text-mint-lime-ink"}`}>{l.label}</span>
-                <span className={`text-[11px] ${active ? "text-white/70" : "text-mint-ink-muted"}`}>{l.caption}</span>
               </button>
             );
           })}
