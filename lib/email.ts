@@ -43,14 +43,19 @@ async function sendEmail({ to, subject, html }: { to: string; subject: string; h
  * Gmail's dark mode repaints flat colors but leaves actual images alone). */
 function emailShell(bodyHtml: string): string {
   const whitePixel = "https://agenda.padelsocial.nl/email/white-pixel.png";
-  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;max-width:420px;margin:0 auto;padding:32px 24px;color:#0E2318;">
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" background="${whitePixel}" style="background-color:#ffffff;background-image:url('${whitePixel}');border-radius:14px;margin:0 0 28px;" bgcolor="#ffffff">
-      <tr><td style="padding:12px 16px;">
-        <img src="https://agenda.padelsocial.nl/logo/S.png" alt="Padel Social" width="140" style="display:block;height:auto;" />
-      </td></tr>
-    </table>
-    ${bodyHtml}
-  </div>`;
+  // `margin:0 auto` on the inner div isn't enough on its own — several
+  // clients ignore it and left-align instead. The outer table with
+  // `align="center"` is what actually centers reliably everywhere.
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center">
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;max-width:420px;margin:0 auto;padding:32px 24px;color:#0E2318;text-align:left;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" background="${whitePixel}" style="background-color:#ffffff;background-image:url('${whitePixel}');border-radius:14px;margin:0 0 28px;" bgcolor="#ffffff">
+        <tr><td style="padding:12px 16px;">
+          <img src="https://agenda.padelsocial.nl/logo/S.png" alt="Padel Social" width="140" style="display:block;height:auto;" />
+        </td></tr>
+      </table>
+      ${bodyHtml}
+    </div>
+  </td></tr></table>`;
 }
 
 export async function sendPaymentConfirmedEmail({
