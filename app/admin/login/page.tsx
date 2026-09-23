@@ -11,9 +11,7 @@ async function requestLink(formData: FormData) {
     await repo.requestMagicLink(email);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Onbekende fout";
-    const friendly = message.includes("rate limit")
-      ? "Net al een link gestuurd — Supabase staat maar een paar e-mails per uur toe op het gratis plan. Probeer het over een uur opnieuw."
-      : message;
+    const friendly = message.includes("rate limit") ? "Bel naar Marc" : message;
     redirect(`/admin/login?error=${encodeURIComponent(friendly)}`);
   }
   if (await repo.currentAdminEmail()) redirect("/admin");
