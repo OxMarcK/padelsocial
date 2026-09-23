@@ -7,7 +7,7 @@ const NAV = [
   { href: "/admin", label: "Events" },
   { href: "/admin/sessies", label: "Sessies" },
   { href: "/admin/leden", label: "Profielen" },
-  { href: "/admin/agenda", label: "Agenda-hero" },
+  { href: "/admin/agenda", label: "Extra" },
 ] as const;
 
 /** Top-level admin nav — client component only for the active-link highlight
