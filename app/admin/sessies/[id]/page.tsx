@@ -9,6 +9,8 @@ import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
 import { Section } from "@/components/admin/section";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { DayBadge } from "@/components/day-badge";
+import { fmtWeekday } from "@/lib/share-metadata";
 import { ShareLink } from "@/components/sessions/share-link";
 import type { SessionStatus } from "@/lib/session-types";
 import {
@@ -70,10 +72,66 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
           ← Sessies
         </Link>
         <h1 className="mt-1 font-mint text-4xl font-bold text-[#0E2318]">{session.title}</h1>
-        <p className="text-sm text-mint-ink-muted">
-          {session.date} · {session.startTime} · {session.location} · baan {formatCourtNumbers(session.courtNumbers)}
-        </p>
       </div>
+
+      <details className="group rounded-[20px] bg-white shadow-[0_10px_24px_rgba(14,35,24,.07)] open:shadow-[0_14px_30px_rgba(14,35,24,.13)]">
+        <summary className="flex cursor-pointer list-none items-center gap-4 p-4">
+          <DayBadge date={session.date} />
+          <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span className="text-sm font-semibold leading-snug text-mint-lime-ink">
+              {fmtWeekday(session.date)} {session.startTime}
+            </span>
+            <span className="text-sm font-medium leading-snug text-mint-ink-muted">
+              {session.location} · {session.courtNumbers.length} banen
+            </span>
+          </span>
+        </summary>
+        <div className="flex flex-col gap-6 border-t border-mint-net/15 px-4 pb-4 pt-4">
+          <div className="flex flex-col gap-3">
+            <h3 className="font-mint text-sm font-bold text-mint-ink-muted">Sessie bewerken</h3>
+            <ActionForm action={updateSessionDetails.bind(null, session.id)} className="flex flex-col gap-3">
+              <Field label="Titel" name="title" defaultValue={session.title} required />
+              <label className="flex flex-col gap-1.5">
+                <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-ink-muted">
+                  Slug (voor de URL)
+                </span>
+                <input
+                  name="slug"
+                  defaultValue={session.slug}
+                  required
+                  className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-[#0E2318]"
+                />
+                <span className="text-xs text-mint-ink-muted">Publieke link wordt agenda.padelsocial.nl/{session.slug}.</span>
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Datum" name="date" type="date" defaultValue={session.date} required />
+                <Field label="Starttijd" name="startTime" type="time" defaultValue={session.startTime} required />
+              </div>
+              <Field label="Locatie" name="location" defaultValue={session.location} required />
+              <Field
+                label="Baannummers (komma-gescheiden)"
+                name="courtNumbers"
+                defaultValue={formatCourtNumbers(session.courtNumbers)}
+                placeholder="1, 2, 3, 4"
+                required
+              />
+              <Field label="Tikkie-link" name="tikkieUrl" defaultValue={session.tikkieUrl ?? ""} placeholder="https://tikkie.me/pay/…" />
+              <ActionFormError />
+              <SaveButton />
+            </ActionForm>
+          </div>
+
+          <div className="flex flex-col gap-3 border-t border-mint-net/15 pt-6">
+            <h3 className="font-mint text-sm font-bold text-clay-orange">Gevarenzone</h3>
+            <ConfirmButton
+              label="Sessie verwijderen"
+              confirmText={`"${session.title}" permanent verwijderen? Alle reserveringen gaan verloren.`}
+              action={deleteSession.bind(null, session.id)}
+              variant="danger"
+            />
+          </div>
+        </div>
+      </details>
 
       <ShareLink url={shareUrl} title={session.title} />
 
@@ -175,57 +233,6 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
             ))}
           </div>
         </Section>
-
-        <details className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">
-          <summary className="cursor-pointer px-4 py-4 font-mint text-lg font-bold text-[#0E2318]">Instellingen</summary>
-          <div className="flex flex-col gap-6 border-t border-mint-net/15 px-4 pb-4 pt-4">
-            <div className="flex flex-col gap-3">
-              <h3 className="font-mint text-sm font-bold text-mint-ink-muted">Sessie bewerken</h3>
-              <ActionForm action={updateSessionDetails.bind(null, session.id)} className="flex flex-col gap-3">
-                <Field label="Titel" name="title" defaultValue={session.title} required />
-                <label className="flex flex-col gap-1.5">
-                  <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-ink-muted">
-                    Slug (voor de URL)
-                  </span>
-                  <input
-                    name="slug"
-                    defaultValue={session.slug}
-                    required
-                    className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-[#0E2318]"
-                  />
-                  <span className="text-xs text-mint-ink-muted">
-                    Publieke link wordt event.padelsocial.nl/{session.slug}.
-                  </span>
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <Field label="Datum" name="date" type="date" defaultValue={session.date} required />
-                  <Field label="Starttijd" name="startTime" type="time" defaultValue={session.startTime} required />
-                </div>
-                <Field label="Locatie" name="location" defaultValue={session.location} required />
-                <Field
-                  label="Baannummers (komma-gescheiden)"
-                  name="courtNumbers"
-                  defaultValue={formatCourtNumbers(session.courtNumbers)}
-                  placeholder="1, 2, 3, 4"
-                  required
-                />
-                <Field label="Tikkie-link" name="tikkieUrl" defaultValue={session.tikkieUrl ?? ""} placeholder="https://tikkie.me/pay/…" />
-                <ActionFormError />
-                <SaveButton />
-              </ActionForm>
-            </div>
-
-            <div className="flex flex-col gap-3 border-t border-mint-net/15 pt-6">
-              <h3 className="font-mint text-sm font-bold text-clay-orange">Gevarenzone</h3>
-              <ConfirmButton
-                label="Sessie verwijderen"
-                confirmText={`"${session.title}" permanent verwijderen? Alle reserveringen gaan verloren.`}
-                action={deleteSession.bind(null, session.id)}
-                variant="danger"
-              />
-            </div>
-          </div>
-        </details>
     </AdminShell>
   );
 }

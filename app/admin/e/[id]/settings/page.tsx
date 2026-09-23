@@ -31,7 +31,7 @@ export default async function AdminEventSettingsPage({ params }: { params: { id:
               className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-[#0E2318]"
             />
             <span className="text-xs text-mint-ink-muted">
-              Publieke link wordt event.padelsocial.nl/{event.slug} — al gedeelde links met de oude slug werken
+              Publieke link wordt agenda.padelsocial.nl/{event.slug} — al gedeelde links met de oude slug werken
               hierna niet meer.
             </span>
           </label>
