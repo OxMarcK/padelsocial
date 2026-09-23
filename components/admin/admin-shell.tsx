@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/logo";
+import { SiteFooter } from "@/components/site-footer";
 import { AdminHeaderNav } from "./admin-header-nav";
 import { signOutAdmin } from "@/app/admin/actions";
 
@@ -15,7 +16,7 @@ import { signOutAdmin } from "@/app/admin/actions";
 export function AdminShell({ email, children }: { email: string; children: ReactNode }) {
   return (
     <div
-      className="flex min-h-screen flex-col font-mint text-mint-ink"
+      className="flex min-h-screen flex-col font-mint text-[#0E2318]"
       style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
     >
       <header className="sticky top-0 z-30 bg-white shadow-[0_1px_0_rgba(14,35,24,.10)]">
@@ -29,16 +30,18 @@ export function AdminShell({ email, children }: { email: string; children: React
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-6 py-10">{children}</main>
 
-      <footer className="border-t border-mint-net/15">
+      <div className="border-t border-mint-net/15">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-5 text-xs text-mint-ink-muted">
           <span>{email}</span>
           <form action={signOutAdmin}>
-            <button type="submit" className="font-mint text-xs font-bold uppercase tracking-wider hover:text-mint-ink">
+            <button type="submit" className="font-mint text-xs font-bold uppercase tracking-wider hover:text-[#0E2318]">
               Uitloggen
             </button>
           </form>
         </div>
-      </footer>
+      </div>
+
+      <SiteFooter noTopMargin />
     </div>
   );
 }

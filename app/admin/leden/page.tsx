@@ -19,7 +19,7 @@ export default async function AdminMembersPage() {
 
   return (
     <AdminShell email={email}>
-      <h1 className="font-mint text-4xl font-bold text-mint-ink">Leden</h1>
+      <h1 className="font-mint text-4xl font-bold text-[#0E2318]">Leden</h1>
 
       <Section title="Leden" subtitle={`${members.length} leden — dit is de lijst waaruit de aanmeldpagina kiest`}>
         <ActionForm action={addMembersBulk} className="flex flex-col gap-2" resetOnSuccess>
@@ -27,7 +27,7 @@ export default async function AdminMembersPage() {
             name="bulk"
             rows={4}
             placeholder={"Eén naam per regel is genoeg:\nSanne Jansen\nJoep de Boer"}
-            className="rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-3 py-2 text-sm text-mint-ink placeholder:text-mint-ink-muted/50"
+            className="rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-3 py-2 text-sm text-[#0E2318] placeholder:text-mint-ink-muted/50"
           />
             <p className="text-xs text-mint-ink-muted">
               E-mail en telefoon zijn optioneel — voeg ze toe met &quot;|&quot; als je ze hebt: Sanne Jansen |
@@ -50,19 +50,19 @@ export default async function AdminMembersPage() {
                       name="name"
                       defaultValue={m.name}
                       placeholder="Naam"
-                      className="h-9 w-full min-w-0 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink sm:flex-1"
+                      className="h-9 w-full min-w-0 rounded-lg border border-mint-net/25 bg-white px-2 text-[#0E2318] sm:flex-1"
                     />
                     <input
                       name="email"
                       type="email"
                       defaultValue={m.email ?? ""}
                       placeholder="E-mail"
-                      className="h-9 w-full min-w-0 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink sm:flex-1"
+                      className="h-9 w-full min-w-0 rounded-lg border border-mint-net/25 bg-white px-2 text-[#0E2318] sm:flex-1"
                     />
                     <select
                       name="level"
                       defaultValue={m.level ?? ""}
-                      className="h-9 w-full rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink sm:w-auto"
+                      className="h-9 w-full rounded-lg border border-mint-net/25 bg-white px-2 text-[#0E2318] sm:w-auto"
                     >
                       <option value="">Geen niveau</option>
                       {Object.entries(LEVEL_LABEL).map(([value, label]) => (

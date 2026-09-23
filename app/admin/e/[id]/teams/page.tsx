@@ -39,7 +39,7 @@ export default async function AdminEventTeamsPage({ params }: { params: { id: st
             name="bulk"
             rows={4}
             placeholder={"Team naam | Speler 1 | Speler 2\nSanne & Joep | Sanne | Joep"}
-            className="rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-3 py-2 text-sm text-mint-ink placeholder:text-mint-ink-muted/50"
+            className="rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-3 py-2 text-sm text-[#0E2318] placeholder:text-mint-ink-muted/50"
           />
           <SaveButton label="Teams toevoegen" savedLabel="Toegevoegd" />
         </ActionForm>
@@ -51,7 +51,7 @@ export default async function AdminEventTeamsPage({ params }: { params: { id: st
                   <input
                     name="name"
                     defaultValue={t.name}
-                    className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+                    className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-[#0E2318]"
                   />
                   <SaveButton variant="ghost" size="sm" />
                 </ActionForm>
@@ -76,12 +76,12 @@ export default async function AdminEventTeamsPage({ params }: { params: { id: st
             const current = poules.find((p) => p.teamIds.includes(t.id))?.label ?? "";
             return (
               <div key={t.id} className="flex items-center gap-2 text-sm">
-                <span className="flex-1 truncate text-mint-ink">{t.name}</span>
+                <span className="flex-1 truncate text-[#0E2318]">{t.name}</span>
                 <select
                   key={current}
                   name={`poule_${t.id}`}
                   defaultValue={current}
-                  className="h-9 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+                  className="h-9 rounded-lg border border-mint-net/25 bg-white px-2 text-[#0E2318]"
                 >
                   <option value="">–</option>
                   {POULE_LABEL_OPTIONS.map((label) => (
@@ -105,7 +105,7 @@ export default async function AdminEventTeamsPage({ params }: { params: { id: st
               name="pouleCount"
               min={1}
               defaultValue={Math.max(1, Math.round(teams.length / 5) || 1)}
-              className="h-9 w-20 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+              className="h-9 w-20 rounded-lg border border-mint-net/25 bg-white px-2 text-[#0E2318]"
             />
           </label>
           <SaveButton variant="ghost" label="Willekeurig verdelen (5 per poule)" savedLabel="Verdeeld" />
@@ -150,7 +150,7 @@ function PointField({ label, name, defaultValue }: { label: string; name: string
         type="number"
         name={name}
         defaultValue={defaultValue}
-        className="h-9 w-16 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+        className="h-9 w-16 rounded-lg border border-mint-net/25 bg-white px-2 text-[#0E2318]"
       />
     </label>
   );

@@ -66,10 +66,10 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
   return (
     <AdminShell email={email}>
       <div>
-        <Link href="/admin/sessies" className="font-mint text-sm font-bold text-mint-ink-muted hover:text-mint-ink">
+        <Link href="/admin/sessies" className="font-mint text-sm font-bold text-mint-ink-muted hover:text-[#0E2318]">
           ← Sessies
         </Link>
-        <h1 className="mt-1 font-mint text-4xl font-bold text-mint-ink">{session.title}</h1>
+        <h1 className="mt-1 font-mint text-4xl font-bold text-[#0E2318]">{session.title}</h1>
         <p className="text-sm text-mint-ink-muted">
           {session.date} · {session.startTime} · {session.location} · baan {formatCourtNumbers(session.courtNumbers)}
         </p>
@@ -79,7 +79,7 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
 
         <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
           <div className="flex items-center justify-between">
-            <span className="font-mint text-lg font-bold text-mint-ink">{STATUS_LABEL[session.status]}</span>
+            <span className="font-mint text-lg font-bold text-[#0E2318]">{STATUS_LABEL[session.status]}</span>
             <span className="font-mint text-sm font-bold tabular-nums text-mint-ink-muted">
               {taken} van {capacity} plekken
             </span>
@@ -111,7 +111,7 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
                   >
                     <div className="flex min-w-0 flex-1 items-center gap-2">
                       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                        <span className="truncate font-semibold text-mint-ink">{memberNameById[r.memberId] ?? "?"}</span>
+                        <span className="truncate font-semibold text-[#0E2318]">{memberNameById[r.memberId] ?? "?"}</span>
                         <span className="truncate text-xs text-mint-ink-muted">
                           {r.status === "held"
                             ? `Verloopt om ${fmtClockTime(r.holdExpiresAt)}`
@@ -162,13 +162,13 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
                 action={setCourtVideo.bind(null, session.id, courtNumber)}
                 className="flex items-center gap-2 rounded-xl bg-mint-net/10 px-3 py-2"
               >
-                <span className="w-16 flex-none font-mint text-sm font-bold text-mint-ink">Baan {courtNumber}</span>
+                <span className="w-16 flex-none font-mint text-sm font-bold text-[#0E2318]">Baan {courtNumber}</span>
                 <input
                   type="url"
                   name="videoUrl"
                   defaultValue={session.courtVideos[courtNumber] ?? ""}
                   placeholder="https://youtube.com/…"
-                  className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-sm text-mint-ink"
+                  className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-sm text-[#0E2318]"
                 />
                 <SaveButton variant="ghost" size="sm" />
               </ActionForm>
@@ -177,7 +177,7 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
         </Section>
 
         <details className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">
-          <summary className="cursor-pointer px-4 py-4 font-mint text-lg font-bold text-mint-ink">Instellingen</summary>
+          <summary className="cursor-pointer px-4 py-4 font-mint text-lg font-bold text-[#0E2318]">Instellingen</summary>
           <div className="flex flex-col gap-6 border-t border-mint-net/15 px-4 pb-4 pt-4">
             <div className="flex flex-col gap-3">
               <h3 className="font-mint text-sm font-bold text-mint-ink-muted">Sessie bewerken</h3>
@@ -191,7 +191,7 @@ export default async function AdminSessionDetailPage({ params }: { params: { id:
                     name="slug"
                     defaultValue={session.slug}
                     required
-                    className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-mint-ink"
+                    className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-[#0E2318]"
                   />
                   <span className="text-xs text-mint-ink-muted">
                     Publieke link wordt event.padelsocial.nl/{session.slug}.

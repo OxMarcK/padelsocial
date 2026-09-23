@@ -28,7 +28,7 @@ export default async function AdminEventSettingsPage({ params }: { params: { id:
               name="slug"
               defaultValue={event.slug}
               required
-              className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-mint-ink"
+              className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-[#0E2318]"
             />
             <span className="text-xs text-mint-ink-muted">
               Publieke link wordt event.padelsocial.nl/{event.slug} — al gedeelde links met de oude slug werken
@@ -99,7 +99,7 @@ export default async function AdminEventSettingsPage({ params }: { params: { id:
               name="slug"
               defaultValue={normalizeSlug(`${event.slug}-test`)}
               required
-              className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-mint-ink"
+              className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-[#0E2318]"
             />
           </label>
           <ActionFormError />

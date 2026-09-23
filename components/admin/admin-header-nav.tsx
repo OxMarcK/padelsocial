@@ -24,7 +24,7 @@ export function AdminHeaderNav() {
             key={item.href}
             href={item.href}
             className={`whitespace-nowrap rounded-full px-3 py-1.5 font-mint text-sm font-bold transition ${
-              active ? "bg-mint-lime text-mint-ink" : "text-mint-ink-muted hover:text-mint-ink"
+              active ? "bg-mint-lime text-[#0E2318]" : "text-mint-ink-muted hover:text-[#0E2318]"
             }`}
           >
             {item.label}

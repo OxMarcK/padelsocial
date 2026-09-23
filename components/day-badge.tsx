@@ -9,7 +9,7 @@ export function DayBadge({ date, tone = "light", plus = false }: { date?: string
   if (plus) {
     return (
       <div className={`flex h-[62px] w-[60px] flex-none items-center justify-center rounded-2xl ${bg} leading-none`}>
-        <span className="translate-y-[-2px] text-4xl font-extrabold text-[#0E2318]">+</span>
+        <span className="mb-[7px] text-4xl font-extrabold text-[#0E2318]">+</span>
       </div>
     );
   }

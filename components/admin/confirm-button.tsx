@@ -69,7 +69,7 @@ export function ConfirmButton({
 
   return (
     <div className={`flex w-full flex-col gap-3 rounded-2xl border ${size === "sm" ? "p-3" : "p-4"} ${boxClasses}`}>
-      <p className="text-sm text-mint-ink">{confirmText}</p>
+      <p className="text-sm text-[#0E2318]">{confirmText}</p>
       <div className="flex gap-2">
         <Button
           type="button"

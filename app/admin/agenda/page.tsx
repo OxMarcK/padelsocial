@@ -19,7 +19,7 @@ export default async function AdminAgendaPage() {
 
   return (
     <AdminShell email={email}>
-      <h1 className="font-mint text-4xl font-bold text-mint-ink">Agenda-hero</h1>
+      <h1 className="font-mint text-4xl font-bold text-[#0E2318]">Agenda-hero</h1>
 
       <Section
           title="Flyer"
@@ -42,7 +42,7 @@ export default async function AdminAgendaPage() {
               name="flyer"
               accept="image/*"
               required
-              className="text-sm text-mint-ink file:mr-3 file:rounded-full file:border-0 file:bg-mint-lime file:px-3 file:py-1.5 file:text-sm file:font-bold file:text-mint-ink"
+              className="text-sm text-[#0E2318] file:mr-3 file:rounded-full file:border-0 file:bg-mint-lime file:px-3 file:py-1.5 file:text-sm file:font-bold file:text-[#0E2318]"
             />
             <ActionFormError />
             <SaveButton label="Flyer uploaden" savedLabel="Geüpload" />
@@ -81,7 +81,7 @@ export default async function AdminAgendaPage() {
               {agendaLinks.map((link) => (
                 <li key={link.id} className="flex flex-wrap items-center gap-3 rounded-xl bg-mint-net/10 px-3 py-2 text-sm">
                   <span className="min-w-0 flex-1">
-                    <span className="block font-bold text-mint-ink">{link.title}</span>
+                    <span className="block font-bold text-[#0E2318]">{link.title}</span>
                     <span className="block text-xs text-mint-ink-muted">
                       {link.date} · {link.startTime} · {link.location}
                     </span>

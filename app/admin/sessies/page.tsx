@@ -27,7 +27,7 @@ function SessionRow({ session }: { session: Session }) {
       <DayBadge date={session.date} />
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="flex items-center gap-2">
-          <span className="truncate font-mint text-lg font-bold text-mint-ink">{session.title}</span>
+          <span className="truncate font-mint text-lg font-bold text-[#0E2318]">{session.title}</span>
           {badge ? (
             <span className={`flex-none rounded-full px-2.5 py-1 font-mint text-xs font-bold ${badge.className}`}>
               {badge.label}
@@ -53,13 +53,13 @@ export default async function AdminSessionsPage() {
 
   return (
     <AdminShell email={email}>
-      <h1 className="font-mint text-4xl font-bold text-mint-ink">Sessies</h1>
+      <h1 className="font-mint text-4xl font-bold text-[#0E2318]">Sessies</h1>
 
       <div className="flex flex-col gap-2">
         <details className="group rounded-[20px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)] open:shadow-[0_4px_14px_rgba(20,35,28,.1)]">
           <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-2.5">
             <DayBadge plus />
-            <span className="font-mint text-lg font-bold text-mint-ink">Nieuwe sessie</span>
+            <span className="font-mint text-lg font-bold text-[#0E2318]">Nieuwe sessie</span>
           </summary>
           <form action={createSession} className="flex flex-col gap-3 px-4 pb-4 pt-1">
             <Field label="Titel" name="title" required placeholder="Dinsdagavond padel" />
@@ -83,16 +83,14 @@ export default async function AdminSessionsPage() {
           </form>
         </details>
 
-        {upcoming.length === 0 ? (
-          <p className="text-sm text-mint-ink-muted">Nog geen sessies.</p>
-        ) : (
-          upcoming.map((s) => <SessionRow key={s.id} session={s} />)
-        )}
+        {upcoming.map((s) => (
+          <SessionRow key={s.id} session={s} />
+        ))}
       </div>
 
       {history.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <h2 className="font-mint text-2xl font-bold text-mint-ink">Vorige edities</h2>
+          <h2 className="font-mint text-2xl font-bold text-[#0E2318]">Vorige edities</h2>
           {history.map((s) => (
             <SessionRow key={s.id} session={s} />
           ))}

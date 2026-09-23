@@ -61,7 +61,7 @@ function TeamSelect({
     <select
       name={name}
       defaultValue={defaultValue}
-      className="h-9 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink"
+      className="h-9 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-[#0E2318]"
     >
       {teams.map((t) => (
         <option key={t.id} value={t.id}>

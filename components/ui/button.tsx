@@ -5,9 +5,9 @@ type Size = "md" | "sm";
 
 /** Design 6A trial: restyled for the light "mint" admin — see app/admin/e/[id]/page.tsx. */
 const VARIANT_CLASSES: Record<Variant, string> = {
-  primary: "bg-mint-lime text-mint-ink hover:brightness-105",
+  primary: "bg-mint-lime text-[#0E2318] hover:brightness-105",
   secondary: "bg-glass-blue text-white hover:brightness-110",
-  ghost: "border border-mint-net/30 bg-white text-mint-ink hover:bg-mint-net/10",
+  ghost: "border border-mint-net/30 bg-white text-[#0E2318] hover:bg-mint-net/10",
   danger: "border border-clay-orange text-clay-orange hover:bg-clay-orange/10",
 };
 

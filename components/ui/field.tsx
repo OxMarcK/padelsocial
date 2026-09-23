@@ -22,7 +22,7 @@ export function Field({
         required={required}
         placeholder={placeholder}
         defaultValue={defaultValue}
-        className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-mint-ink placeholder:text-mint-ink-muted/50"
+        className="h-12 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 text-[#0E2318] placeholder:text-mint-ink-muted/50"
       />
     </label>
   );

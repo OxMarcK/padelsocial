@@ -50,7 +50,7 @@ function EventRow({ event }: { event: PadelEvent }) {
       <DayBadge date={event.date} />
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="flex items-center gap-2">
-          <span className="truncate font-mint text-lg font-bold text-mint-ink">{event.name}</span>
+          <span className="truncate font-mint text-lg font-bold text-[#0E2318]">{event.name}</span>
           {badge ? (
             <span className={`flex-none rounded-full px-2.5 py-1 font-mint text-xs font-bold ${badge.className}`}>
               {badge.label}
@@ -75,13 +75,13 @@ export default async function AdminHomePage() {
 
   return (
     <AdminShell email={email}>
-      <h1 className="font-mint text-4xl font-bold text-mint-ink">Events</h1>
+      <h1 className="font-mint text-4xl font-bold text-[#0E2318]">Events</h1>
 
       <div className="flex flex-col gap-2">
         <details className="group rounded-[20px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)] open:shadow-[0_4px_14px_rgba(20,35,28,.1)]">
           <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-2.5">
             <DayBadge plus />
-            <span className="font-mint text-lg font-bold text-mint-ink">Nieuw event</span>
+            <span className="font-mint text-lg font-bold text-[#0E2318]">Nieuw event</span>
           </summary>
           <form action={createEvent} className="flex flex-col gap-3 px-4 pb-4 pt-1">
             <Field label="Naam" name="name" required placeholder="Padel Social — 30 augustus" />
@@ -98,16 +98,14 @@ export default async function AdminHomePage() {
           </form>
         </details>
 
-        {upcoming.length === 0 ? (
-          <p className="text-sm text-mint-ink-muted">Nog geen events.</p>
-        ) : (
-          upcoming.map((e) => <EventRow key={e.id} event={e} />)
-        )}
+        {upcoming.map((e) => (
+          <EventRow key={e.id} event={e} />
+        ))}
       </div>
 
       {history.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <h2 className="font-mint text-2xl font-bold text-mint-ink">Vorige edities</h2>
+          <h2 className="font-mint text-2xl font-bold text-[#0E2318]">Vorige edities</h2>
           {history.map((e) => (
             <EventRow key={e.id} event={e} />
           ))}

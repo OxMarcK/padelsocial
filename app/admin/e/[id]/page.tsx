@@ -98,7 +98,7 @@ export default async function AdminEventScoresPage({
       <div className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="font-mint text-lg font-bold text-mint-ink">{indicator.phaseLabel}</div>
+            <div className="font-mint text-lg font-bold text-[#0E2318]">{indicator.phaseLabel}</div>
             <div className="text-sm text-mint-ink-muted">{indicator.subLabel}</div>
           </div>
           <div className="flex-none text-right text-xs text-mint-ink-muted">{indicator.timeWindowText}</div>
@@ -165,7 +165,7 @@ export default async function AdminEventScoresPage({
                 key={r}
                 href={`/admin/e/${event.id}?round=${r}`}
                 className={`flex-1 rounded-lg py-1.5 text-center font-mint text-xs font-bold ${
-                  viewedRound === r ? "bg-mint-lime text-mint-ink" : "text-mint-ink-muted"
+                  viewedRound === r ? "bg-mint-lime text-[#0E2318]" : "text-mint-ink-muted"
                 }`}
               >
                 Ronde {r}
@@ -245,7 +245,7 @@ export default async function AdminEventScoresPage({
                   {m.videoUrl ? <span aria-hidden className="text-mint-lime-ink">✓</span> : null}
                   <span className="truncate text-mint-ink-muted">{m.label}</span>
                 </div>
-                <span className="truncate font-semibold text-mint-ink">
+                <span className="truncate font-semibold text-[#0E2318]">
                   {m.teamAId ? teamNameById[m.teamAId] ?? "?" : "?"} vs {m.teamBId ? teamNameById[m.teamBId] ?? "?" : "?"}
                 </span>
                 <div className="flex items-center gap-2">
@@ -254,7 +254,7 @@ export default async function AdminEventScoresPage({
                     name="videoUrl"
                     defaultValue={m.videoUrl ?? ""}
                     placeholder="https://youtube.com/…"
-                    className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-mint-ink placeholder:text-mint-ink-muted/60"
+                    className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-[#0E2318] placeholder:text-mint-ink-muted/60"
                   />
                   <SaveButton variant="ghost" size="sm" />
                 </div>
