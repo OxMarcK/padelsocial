@@ -87,7 +87,7 @@ export function FirstTimeForm({
 
       <div className="flex flex-col gap-1.5">
         <span className="font-mint text-xs font-bold uppercase tracking-wider text-mint-lime-ink">Hoe speel je?</span>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-1.5">
           {LEVELS.map((l) => {
             const active = level === l.value;
             return (
@@ -95,7 +95,7 @@ export function FirstTimeForm({
                 key={l.value}
                 type="button"
                 onClick={() => setLevel(l.value)}
-                className={`flex items-center justify-center rounded-full border px-2 py-3 text-center transition ${
+                className={`flex items-center justify-center rounded-full border px-3 py-3 text-center transition ${
                   active ? "border-[#0E2318] bg-[#0E2318]" : "border-mint-net/25 bg-white"
                 }`}
               >
