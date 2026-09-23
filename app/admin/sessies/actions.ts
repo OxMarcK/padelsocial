@@ -7,6 +7,7 @@ import { sessionsRepo } from "@/lib/data/sessions";
 import { normalizeSlug, assertValidSlug } from "@/lib/slug";
 import { isSlugTaken } from "@/lib/slug-registry";
 import { parseCourtNumbers } from "@/lib/sessions";
+import { sendPaymentConfirmedEmail } from "@/lib/email";
 import type { SessionStatus } from "@/lib/session-types";
 
 function path(sessionId: string) {
@@ -96,7 +97,19 @@ export async function setCourtVideo(sessionId: string, courtNumber: number, form
 
 export async function markReservationPaid(sessionId: string, reservationId: string) {
   await requireAdmin();
-  await sessionsRepo.markPaid(reservationId);
+  const reservation = await sessionsRepo.markPaid(reservationId);
+  const [session, members] = await Promise.all([sessionsRepo.getSession(sessionId), sessionsRepo.listMembers()]);
+  const member = members.find((m) => m.id === reservation.memberId);
+  if (session && member?.email) {
+    await sendPaymentConfirmedEmail({
+      to: member.email,
+      memberName: member.name,
+      sessionTitle: session.title,
+      date: session.date,
+      startTime: session.startTime,
+      location: session.location,
+    });
+  }
   revalidatePath(path(sessionId));
 }
 
