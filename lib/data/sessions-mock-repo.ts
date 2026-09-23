@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { HOLD_MINUTES, activeReservations, isReservationExpired, sessionCapacity } from "../sessions";
 import type { Member, Reservation, Session } from "../session-types";
 import type { NewMemberInput, NewSessionInput, SessionsRepo } from "./sessions-repo";
@@ -12,12 +14,79 @@ class SessionsMockStore {
   reservations = new Map<string, Reservation>();
 }
 
+/**
+ * Seeds real session data (title/date/location/status — no member names or
+ * emails, those never leave the live DB) from lib/data/dev-seed.local.json,
+ * a gitignored one-off export (see scripts/export-sessions-seed.mjs), so
+ * local dev starts with real sessions to click into instead of an empty
+ * store that needs recreating through the admin UI after every restart.
+ * A fixed set of fake test members/reservations is layered on top of any
+ * "open" seeded session so the sign-up flow has something to show too.
+ */
+function seedFromDevSnapshot(store: SessionsMockStore) {
+  const seedPath = path.join(process.cwd(), "lib/data/dev-seed.local.json");
+  let raw: { sessions: any[] };
+  try {
+    raw = JSON.parse(fs.readFileSync(seedPath, "utf8"));
+  } catch {
+    return;
+  }
+
+  for (const row of raw.sessions ?? []) {
+    const session: Session = {
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      date: row.date,
+      startTime: row.start_time,
+      location: row.location,
+      courtNumbers: row.court_numbers ?? [],
+      tikkieUrl: row.tikkie_url,
+      status: row.status,
+      courtVideos: row.court_videos ?? {},
+      createdAt: row.created_at,
+    };
+    store.sessions.set(session.id, session);
+  }
+
+  const testMembers: Member[] = ["Test Speler 1", "Test Speler 2", "Test Speler 3", "Test Speler 4"].map((name, i) => ({
+    id: `member_test_${i}`,
+    name,
+    email: `test-speler-${i}@example.com`,
+    phone: null,
+    level: i % 2 === 0 ? "beginner_plus" : "intermediate",
+    createdAt: new Date().toISOString(),
+  }));
+  for (const m of testMembers) store.members.set(m.id, m);
+
+  const openSession = Array.from(store.sessions.values()).find((s) => s.status === "open");
+  if (openSession) {
+    testMembers.slice(0, 2).forEach((m, i) => {
+      const reservation: Reservation = {
+        id: `reservation_test_${i}`,
+        sessionId: openSession.id,
+        memberId: m.id,
+        status: "held",
+        reservedAt: new Date().toISOString(),
+        holdExpiresAt: new Date(Date.now() + HOLD_MINUTES * 60_000).toISOString(),
+        paidAt: null,
+        createdAt: new Date().toISOString(),
+      };
+      store.reservations.set(reservation.id, reservation);
+    });
+  }
+}
+
 // module-singleton so state survives across requests within the same dev server
 // process — without this, separate route bundles (e.g. the opengraph-image route)
 // each get their own fresh, empty store instead of sharing one (mirrors the same
 // fix already applied to lib/data/mock-repo.ts).
-const store: SessionsMockStore = (globalThis as any).__padelSocialSessionsMockStore ?? new SessionsMockStore();
-(globalThis as any).__padelSocialSessionsMockStore = store;
+let store: SessionsMockStore = (globalThis as any).__padelSocialSessionsMockStore;
+if (!store) {
+  store = new SessionsMockStore();
+  seedFromDevSnapshot(store);
+  (globalThis as any).__padelSocialSessionsMockStore = store;
+}
 
 function requireSession(id: string): Session {
   const session = store.sessions.get(id);
