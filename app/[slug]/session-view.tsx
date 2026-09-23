@@ -1,8 +1,10 @@
 import { headers } from "next/headers";
 import { sessionsRepo } from "@/lib/data/sessions";
 import { activeReservations, sessionCapacity } from "@/lib/sessions";
+import { fmtWeekday } from "@/lib/share-metadata";
 import type { Session } from "@/lib/session-types";
 import { Logo } from "@/components/logo";
+import { DayBadge } from "@/components/day-badge";
 import { SignupFlow } from "@/components/sessions/signup-flow";
 import { CourtSpots } from "@/components/sessions/court-spots";
 import { AlreadySignedUp } from "@/components/sessions/already-signed-up";
@@ -55,13 +57,19 @@ export async function SessionSignupView({ session }: { session: Session }) {
 
       <main className="mx-auto flex max-w-md flex-col gap-6 px-6 py-8">
         <div>
-          <h2 className="font-mint text-3xl font-bold text-[#0E2318]">{session.title}</h2>
-          <p className="text-sm text-mint-ink-muted">
-            {session.date} · {session.startTime}
-          </p>
-          <p className="text-sm text-mint-ink-muted">
-            {session.location} · {session.courtNumbers.length} banen
-          </p>
+          <h2 className="text-[clamp(2.4rem,5vw,3.6rem)] font-extrabold leading-[0.98] tracking-tight text-[#0E2318]">{session.title}</h2>
+        </div>
+
+        <div className="flex items-center gap-4 rounded-[20px] bg-white p-4 shadow-[0_10px_24px_rgba(14,35,24,.07)]">
+          <DayBadge date={session.date} tone="light" />
+          <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span className="text-sm font-semibold leading-snug text-[#4F6E14]">
+              {fmtWeekday(session.date)} {session.startTime}
+            </span>
+            <span className="text-sm font-medium leading-snug text-[#5C7266]">
+              {session.location} · {session.courtNumbers.length} banen
+            </span>
+          </span>
         </div>
 
         <div className="rounded-[20px] bg-white p-4 shadow-[0_8px_20px_rgba(14,35,24,.06)]">

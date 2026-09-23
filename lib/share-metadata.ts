@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
 
+/** Capitalized Dutch weekday name, e.g. "Zondag" — shared by the agenda list
+ * (event and session rows) and the session signup page. */
+export function fmtWeekday(date: string): string {
+  const weekday = new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { weekday: "long" });
+  return weekday.charAt(0).toUpperCase() + weekday.slice(1);
+}
+
 /** Short date for share-card titles, e.g. "zo 30 aug, 10:30". */
 export function fmtDateShort(date: string, time: string): string {
   const short = new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", {

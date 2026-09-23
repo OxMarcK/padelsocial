@@ -6,7 +6,8 @@ import { sessionsRepo } from "@/lib/data/sessions";
 import { siteSettingsRepo } from "@/lib/data/site-settings";
 import { agendaLinksRepo } from "@/lib/data/agenda-links";
 import { Logo } from "@/components/logo";
-import { buildShareMetadata, fmtDateShort } from "@/lib/share-metadata";
+import { DayBadge } from "@/components/day-badge";
+import { buildShareMetadata, fmtDateShort, fmtWeekday } from "@/lib/share-metadata";
 import { isUpcomingPublicEvent, isUpcomingPublicSession, isPastPublicSession, isPastDate } from "@/lib/upcoming";
 import { activeReservations } from "@/lib/sessions";
 import { WHATSAPP_URL, INSTAGRAM_URL } from "@/lib/site-links";
@@ -18,11 +19,6 @@ const OG_DESCRIPTION = "Speel individueel mee bij onze sessies, of meld je aan a
 // — a live Supabase call that, on a bad day, can fail the whole deploy.
 // Forcing dynamic rendering moves that call to request time instead.
 export const dynamic = "force-dynamic";
-
-function fmtWeekday(date: string): string {
-  const weekday = new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", { weekday: "long" });
-  return weekday.charAt(0).toUpperCase() + weekday.slice(1);
-}
 
 /** Every session is individual signup and individual Tikkie payment,
  * regardless of format — a King of the Court "duo" plays together on
@@ -485,19 +481,6 @@ function AgendaRowLink({
     <Link href={href} className={className}>
       {children}
     </Link>
-  );
-}
-
-function DayBadge({ date, tone = "light" }: { date: string; tone?: "light" | "onDark" }) {
-  const d = new Date(`${date}T00:00:00`);
-  const day = d.getDate();
-  const month = d.toLocaleDateString("nl-NL", { month: "short" }).replace(".", "").toUpperCase();
-  const bg = tone === "onDark" ? "bg-white" : "bg-[#EAF1EA]";
-  return (
-    <div className={`flex h-[62px] w-[60px] flex-none flex-col items-center justify-center rounded-2xl ${bg} leading-none`}>
-      <span className="text-2xl font-extrabold tracking-tight text-[#0E2318]">{day}</span>
-      <span className="text-[10px] font-extrabold tracking-widest text-[#3F5610]">{month}</span>
-    </div>
   );
 }
 
