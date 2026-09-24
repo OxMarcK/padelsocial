@@ -3,6 +3,7 @@ import { sessionsRepo } from "@/lib/data/sessions";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, SaveButton } from "@/components/admin/action-form";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { DetailsCard } from "@/components/admin/details-card";
 import { DayBadge } from "@/components/day-badge";
 import { Field } from "@/components/ui/field";
 import type { Member } from "@/lib/session-types";
@@ -12,18 +13,22 @@ const LEVEL_LABEL = { beginner: "Beginner", beginner_plus: "Beginner+", intermed
 
 function MemberRow({ member }: { member: Member }) {
   return (
-    <details className="group rounded-[20px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)] open:shadow-[0_4px_14px_rgba(20,35,28,.1)]">
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5">
-        <span className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate font-mint text-lg font-bold text-[#0E2318]">{member.name}</span>
-          {member.email ? <span className="truncate text-sm leading-snug text-mint-ink-muted">{member.email}</span> : null}
-        </span>
-        {member.level ? (
-          <span className="flex-none rounded-full bg-mint-net/15 px-2.5 py-1 font-mint text-xs font-bold text-mint-ink-muted">
-            {LEVEL_LABEL[member.level]}
+    <DetailsCard
+      summaryClassName="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5"
+      summary={
+        <>
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className="truncate font-mint text-lg font-bold text-[#0E2318]">{member.name}</span>
+            {member.email ? <span className="truncate text-sm leading-snug text-mint-ink-muted">{member.email}</span> : null}
           </span>
-        ) : null}
-      </summary>
+          {member.level ? (
+            <span className="flex-none rounded-full bg-mint-net/15 px-2.5 py-1 font-mint text-xs font-bold text-mint-ink-muted">
+              {LEVEL_LABEL[member.level]}
+            </span>
+          ) : null}
+        </>
+      }
+    >
       <div className="flex flex-col gap-3 px-4 pb-4 pt-1">
         <ActionForm action={updateMember.bind(null, member.id)} className="flex flex-col gap-3">
           <Field label="Naam" name="name" defaultValue={member.name} required />
@@ -57,7 +62,7 @@ function MemberRow({ member }: { member: Member }) {
           </div>
         </ActionForm>
       </div>
-    </details>
+    </DetailsCard>
   );
 }
 
@@ -78,11 +83,14 @@ export default async function AdminMembersPage() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <details className="group rounded-[20px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)] open:shadow-[0_4px_14px_rgba(20,35,28,.1)]">
-          <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-2.5">
-            <DayBadge plus />
-            <span className="font-mint text-lg font-bold text-[#0E2318]">Profiel toevoegen</span>
-          </summary>
+        <DetailsCard
+          summary={
+            <>
+              <DayBadge plus />
+              <span className="font-mint text-lg font-bold text-[#0E2318]">Profiel toevoegen</span>
+            </>
+          }
+        >
           <div className="flex flex-col gap-2 px-4 pb-4 pt-1">
             <ActionForm action={addMembersBulk} className="flex flex-col gap-2" resetOnSuccess>
               <textarea
@@ -98,7 +106,7 @@ export default async function AdminMembersPage() {
               <SaveButton label="Profiel toevoegen" savedLabel="Toegevoegd" />
             </ActionForm>
           </div>
-        </details>
+        </DetailsCard>
 
         {members.map((m) => (
           <MemberRow key={m.id} member={m} />

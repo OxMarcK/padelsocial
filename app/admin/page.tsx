@@ -6,6 +6,7 @@ import { repo } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { DetailsCard } from "@/components/admin/details-card";
 import { DayBadge } from "@/components/day-badge";
 import { fmtWeekday } from "@/lib/share-metadata";
 import { PHASE_META } from "@/lib/phases";
@@ -78,11 +79,14 @@ export default async function AdminHomePage() {
       <h1 className="font-mint text-4xl font-extrabold tracking-tight text-[#0E2318]">Events</h1>
 
       <div className="flex flex-col gap-2">
-        <details className="group rounded-[20px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)] open:shadow-[0_4px_14px_rgba(20,35,28,.1)]">
-          <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-2.5">
-            <DayBadge plus />
-            <span className="font-mint text-lg font-bold text-[#0E2318]">Nieuw event</span>
-          </summary>
+        <DetailsCard
+          summary={
+            <>
+              <DayBadge plus />
+              <span className="font-mint text-lg font-bold text-[#0E2318]">Nieuw event</span>
+            </>
+          }
+        >
           <form action={createEvent} className="flex flex-col gap-3 px-4 pb-4 pt-1">
             <Field label="Naam" name="name" required placeholder="Padel Social — 30 augustus" />
             <Field label="Slug (voor de URL)" name="slug" required placeholder="padel-social-30-augustus" />
@@ -96,7 +100,7 @@ export default async function AdminHomePage() {
               Event aanmaken
             </Button>
           </form>
-        </details>
+        </DetailsCard>
 
         {upcoming.map((e) => (
           <EventRow key={e.id} event={e} />

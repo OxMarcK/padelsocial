@@ -4,6 +4,7 @@ import { siteSettingsRepo } from "@/lib/data/site-settings";
 import { agendaLinksRepo, type AgendaLink } from "@/lib/data/agenda-links";
 import { Field } from "@/components/ui/field";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { DetailsCard } from "@/components/admin/details-card";
 import { DayBadge } from "@/components/day-badge";
 import { fmtWeekday } from "@/lib/share-metadata";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
@@ -45,28 +46,31 @@ export default async function AdminAgendaPage() {
     <AdminShell email={email}>
       <h1 className="font-mint text-4xl font-extrabold tracking-tight text-[#0E2318]">Extra</h1>
 
-      <details className="group rounded-[20px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)] open:shadow-[0_4px_14px_rgba(20,35,28,.1)]">
-        <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-2.5">
-          {settings.heroFlyerUrl ? (
-            <Image
-              src={settings.heroFlyerUrl}
-              alt="Huidige agenda-flyer"
-              width={60}
-              height={62}
-              className="h-[62px] w-[60px] flex-none rounded-2xl object-cover"
-            />
-          ) : (
-            <div className="flex h-[62px] w-[60px] flex-none items-center justify-center rounded-2xl bg-[#EAF1EA] text-xs font-bold text-mint-ink-muted">
-              —
-            </div>
-          )}
-          <span className="flex min-w-0 flex-1 flex-col">
-            <span className="font-mint text-lg font-bold text-[#0E2318]">Flyer &amp; link</span>
-            <span className="truncate text-sm text-mint-ink-muted">
-              {settings.heroFlyerUrl ? "Flyer geüpload" : "Nog geen flyer geüpload"}
+      <DetailsCard
+        summary={
+          <>
+            {settings.heroFlyerUrl ? (
+              <Image
+                src={settings.heroFlyerUrl}
+                alt="Huidige agenda-flyer"
+                width={60}
+                height={62}
+                className="h-[62px] w-[60px] flex-none rounded-2xl object-cover"
+              />
+            ) : (
+              <div className="flex h-[62px] w-[60px] flex-none items-center justify-center rounded-2xl bg-[#EAF1EA] text-xs font-bold text-mint-ink-muted">
+                —
+              </div>
+            )}
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="font-mint text-lg font-bold text-[#0E2318]">Flyer &amp; link</span>
+              <span className="truncate text-sm text-mint-ink-muted">
+                {settings.heroFlyerUrl ? "Flyer geüpload" : "Nog geen flyer geüpload"}
+              </span>
             </span>
-          </span>
-        </summary>
+          </>
+        }
+      >
         <div className="flex flex-col gap-6 px-4 pb-4 pt-1">
           <div className="flex flex-col gap-3">
             <h2 className="font-mint text-sm font-bold uppercase tracking-wider text-mint-ink-muted">Flyer</h2>
@@ -113,16 +117,19 @@ export default async function AdminAgendaPage() {
             </ActionForm>
           </div>
         </div>
-      </details>
+      </DetailsCard>
 
       <div className="flex flex-col gap-2">
         <h2 className="font-mint text-2xl font-extrabold tracking-tight text-[#0E2318]">Externe agenda item</h2>
 
-        <details className="group rounded-[20px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)] open:shadow-[0_4px_14px_rgba(20,35,28,.1)]">
-          <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-2.5">
-            <DayBadge plus />
-            <span className="font-mint text-lg font-bold text-[#0E2318]">Item toevoegen</span>
-          </summary>
+        <DetailsCard
+          summary={
+            <>
+              <DayBadge plus />
+              <span className="font-mint text-lg font-bold text-[#0E2318]">Item toevoegen</span>
+            </>
+          }
+        >
           <div className="flex flex-col gap-3 px-4 pb-4 pt-1">
             <p className="text-xs text-mint-ink-muted">
               Voor het uitzonderlijke geval: een item in de agenda dat naar een externe link verwijst in plaats van
@@ -140,7 +147,7 @@ export default async function AdminAgendaPage() {
               <SaveButton label="Item toevoegen" savedLabel="Toegevoegd" />
             </ActionForm>
           </div>
-        </details>
+        </DetailsCard>
 
         {agendaLinks.map((link) => (
           <AgendaLinkRow key={link.id} link={link} />
