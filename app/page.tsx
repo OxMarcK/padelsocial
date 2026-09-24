@@ -231,12 +231,7 @@ export default async function LandingPage() {
                   Inschrijven voor dit toernooi
                 </span>
               </a>
-            ) : (
-              <div className="mx-auto flex aspect-[719/898] w-full max-w-[430px] flex-col items-center justify-center gap-2 rounded-[28px] bg-[#E7EEE9] text-center text-[#5C7266]">
-                <span className="text-sm font-bold">Flyer volgt</span>
-                <span className="max-w-[22ch] text-xs font-medium">Zodra het volgende toernooi vaststaat, zie je de flyer hier.</span>
-              </div>
-            )}
+            ) : null}
           </div>
         </section>
 
