@@ -47,12 +47,22 @@ type HistoryRow = {
   external?: boolean;
 };
 
+/** A transient Supabase blip (timeout, momentary clock-skew JWT rejection) in
+ * any one of these independent sources shouldn't 500 the whole landing page
+ * — better to render with that section empty than to crash entirely. */
+function withFallback<T>(promise: Promise<T>, fallback: T, label: string): Promise<T> {
+  return promise.catch((err) => {
+    console.error(`[LandingPage] ${label} failed, falling back:`, err);
+    return fallback;
+  });
+}
+
 export default async function LandingPage() {
   const [events, sessions, heroSettings, agendaLinks] = await Promise.all([
-    repo.listEvents(),
-    sessionsRepo.listSessions(),
-    siteSettingsRepo.getSiteSettings(),
-    agendaLinksRepo.listAgendaLinks(),
+    withFallback(repo.listEvents(), [], "listEvents"),
+    withFallback(sessionsRepo.listSessions(), [], "listSessions"),
+    withFallback(siteSettingsRepo.getSiteSettings(), { heroFlyerUrl: null, heroFlyerLink: null }, "getSiteSettings"),
+    withFallback(agendaLinksRepo.listAgendaLinks(), [], "listAgendaLinks"),
   ]);
   const upcoming = events.find(isUpcomingPublicEvent) ?? null;
   const past = events.filter((e) => e.status === "finished");

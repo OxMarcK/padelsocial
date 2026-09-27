@@ -28,7 +28,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 const DEFAULT_DESCRIPTION = "Volg live de standen, je baanindeling en de knock-out.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://event.padelsocial.nl"),
+  metadataBase: new URL("https://agenda.padelsocial.nl"),
   title: "Padel Social",
   description: DEFAULT_DESCRIPTION,
   manifest: "/manifest.json",

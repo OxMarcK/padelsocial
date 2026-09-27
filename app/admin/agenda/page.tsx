@@ -109,7 +109,7 @@ export default async function AdminAgendaPage() {
                 label="URL"
                 name="link"
                 type="url"
-                placeholder="https://event.padelsocial.nl/toernooi-2"
+                placeholder="https://agenda.padelsocial.nl/toernooi-2"
                 defaultValue={settings.heroFlyerLink ?? ""}
               />
               <ActionFormError />
