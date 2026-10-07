@@ -22,7 +22,7 @@ export function BracketTab({
       {GROUPS.map((group) => (
         <div key={group.title} className="flex flex-col gap-2">
           <div className="flex items-baseline gap-2">
-            <h2 className="font-mint text-2xl font-bold text-[#0E2318]">{group.title}</h2>
+            <h2 className="font-mint text-2xl font-extrabold tracking-tight text-mint-ink">{group.title}</h2>
             <span className="text-xs text-mint-ink-muted">{group.note}</span>
           </div>
           {group.ids.map((id) => {
@@ -42,7 +42,7 @@ export function BracketTab({
           })}
         </div>
       ))}
-      <div className="rounded-[24px] border border-dashed border-mint-net/50 p-3.5 text-xs text-mint-ink">
+      <div className="rounded-[20px] border border-dashed border-mint-net/50 p-3.5 text-xs text-mint-ink">
         Overige banen zijn vrij te spelen. Plek 5 t/m 8 wordt bepaald door de seeding van het verliezende team, plek
         9 en verder door de poulestand.
       </div>

@@ -17,7 +17,7 @@ const inter = Inter({
   display: "swap",
 });
 
-// Design 6A trial only (see components/mint/) — not used anywhere else yet.
+// The design-system font (CLAUDE.md): Agenda, tournament companion, sessions, admin.
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],

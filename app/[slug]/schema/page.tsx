@@ -64,7 +64,7 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
         <Logo variant="light" size="xl" />
         <div className="h-11 w-0.5 bg-mint-net/40" />
         <div>
-          <div className="font-mint text-5xl font-bold leading-none text-mint-ink">{event.name}</div>
+          <div className="font-mint text-5xl font-extrabold leading-none tracking-tight text-mint-ink">{event.name}</div>
           <div className="mt-1.5 text-xl text-mint-ink-muted">
             {event.date} · {event.startTime} · {event.location}
           </div>
@@ -73,8 +73,8 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
 
       <main className="px-16 py-12">
       <section className="mt-10 flex flex-col gap-4">
-        <h2 className="font-mint text-3xl font-bold text-[#0E2318]">Dagindeling</h2>
-        <div className="flex overflow-x-auto rounded-[28px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+        <h2 className="font-mint text-3xl font-extrabold tracking-tight text-mint-ink">Dagindeling</h2>
+        <div className="flex overflow-x-auto rounded-[28px] bg-white shadow-card">
           {windows.map((w) => (
             <div key={w.status} className="min-w-[170px] flex-1 border-r border-mint-net/15 px-5 py-4 last:border-r-0">
               <div className="font-mint text-base font-bold text-mint-ink">{PHASE_META[w.status].label}</div>
@@ -89,8 +89,8 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
 
       {schedule.roundsCount > 0 ? (
         <section className="mt-10 flex flex-col gap-4">
-          <h2 className="font-mint text-3xl font-bold text-[#0E2318]">Poulefase</h2>
-          <div className="overflow-x-auto rounded-[28px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+          <h2 className="font-mint text-3xl font-extrabold tracking-tight text-mint-ink">Poulefase</h2>
+          <div className="overflow-x-auto rounded-[28px] bg-white shadow-card">
             <table className="w-full min-w-[900px] border-collapse">
               <thead>
                 <tr>
@@ -148,8 +148,8 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
       ) : null}
 
       <section className="mt-10 flex flex-col gap-4">
-        <h2 className="font-mint text-3xl font-bold text-[#0E2318]">Knock-out</h2>
-        <div className="overflow-x-auto rounded-[28px] bg-white shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+        <h2 className="font-mint text-3xl font-extrabold tracking-tight text-mint-ink">Knock-out</h2>
+        <div className="overflow-x-auto rounded-[28px] bg-white shadow-card">
           <table className="w-full min-w-[900px] border-collapse">
             <thead>
               <tr>

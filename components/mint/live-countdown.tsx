@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { fmtCountdown } from "@/lib/schedule";
 
 export type CountdownVariant = "billboard" | "split";
 /** Billboard-only: which solid background it's sitting on, so text/pill/progress bar stay legible. */
-export type CountdownTone = "lime" | "blue";
+export type CountdownTone = "lime" | "ink";
 
 export interface LiveCountdownProps {
   variant: CountdownVariant;
@@ -15,13 +16,6 @@ export interface LiveCountdownProps {
   initialText: string;
   initialProgress: number;
   tone?: CountdownTone;
-}
-
-function fmtCountdown(ms: number): string {
-  const totalSec = Math.max(0, Math.round(ms / 1000));
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
-  return `${m}:${String(s).padStart(2, "0")}`;
 }
 
 /**
@@ -91,26 +85,26 @@ export function LiveCountdown({
   const { countdownText, pct } = useTicking(startsAtIso, endsAtIso, initialText, initialProgress);
 
   if (variant === "billboard") {
-    const isBlue = tone === "blue";
+    const isInk = tone === "ink";
     return (
       <>
         <div className="mt-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
           <span
-            className={`font-mint text-5xl font-bold leading-none tabular-nums ${isBlue ? "text-white" : "text-mint-ink"}`}
+            className={`font-mint text-5xl font-extrabold leading-none tracking-tight tabular-nums ${isInk ? "text-white" : "text-mint-ink"}`}
           >
             {countdownText}
           </span>
           <span
             className={`flex-none whitespace-nowrap rounded-full px-3.5 py-1.5 font-mint text-sm font-bold ${
-              isBlue ? "bg-black/20 text-white" : "bg-black/10 text-mint-ink"
+              isInk ? "bg-white/15 text-white" : "bg-black/10 text-mint-ink"
             }`}
           >
             {subLabel}
           </span>
         </div>
-        <div className={`mt-3 h-1.5 overflow-hidden rounded-full ${isBlue ? "bg-white/20" : "bg-black/10"}`}>
+        <div className={`mt-3 h-1.5 overflow-hidden rounded-full ${isInk ? "bg-white/15" : "bg-black/10"}`}>
           <div
-            className={`h-full rounded-full transition-[width] duration-1000 ease-linear ${isBlue ? "bg-white" : "bg-mint-ink"}`}
+            className={`h-full rounded-full transition-[width] duration-1000 ease-linear ${isInk ? "bg-mint-lime" : "bg-mint-ink"}`}
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -121,8 +115,8 @@ export function LiveCountdown({
   return (
     <>
       <div className="mt-1 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-        <span className="font-mint text-5xl font-bold leading-none tabular-nums text-mint-ink">{countdownText}</span>
-        <span className="text-base text-mint-ink-muted">{subLabel}</span>
+        <span className="font-mint text-5xl font-extrabold leading-none tracking-tight tabular-nums text-mint-ink">{countdownText}</span>
+        <span className="text-base font-medium text-mint-ink-muted">{subLabel}</span>
       </div>
       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-mint-net/20">
         <div className="h-full rounded-full bg-mint-lime transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%` }} />

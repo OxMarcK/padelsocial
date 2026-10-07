@@ -50,7 +50,7 @@ export function TeamSearchGrid({ slug, teams }: { slug: string; teams: TeamListR
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Zoek een team…"
-        className="h-12 rounded-full bg-white px-4 text-mint-ink shadow-[0_1px_3px_rgba(20,35,28,.08)] placeholder:text-mint-ink-muted"
+        className="h-12 rounded-full bg-white px-4 text-mint-ink shadow-pill placeholder:text-mint-ink-muted"
       />
       <div className="flex flex-col gap-2.5">
         {sorted.map((t) => (
@@ -58,14 +58,14 @@ export function TeamSearchGrid({ slug, teams }: { slug: string; teams: TeamListR
             key={t.id}
             href={`/${slug}/teams/${slugById.get(t.id) ?? t.id}`}
             prefetch={false}
-            className="flex items-center gap-3.5 rounded-[24px] bg-white px-4 py-3.5 shadow-[0_1px_3px_rgba(20,35,28,.08)] hover:brightness-95"
+            className="flex items-center gap-3.5 rounded-[20px] bg-white px-4 py-3.5 shadow-card hover:brightness-95"
           >
-            <span className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-mint-lime/40 font-mint text-lg font-bold text-mint-lime-ink">
+            <span className="flex h-12 w-12 flex-none items-center justify-center rounded-[14px] bg-mint-lime/40 font-mint text-lg font-bold text-mint-lime-ink">
               {t.pouleLabel ?? "?"}
             </span>
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span className="flex items-center gap-2">
-                <span className="truncate font-mint text-lg font-bold text-mint-ink">{t.name}</span>
+                <span className="truncate font-mint text-lg font-extrabold tracking-tight text-mint-ink">{t.name}</span>
                 {t.finalRank !== null && t.finalRank <= 3 ? (
                   <span className="flex-none rounded-full bg-mint-lime px-2.5 py-0.5 font-mint text-xs font-bold text-mint-lime-ink">
                     Top 3
