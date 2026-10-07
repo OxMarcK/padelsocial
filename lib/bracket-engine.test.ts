@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   computeTop8Ranking,
+  freePlayCourts,
   resolveBracketMatches,
   resolveTop8,
   KWARTFINALE_SEED_PAIRS,
@@ -263,5 +264,17 @@ describe("resolveTop8 — poule-count-agnostic qualification", () => {
     );
     expect(placementSeeds).toHaveLength(2); // just the two 5th places
     expect(placementSeeds).toEqual(["A5", "B5"]);
+  });
+});
+
+describe("freePlayCourts", () => {
+  it("offers every untracked court when no booking list is given", () => {
+    expect(freePlayCourts(1, 5)).toEqual([1]);
+    expect(freePlayCourts(2, 5)).toEqual([1, 2, 3]);
+  });
+
+  it("leaves out courts the poulefase never used (baan 1 not booked)", () => {
+    expect(freePlayCourts(1, 5, [2, 3, 4, 5])).toEqual([]);
+    expect(freePlayCourts(2, 5, [2, 3, 4, 5])).toEqual([2, 3]);
   });
 });

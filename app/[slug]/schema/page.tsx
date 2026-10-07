@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { repo } from "@/lib/data";
-import { generatePouleSchedule } from "@/lib/poule-scheduler";
+import { generatePouleSchedule, playedCourts } from "@/lib/poule-scheduler";
 import { computeSchedule, pouleRoundWindow, fmtTime } from "@/lib/schedule";
 import { PHASE_META } from "@/lib/phases";
 import { BRACKET_DEFINITION, resolveBracketMatches, type ResolvedBracketMatch, type TeamSource } from "@/lib/bracket-engine";
@@ -34,7 +34,7 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
   const schedule = generatePouleSchedule(poules.map((p) => ({ label: p.label, teamIds: p.teamIds })), event.courts);
   const windows = computeSchedule(event, schedule.roundsCount || 1);
   const pouleStartsAt = windows.find((w) => w.status === "poulefase")!.startsAt;
-  const courtNumbers = Array.from({ length: event.courts }, (_, i) => i + 1);
+  const courtNumbers = playedCourts(schedule, event.courts);
   const bracketDefById = Object.fromEntries(BRACKET_DEFINITION.map((d) => [d.id, d]));
 
   // Once the top-8 is published, show the actual team names instead of the
