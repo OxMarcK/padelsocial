@@ -27,7 +27,7 @@ export function FavoriteStarButton({ slug, teamId }: { slug: string; teamId: str
       onClick={toggle}
       aria-pressed={isFavorite}
       aria-label={isFavorite ? "Team onthouden — tik om te vergeten" : "Onthoud dit team"}
-      className={`flex h-14 w-14 flex-none items-center justify-center rounded-full shadow-[0_1px_3px_rgba(20,35,28,.08)] transition-colors ${
+      className={`flex h-14 w-14 flex-none items-center justify-center rounded-full shadow-pill transition-colors ${
         isFavorite ? "bg-mint-lime text-mint-lime-ink" : "bg-white text-mint-ink-muted"
       }`}
     >

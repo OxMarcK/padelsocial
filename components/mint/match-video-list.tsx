@@ -21,7 +21,7 @@ export function MatchVideoSection({ title, rows }: { title: string; rows: MatchV
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="font-mint text-lg font-bold text-[#0E2318]">{title}</h2>
+        <h2 className="font-mint text-lg font-extrabold tracking-tight text-mint-ink">{title}</h2>
         <span className="font-mint text-xs font-bold text-mint-ink-muted">{rows.length} gespeeld</span>
       </div>
       {rows.length === 0 ? (
@@ -45,7 +45,7 @@ function MatchVideoCard({ row }: { row: MatchVideoRow }) {
       rel="noreferrer"
       title={row.title}
       aria-label={row.title}
-      className={`flex items-center gap-3 rounded-[24px] border-l-4 bg-mint-surface py-2.5 pl-3 pr-4 transition-colors hover:brightness-95 ${
+      className={`flex items-center gap-3 rounded-[20px] border-l-4 bg-mint-surface py-2.5 pl-3 pr-4 transition-colors hover:brightness-95 ${
         row.accent ? ACCENT_BORDER[row.accent] : "border-l-transparent"
       }`}
     >

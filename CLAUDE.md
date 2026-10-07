@@ -23,7 +23,8 @@ Next.js 13.5 (App Router, Server Actions), Tailwind, Supabase (Postgres + magic-
 - Kleuren: ink `#0E2318`, ink-muted `#5C7266`, lime `#D2E95C`, lime-ink `#4F6E14`, achtergrond `linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)`.
 - Radius: 14 / 20 / 28 px, knoppen pill (999px).
 - Font: Plus Jakarta Sans (`font-mint`). Headings: `font-extrabold tracking-tight` (weight 800, letter-spacing -.025em), ook in /admin.
-- Herhaalde UI als component, niet als losse class-strings: `components/admin/section.tsx`, `components/admin/details-card.tsx`, `components/ui/*`.
+- Herhaalde UI als component, niet als losse class-strings: `components/admin/section.tsx`, `components/admin/details-card.tsx`, `components/ui/*` (o.a. `Heading`, `Card`), `components/mint/event-shell.tsx` (frame van de toernooi-companion).
+- Tokens: `mint-ink` = ink, `shadow-card` / `shadow-pill` = schaduwschaal van de Agenda. Blauw (`glass-blue`) alleen voor banen en het podium, niet voor kaarten of knoppen.
 
 ## E-mail
 

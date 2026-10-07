@@ -15,9 +15,9 @@ export interface PouleTableProps {
  */
 export function PouleTable({ label, rows }: PouleTableProps) {
   return (
-    <div className="flex flex-col gap-1 rounded-[28px] bg-white py-4 pl-4 pr-6 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+    <div className="flex flex-col gap-1 rounded-[28px] bg-white py-4 pl-4 pr-6 shadow-card">
       <div className="flex items-center justify-between gap-3 px-1 pb-1">
-        <span className="font-mint text-2xl font-bold text-mint-ink">Poule {label}</span>
+        <span className="font-mint text-2xl font-extrabold tracking-tight text-mint-ink">Poule {label}</span>
         <span className="flex items-center gap-3">
           <span className="w-12 flex-none text-center font-mint text-sm font-medium text-mint-ink-muted">Saldo</span>
           <span className="w-14 flex-none text-center font-mint text-sm font-medium text-mint-ink-muted">Punten</span>

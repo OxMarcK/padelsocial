@@ -137,11 +137,16 @@ export function fmtTime(d: Date): string {
   return d.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit", timeZone: VENUE_TIME_ZONE });
 }
 
+/** "m:ss" under an hour, "h:mm:ss" under a day, and "4d 3u" beyond that — a
+ * multi-day wait as raw minutes ("5760:24") reads as a glitch. */
 export function fmtCountdown(ms: number): string {
   const totalSec = Math.max(0, Math.round(ms / 1000));
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
-  return `${m}:${String(s).padStart(2, "0")}`;
+  const days = Math.floor(totalSec / 86_400);
+  if (days > 0) return `${days}d ${Math.floor((totalSec % 86_400) / 3600)}u`;
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = String(totalSec % 60).padStart(2, "0");
+  return h > 0 ? `${h}:${String(m).padStart(2, "0")}:${s}` : `${m}:${s}`;
 }
 
 export interface PhaseIndicatorData {

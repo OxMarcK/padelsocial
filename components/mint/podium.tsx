@@ -26,7 +26,7 @@ export function Podium({ entries, caption }: { entries: PodiumEntry[]; caption?:
   const byRank = new Map(entries.map((e) => [e.rank, e]));
 
   return (
-    <div className="flex flex-col gap-5 rounded-[28px] bg-white p-5 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+    <div className="flex flex-col gap-5 rounded-[28px] bg-white p-5 shadow-card">
       <div className="grid grid-cols-3 items-end gap-3">
         {order.map((rank) => {
           const entry = byRank.get(rank);
@@ -39,8 +39,8 @@ export function Podium({ entries, caption }: { entries: PodiumEntry[]; caption?:
               <div className={`text-center text-sm leading-tight text-mint-ink ${rank === 1 ? "font-bold" : "font-semibold"}`}>
                 {entry.name}
               </div>
-              <div className={`flex w-full flex-col items-center justify-center gap-1 rounded-[24px] ${HEIGHTS[rank]} ${COLORS[rank]}`}>
-                <span className={`font-mint font-bold leading-none ${TEXT_SIZE[rank]}`}>{rank}</span>
+              <div className={`flex w-full flex-col items-center justify-center gap-1 rounded-[20px] ${HEIGHTS[rank]} ${COLORS[rank]}`}>
+                <span className={`font-mint font-extrabold leading-none ${TEXT_SIZE[rank]}`}>{rank}</span>
                 {entry.note ? <span className="text-[11px] font-semibold">{entry.note}</span> : null}
               </div>
             </div>

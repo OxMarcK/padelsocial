@@ -47,7 +47,7 @@ export function StandingsList({ rows }: { rows: StandingsRow[] }) {
   }, [rows.map((r) => r.teamId).join(",")]);
 
   return (
-    <div className="flex flex-col gap-1 rounded-[28px] bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+    <div className="flex flex-col gap-1 rounded-[28px] bg-white p-4 shadow-card">
       <div className="flex items-center justify-end gap-2 px-1 pb-1">
         <span className="w-10 flex-none text-right font-mint text-sm font-medium text-mint-ink-muted">Saldo</span>
         <span className="w-12 flex-none text-right font-mint text-sm font-medium text-mint-ink-muted">Punten</span>
@@ -58,7 +58,7 @@ export function StandingsList({ rows }: { rows: StandingsRow[] }) {
         return (
           <div
             key={row.teamId}
-            className="flex h-11 items-center gap-2 rounded-2xl px-2 text-mint-ink transition-[transform,background-color] duration-500 ease-[cubic-bezier(.2,.9,.2,1)]"
+            className="flex h-11 items-center gap-2 rounded-[14px] px-2 text-mint-ink transition-[transform,background-color] duration-500 ease-[cubic-bezier(.2,.9,.2,1)]"
             style={{
               transform: offset ? `translateY(${offset}px)` : undefined,
               backgroundColor: flashed ? "rgba(210,233,92,.35)" : "transparent",

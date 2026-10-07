@@ -9,9 +9,8 @@ import { buildMatchVideoRows } from "@/lib/match-video";
 import { buildTeamSlugMap, resolveTeamBySlugOrId } from "@/lib/team-slug";
 import { TeamResultCard } from "@/components/mint/team-result-card";
 import { MatchVideoSection } from "@/components/mint/match-video-list";
-import { Logo } from "@/components/logo";
 import { EventNav } from "@/components/mint/event-nav";
-import { EVENT_NAV_SPACER_CLASS } from "@/lib/event-nav-spacer";
+import { EventShell } from "@/components/mint/event-shell";
 
 export default async function TeamDetailPage({ params }: { params: { slug: string; teamId: string } }) {
   const event = await repo.getEventBySlug(params.slug);
@@ -67,17 +66,7 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
   );
 
   return (
-    <div
-      className={`min-h-screen font-mint text-mint-ink ${EVENT_NAV_SPACER_CLASS}`}
-      style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
-    >
-      <header className="sticky top-0 z-10 bg-white">
-        <div className="mx-auto flex max-w-md items-center justify-between gap-3 px-5 py-4">
-          <Logo variant="light" />
-          <h1 className="font-mint text-2xl font-bold text-mint-ink">Team</h1>
-        </div>
-      </header>
-      <main className="mx-auto flex max-w-md flex-col gap-6 px-5 py-8">
+    <EventShell title="Team" width="sm">
       <TeamResultCard
         slug={event.slug}
         teamId={team.id}
@@ -95,7 +84,7 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
 
       {pouleMatches.length > 0 && event.status !== "finished" ? (
         <section className="flex flex-col gap-2">
-          <h2 className="font-mint text-lg font-bold text-[#0E2318]">Poule Schema</h2>
+          <h2 className="font-mint text-lg font-extrabold tracking-tight text-mint-ink">Poule Schema</h2>
           <div className="flex flex-col gap-1.5">
             {pouleMatches.map((m) => {
               const opp = m.teamAId === team.id ? m.teamBId : m.teamAId;
@@ -103,12 +92,12 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
               const oppScore = m.teamAId === team.id ? m.scoreB : m.scoreA;
               const { startsAt, endsAt } = pouleRoundWindow(pouleWindow.startsAt, m.roundNumber, event.schedule.pouleChangeoverMinutes);
               return (
-                <div key={m.id} className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-sm shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+                <div key={m.id} className="flex items-center justify-between rounded-[14px] bg-white px-3 py-2 text-sm shadow-card">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-mint-ink-muted">
                       Ronde {m.roundNumber} · Baan {m.courtNumber} · {fmtTime(startsAt)}–{fmtTime(endsAt)}
                     </span>
-                    <span className="truncate text-mint-ink">
+                    <span className="truncate font-semibold text-mint-ink">
                       {team.name} vs {opp ? teamNameById[opp] ?? "?" : "?"}
                     </span>
                   </div>
@@ -123,7 +112,6 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
       <MatchVideoSection title="Wedstrijden" rows={videoRows} />
 
       <EventNav slug={event.slug} />
-      </main>
-    </div>
+    </EventShell>
   );
 }

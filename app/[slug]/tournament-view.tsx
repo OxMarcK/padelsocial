@@ -9,18 +9,17 @@ import { freePlayCourts } from "@/lib/bracket-engine";
 import { buildTeamSlugMap } from "@/lib/team-slug";
 import { computeTournamentStats, formatPodiumCaption } from "@/lib/tournament-stats";
 import type { Match, PadelEvent, Team } from "@/lib/types";
-import { Logo } from "@/components/logo";
 import { EventNav } from "@/components/mint/event-nav";
-import { EVENT_NAV_SPACER_CLASS } from "@/lib/event-nav-spacer";
 import { LivePoll } from "@/components/live-poll";
-// Design 6A trial (light "mint" palette) — see components/mint/. Only this page
-// has been redone; standen/teams/homepage still use the original components above.
 import { PhaseIndicator } from "@/components/mint/phase-indicator";
 import { PhaseTimeline } from "@/components/mint/phase-timeline";
 import { CourtCard } from "@/components/mint/court-card";
 import { StandingsList } from "@/components/mint/standings-list";
 import { Podium } from "@/components/mint/podium";
 import { MatchVideoSection } from "@/components/mint/match-video-list";
+import { EventShell } from "@/components/mint/event-shell";
+import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
 
 /** The tournament half of the /{slug} dispatcher (see app/[slug]/page.tsx) — takes
  * the already-looked-up event rather than re-fetching by slug, since the dispatcher
@@ -41,7 +40,7 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
       .filter((m) => m.phase === "poule" && m.roundNumber === 1)
       .sort((a, b) => a.courtNumber - b.courtNumber);
     return (
-      <Shell event={event} headerLabel="Live">
+      <Shell event={event}>
         <PhaseTimeline windows={windows} currentStatus={event.status} />
         <PhaseIndicator
           phaseLabel={indicator.phaseLabel}
@@ -56,23 +55,23 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
         />
         {firstRoundMatches.length > 0 ? (
           <div className="flex flex-col gap-2">
-            <h2 className="font-mint text-lg font-bold text-[#0E2318]">Zo beginnen we</h2>
+            <Heading size="sub">Zo beginnen we</Heading>
             <div className="flex flex-col gap-2">
               {firstRoundMatches.map((m) => (
-                <div key={m.id} className="rounded-[24px] bg-white p-4 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+                <Card key={m.id} className="p-4">
                   <div className="flex items-center justify-between text-xs font-bold">
                     <span className="text-mint-lime-ink">{m.label}</span>
                     <span className="text-mint-ink-muted">Baan {m.courtNumber}</span>
                   </div>
-                  <div className="mt-1 text-sm text-mint-ink">
+                  <div className="mt-1 text-base font-bold text-mint-ink">
                     {teamNameById[m.teamAId ?? ""] ?? "?"} vs {teamNameById[m.teamBId ?? ""] ?? "?"}
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           </div>
         ) : (
-          <p className="text-mint-ink-muted">Dit event wordt nog opgezet.</p>
+          <p className="font-medium text-mint-ink-muted">Dit event wordt nog opgezet.</p>
         )}
         <EventNav slug={event.slug} active="event" />
       </Shell>
@@ -104,7 +103,7 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
   const placementRanking = top8State ? top8State.placementSeeds.map((teamId, i) => ({ teamId, rank: 9 + i })) : [];
 
   return (
-    <Shell event={event} headerLabel="Live">
+    <Shell event={event}>
       <LivePoll />
       <PhaseTimeline windows={windows} currentStatus={event.status} />
       <PhaseIndicator
@@ -134,7 +133,7 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
 
       {showCourts ? (
         <div className="flex flex-col gap-4">
-          <h2 className="font-mint text-3xl font-bold text-[#0E2318]">Nu op de baan</h2>
+          <Heading>Nu op de baan</Heading>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {currentMatches
               .sort((a, b) => a.courtNumber - b.courtNumber)
@@ -156,14 +155,14 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
 
       {restingTeamIds.length > 0 ? (
         <div className="flex flex-col gap-2">
-          <h2 className="font-mint text-lg font-bold text-[#0E2318]">
-            Rust deze ronde <span className="text-sm font-normal text-mint-ink-muted">{restingTeamIds.length} teams</span>
-          </h2>
+          <Heading size="sub">
+            Rust deze ronde <span className="text-sm font-semibold tracking-normal text-mint-ink-muted">{restingTeamIds.length} teams</span>
+          </Heading>
           <div className="flex flex-wrap gap-2">
             {restingTeamIds.map((teamId) => (
               <span
                 key={teamId}
-                className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm text-mint-ink shadow-[0_1px_3px_rgba(20,35,28,.08)]"
+                className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-mint-ink shadow-pill"
               >
                 <span className="rounded-full bg-mint-net/60 px-1.5 py-0.5 font-mint text-[10px] font-bold text-white">RUST</span>
                 {teamNameById[teamId] ?? "?"}
@@ -175,7 +174,7 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
 
       {showCourts ? (
         <div className="flex flex-col gap-2">
-          <h2 className="font-mint text-2xl font-bold text-[#0E2318]">Live stand</h2>
+          <Heading>Live stand</Heading>
           <StandingsList
             rows={combinedRows.map((r) => ({
               teamId: r.teamId,
@@ -210,14 +209,14 @@ function RankingList({
   slug?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1 rounded-[24px] bg-white p-1 shadow-[0_1px_3px_rgba(20,35,28,.08)]">
+    <Card className="flex flex-col gap-1 p-1">
       {rows
         .sort((a, b) => a.rank - b.rank)
         .map((r) => {
           const row = (
-            <div className="flex items-center gap-3 rounded-2xl px-2 py-2.5">
+            <div className="flex items-center gap-3 rounded-[14px] px-2 py-2.5">
               <span
-                className={`flex h-9 w-9 flex-none items-center justify-center rounded-full font-mint text-lg font-bold tabular-nums ${
+                className={`flex h-9 w-9 flex-none items-center justify-center rounded-full font-mint text-lg font-extrabold tabular-nums ${
                   r.rank <= 3 ? "bg-mint-lime text-mint-lime-ink" : "bg-mint-lime/15 text-mint-ink-muted"
                 }`}
               >
@@ -234,42 +233,13 @@ function RankingList({
             <div key={r.teamId}>{row}</div>
           );
         })}
-    </div>
+    </Card>
   );
 }
 
-// Design 6A trial: light "mint" gradient background + Plus Jakarta Sans, applied only
-// to this page (see components/mint/ for the matching component restyles). The
-// gradient is painted directly on <main> — opaque and min-h-screen — so it fully
-// covers the dark noise texture from the root layout's <body> for this route.
-// Per the 6A canvas: the header sits on its own solid white bar — logo and title
-// aren't floating directly on the gradient — while everything else keeps the mint
-// background. Sticky so it stays put while scrolling, matching the reference.
-function Shell({
-  children,
-  event,
-  headerLabel,
-}: {
-  children: React.ReactNode;
-  event?: PadelEvent;
-  /** undefined -> falls back to event.name; null -> no title at all (e.g. the finished/Eindstand view). */
-  headerLabel?: string | null;
-}) {
-  const title = headerLabel === null ? null : headerLabel ?? event?.name;
-  return (
-    <div
-      className={`min-h-screen font-mint text-mint-ink ${EVENT_NAV_SPACER_CLASS}`}
-      style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
-    >
-      <header className="sticky top-0 z-10 bg-white">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-5 py-4">
-          <Logo variant="light" />
-          {title ? <h1 className="min-w-0 truncate font-mint text-2xl font-bold text-mint-ink">{title}</h1> : null}
-        </div>
-      </header>
-      <main className="mx-auto flex max-w-2xl flex-col gap-6 px-5 py-8">{children}</main>
-    </div>
-  );
+/** Header title per state: the event's name until it starts, "Live" while it runs, "Eindstand" after (passed explicitly). */
+function Shell({ children, event, headerLabel }: { children: React.ReactNode; event: PadelEvent; headerLabel?: string }) {
+  return <EventShell title={headerLabel ?? (event.status === "draft" ? event.name : "Live")}>{children}</EventShell>;
 }
 
 async function ResultsView({
@@ -300,8 +270,8 @@ async function ResultsView({
   return (
     <Shell event={event} headerLabel="Eindstand">
       <div>
-        <h2 className="font-mint text-4xl font-bold text-[#0E2318]">{event.name}</h2>
-        <p className="text-sm text-mint-ink-muted">
+        <Heading size="display">{event.name}</Heading>
+        <p className="mt-1 text-sm font-medium text-mint-ink-muted">
           {event.date} · {teams.length} teams
         </p>
       </div>
@@ -332,7 +302,7 @@ async function ResultsView({
         />
       </Section>
 
-      <p className="text-center text-xs text-mint-ink-muted">Tik op een team voor de kaart en de deelknop.</p>
+      <p className="text-center text-xs font-medium text-mint-ink-muted">Tik op een team voor de kaart en de deelknop.</p>
 
       <MatchVideoSection title="Video's" rows={videoRows} />
       <EventNav slug={event.slug} active="event" />
@@ -343,7 +313,7 @@ async function ResultsView({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="font-mint text-lg font-bold text-[#0E2318]">{title}</h2>
+      <Heading size="sub">{title}</Heading>
       {children}
     </section>
   );

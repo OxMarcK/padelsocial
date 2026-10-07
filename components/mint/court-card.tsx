@@ -35,14 +35,14 @@ export function CourtCard({ courtNumber, eyebrow, teamA, teamB, highlight, size 
   const scoreSize = size === "lg" ? "text-5xl" : "text-4xl";
 
   return (
-    <div className={`flex flex-col gap-4 rounded-[32px] bg-white p-5 shadow-[0_1px_3px_rgba(20,35,28,.08)] ${highlight ? "ring-2 ring-mint-lime" : ""}`}>
+    <div className={`flex flex-col gap-4 rounded-[28px] bg-white p-5 shadow-card ${highlight ? "ring-2 ring-mint-lime" : ""}`}>
       <div className="flex items-baseline gap-2 min-w-0">
-        <span className="font-mint text-2xl font-bold leading-none text-mint-ink">Baan {courtNumber}</span>
+        <span className="font-mint text-2xl font-extrabold leading-none tracking-tight text-mint-ink">Baan {courtNumber}</span>
         {!freePlay && eyebrow ? <span className="truncate font-mint text-sm font-medium text-mint-lime-ink">{eyebrow}</span> : null}
       </div>
-      <div className={`relative aspect-[2/1] w-full overflow-hidden rounded-[24px] ${freePlay ? "bg-mint-net/30" : "bg-glass-blue"}`}>
+      <div className={`relative aspect-[2/1] w-full overflow-hidden rounded-[20px] ${freePlay ? "bg-mint-net/30" : "bg-glass-blue"}`}>
         {/* Court outline — fully opaque white, inset with a visible blue margin around it. */}
-        <div className={`absolute inset-3 rounded-2xl border-2 border-white ${freePlay ? "opacity-40" : ""}`} />
+        <div className={`absolute inset-3 rounded-[14px] border-2 border-white ${freePlay ? "opacity-40" : ""}`} />
         {/* Net — full height, 100% opaque, same strength as the outline. */}
         <div className={`absolute inset-y-3 left-1/2 w-[2px] -translate-x-1/2 bg-white ${freePlay ? "opacity-40" : ""}`} />
         {/* Each of the 2 squares the net makes gets its own subtle vertical center line. */}
@@ -62,7 +62,7 @@ export function CourtCard({ courtNumber, eyebrow, teamA, teamB, highlight, size 
                   {team.name}
                 </div>
                 <div
-                  className={`font-mint font-bold leading-none tabular-nums ${scoreSize} ${
+                  className={`font-mint font-extrabold leading-none tabular-nums ${scoreSize} ${
                     team.winning ? "text-mint-lime" : "text-white"
                   }`}
                 >

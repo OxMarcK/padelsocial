@@ -20,14 +20,14 @@ export function PhaseTimeline({ windows, currentStatus }: { windows: PhaseWindow
         return (
           <div
             key={status}
-            className={`flex-none rounded-full px-4 py-2 shadow-[0_1px_3px_rgba(20,35,28,.08)] ${
+            className={`flex-none rounded-full px-4 py-2 shadow-pill ${
               isCurrent ? "bg-mint-lime" : "bg-white"
             }`}
           >
-            <div className={`font-mint text-sm font-bold ${isCurrent ? "text-[#0E2318]" : "text-mint-ink"}`}>
+            <div className={`font-mint text-sm font-bold ${"text-mint-ink"}`}>
               {PHASE_META[status].label}
             </div>
-            <div className={`text-xs ${isCurrent ? "text-[#0E2318]/70" : "text-mint-ink-muted"}`}>{timeText}</div>
+            <div className={`text-xs ${isCurrent ? "text-mint-ink/70" : "text-mint-ink-muted"}`}>{timeText}</div>
           </div>
         );
       })}
