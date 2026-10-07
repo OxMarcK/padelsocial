@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { repo } from "@/lib/data";
 import { groupStandingsByPoule } from "@/lib/standings";
 import { phaseIndicatorData } from "@/lib/schedule";
-import { generatePouleSchedule } from "@/lib/poule-scheduler";
+import { generatePouleSchedule, playedCourts } from "@/lib/poule-scheduler";
 import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
 import { freePlayCourts } from "@/lib/bracket-engine";
 import { TvView } from "./tv-view";
@@ -23,7 +23,7 @@ export default async function TvPage({ params }: { params: { slug: string } }) {
       ? matches.filter((m) => m.phase === "poule" && m.roundNumber === event.currentPouleRound)
       : matches.filter((m) => m.phase !== "poule" && m.roundNumber === bracketRound)
     : [];
-  const freeCourts = bracketRound ? freePlayCourts(bracketRound, event.courts) : [];
+  const freeCourts = bracketRound ? freePlayCourts(bracketRound, event.courts, playedCourts(schedule, event.courts)) : [];
   const restingTeamNames =
     event.status === "poulefase"
       ? poules.flatMap((p) => schedule.restingTeamIds(event.currentPouleRound, p.label)).map((id) => teamNameById[id] ?? "?")

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import { getEventCached } from "@/lib/data/cached";
-import { generatePouleSchedule } from "@/lib/poule-scheduler";
+import { generatePouleSchedule, hasBackToBack } from "@/lib/poule-scheduler";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, SaveButton } from "@/components/admin/action-form";
 import { Section } from "@/components/admin/section";
@@ -122,8 +122,10 @@ export default async function AdminEventTeamsPage({ params }: { params: { id: st
 
         {schedulePreview ? (
           <p className="mb-2 text-xs text-mint-ink-muted">
-            {schedulePreview.matches.length} wedstrijden over {schedulePreview.roundsCount} rondes (5 banen elke
-            ronde vol — zie lib/poule-scheduler.ts voor waarom dit er {schedulePreview.roundsCount} zijn, niet 5).
+            {schedulePreview.matches.length} wedstrijden over {schedulePreview.roundsCount} rondes.{" "}
+            {hasBackToBack(schedulePreview.matches)
+              ? "Sommige teams spelen twee rondes achter elkaar."
+              : "Geen enkel team speelt twee rondes achter elkaar."}
           </p>
         ) : (
           <p className="mb-2 text-xs text-mint-ink-muted">Verdeel eerst de teams over de poules.</p>

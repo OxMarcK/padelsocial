@@ -2,7 +2,7 @@ import Link from "next/link";
 import { repo } from "@/lib/data";
 import { groupStandingsByPoule } from "@/lib/standings";
 import { computeSchedule, phaseIndicatorData, type PhaseWindow } from "@/lib/schedule";
-import { generatePouleSchedule } from "@/lib/poule-scheduler";
+import { generatePouleSchedule, playedCourts } from "@/lib/poule-scheduler";
 import { top8RankingFromMatches } from "@/lib/ranking-from-matches";
 import { buildMatchVideoRows } from "@/lib/match-video";
 import { freePlayCourts } from "@/lib/bracket-engine";
@@ -85,7 +85,7 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
       ? matches.filter((m) => m.phase === "poule" && m.roundNumber === event.currentPouleRound)
       : matches.filter((m) => m.phase !== "poule" && m.roundNumber === bracketRound)
     : [];
-  const freeCourts = bracketRound ? freePlayCourts(bracketRound, event.courts) : [];
+  const freeCourts = bracketRound ? freePlayCourts(bracketRound, event.courts, playedCourts(schedule, event.courts)) : [];
   const restingTeamIds =
     event.status === "poulefase" ? poules.flatMap((p) => schedule.restingTeamIds(event.currentPouleRound, p.label)) : [];
 

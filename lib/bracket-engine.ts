@@ -68,10 +68,17 @@ export const BRACKET_ROUND_COURTS: Record<1 | 2 | 3, number[]> = {
   3: [4, 5],
 };
 
-/** The courts in a bracket round with no tracked match — for rendering "Vrij te spelen" placeholders. */
-export function freePlayCourts(round: 1 | 2 | 3, totalCourts: number): number[] {
+/**
+ * The courts in a bracket round with no tracked match — for rendering "Vrij
+ * te spelen" placeholders. `bookedCourts` narrows that to courts the event
+ * actually has: when the poulefase never used a court (e.g. baan 1 isn't
+ * booked and the alternating poule schedule runs on 2-5), offering it for
+ * free play would send players onto someone else's court.
+ */
+export function freePlayCourts(round: 1 | 2 | 3, totalCourts: number, bookedCourts?: number[]): number[] {
   const tracked = new Set(BRACKET_ROUND_COURTS[round]);
-  return Array.from({ length: totalCourts }, (_, i) => i + 1).filter((c) => !tracked.has(c));
+  const booked = bookedCourts && bookedCourts.length > 0 ? new Set(bookedCourts) : null;
+  return Array.from({ length: totalCourts }, (_, i) => i + 1).filter((c) => !tracked.has(c) && (!booked || booked.has(c)));
 }
 
 export interface MatchResult {

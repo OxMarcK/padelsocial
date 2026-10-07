@@ -86,12 +86,11 @@ interface PouleQueueState {
 }
 
 /**
- * Packs each poule's internal round robin onto `courts` shared courts,
- * filling every court every wall-clock round whenever matches are ready for
- * it. A poule's own matches are only ever drawn in internal-round order (so
- * two matches sharing a wall-clock round always come from the same internal
- * round and are guaranteed to be team-disjoint) — this guarantees no team is
- * ever double-booked within a round, for any number of poules/courts.
+ * Picks the poule schedule for the event. Default is packPouleSchedule (every
+ * court full every round). When that leaves teams playing back-to-back and
+ * alternatingPouleSchedule fits in at most one extra round, the alternating
+ * schedule wins instead: the organizer's rule is no back-to-backs, and one
+ * extra 20-minute round is the accepted price for it.
  */
 export function generatePouleSchedule(
   poules: PouleInput[],
@@ -99,6 +98,110 @@ export function generatePouleSchedule(
 ): PouleScheduleResult {
   if (courts < 1) throw new Error("courts must be >= 1");
 
+  const packed = packPouleSchedule(poules, courts);
+  const alternating = alternatingPouleSchedule(poules, courts);
+  if (
+    alternating &&
+    hasBackToBack(packed.matches) &&
+    alternating.roundsCount <= packed.roundsCount + 1
+  ) {
+    return alternating;
+  }
+  return packed;
+}
+
+/**
+ * The baannummers the event actually plays on, read off the poule schedule:
+ * 1..totalCourts normally, but 2-5 when the alternating schedule leaves baan
+ * 1 idle all poulefase (it isn't booked). Falls back to 1..totalCourts before
+ * poules exist.
+ */
+export function playedCourts(result: PouleScheduleResult, totalCourts: number): number[] {
+  const used = [...new Set(result.matches.map((m) => m.court))].sort((a, b) => a - b);
+  return used.length > 0 ? used : Array.from({ length: totalCourts }, (_, i) => i + 1);
+}
+
+/** True if any team plays in two consecutive wall-clock rounds. */
+export function hasBackToBack(matches: ScheduledPouleMatch[]): boolean {
+  const roundsByTeam = new Map<string, Set<number>>();
+  for (const m of matches) {
+    for (const id of [m.teamAId, m.teamBId]) {
+      const rounds = roundsByTeam.get(id) ?? new Set<number>();
+      if (rounds.has(m.round - 1) || rounds.has(m.round + 1)) return true;
+      rounds.add(m.round);
+      roundsByTeam.set(id, rounds);
+    }
+  }
+  return false;
+}
+
+/**
+ * Splits the poules into two halves that take turns: the first half plays
+ * wall-clock rounds 1, 3, 5, ..., the second half 2, 4, 6, ... — so no team
+ * ever plays two rounds in a row. Each poule plays one of its own
+ * round-robin rounds per turn. Costs at most one extra round over packing
+ * every court (e.g. 4 poules of 4: 6 rounds instead of 5), which
+ * generatePouleSchedule accepts in exchange for zero back-to-backs.
+ *
+ * Only `matchesPerRound` of the courts are used each round, taken from the
+ * top (court `courts` downwards), so the idle court is baan 1 — the same
+ * "worst court sits idle" convention as BRACKET_DEFINITION's kwartfinales.
+ *
+ * Returns null when the shape doesn't fit: fewer than 2 poules, the two
+ * halves needing a different number of turns (the longer half would then
+ * play back-to-back at the end), or a half needing more courts than exist.
+ */
+export function alternatingPouleSchedule(
+  poules: PouleInput[],
+  courts: number
+): PouleScheduleResult | null {
+  if (poules.length < 2) return null;
+  const half = Math.ceil(poules.length / 2);
+  const groups = [poules.slice(0, half), poules.slice(half)];
+  const groupRounds = groups.map((g) => g.map((p) => roundRobinRounds(p.teamIds)));
+  const turns = groupRounds.map((g) => Math.max(0, ...g.map((rounds) => rounds.length)));
+  if (turns[0] !== turns[1] || turns[0] === 0) return null;
+
+  const matches: ScheduledPouleMatch[] = [];
+  const resting = new Map<string, string[]>();
+  const roundsCount = turns[0]! * 2;
+
+  for (let round = 1; round <= roundsCount; round++) {
+    const groupIndex = (round - 1) % 2;
+    const turn = Math.floor((round - 1) / 2);
+    const group = groups[groupIndex]!;
+    const roundPairs = group.flatMap((p, i) =>
+      (groupRounds[groupIndex]![i]![turn]?.pairs ?? []).map((pair) => ({ poule: p, pair }))
+    );
+    if (roundPairs.length > courts) return null;
+
+    const firstCourt = courts - roundPairs.length + 1;
+    roundPairs.forEach(({ poule, pair: [teamAId, teamBId] }, i) => {
+      matches.push({ round, pouleRound: turn + 1, court: firstCourt + i, pouleLabel: poule.label, teamAId, teamBId });
+    });
+
+    for (const p of poules) {
+      const busy = new Set(matches.filter((m) => m.round === round && m.pouleLabel === p.label).flatMap((m) => [m.teamAId, m.teamBId]));
+      resting.set(`${round}|${p.label}`, p.teamIds.filter((id) => !busy.has(id)));
+    }
+  }
+
+  return {
+    matches,
+    roundsCount,
+    restingTeamIds: (r, pouleLabel) => resting.get(`${r}|${pouleLabel}`) ?? [],
+  };
+}
+
+/**
+ * Packs each poule's internal round robin onto `courts` shared courts,
+ * filling every court every wall-clock round whenever matches are ready for
+ * it. A poule's own matches are only ever drawn in internal-round order (so
+ * two matches sharing a wall-clock round always come from the same internal
+ * round and are guaranteed to be team-disjoint) — this guarantees no team is
+ * ever double-booked within a round, for any number of poules/courts.
+ */
+function packPouleSchedule(poules: PouleInput[], courts: number): PouleScheduleResult {
   const queues: PouleQueueState[] = poules.map((p) => ({
     label: p.label,
     teamIds: p.teamIds,
