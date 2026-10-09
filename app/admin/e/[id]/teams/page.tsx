@@ -4,7 +4,7 @@ import { repo } from "@/lib/data";
 import { getEventCached } from "@/lib/data/cached";
 import { defaultPouleCount, generatePouleSchedule, hasBackToBack } from "@/lib/poule-scheduler";
 import { ConfirmButton } from "@/components/admin/confirm-button";
-import { ActionForm, SaveButton } from "@/components/admin/action-form";
+import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
 import { Section } from "@/components/admin/section";
 import { addTeamsBulk, deleteTeam, publishPouleMatches, randomizePoules, renameTeam, savePoulesManual, updatePoints } from "../actions";
 
@@ -96,6 +96,7 @@ export default async function AdminEventTeamsPage({ params }: { params: { id: st
           <div className="mt-2 flex gap-2">
             <SaveButton label="Opslaan verdeling" />
           </div>
+          <ActionFormError />
         </ActionForm>
         <ActionForm action={randomizePoules.bind(null, event.id)} className="mt-2 flex items-end gap-2">
           <label className="flex flex-col gap-1 text-xs">
@@ -109,6 +110,7 @@ export default async function AdminEventTeamsPage({ params }: { params: { id: st
             />
           </label>
           <SaveButton variant="ghost" label="Willekeurig verdelen" savedLabel="Verdeeld" />
+          <ActionFormError />
         </ActionForm>
       </Section>
 
