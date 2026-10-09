@@ -107,17 +107,20 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
     <Shell event={event}>
       <LivePoll />
       <PhaseTimeline windows={windows} currentStatus={event.status} />
-      <PhaseIndicator
-        phaseLabel={indicator.phaseLabel}
-        subLabel={indicator.subLabel}
-        timeWindowText={indicator.timeWindowText}
-        nextLine={indicator.nextLine}
-        kind={indicator.kind}
-        countdownText={indicator.countdownText}
-        progress={indicator.progress}
-        countdownStartsAt={indicator.countdownStartsAt}
-        countdownEndsAt={indicator.countdownEndsAt}
-      />
+      {/* Bij de prijsuitreiking zegt het podium alles al; de fasekaart erboven is dan alleen ruis. */}
+      {showPodium ? null : (
+        <PhaseIndicator
+          phaseLabel={indicator.phaseLabel}
+          subLabel={indicator.subLabel}
+          timeWindowText={indicator.timeWindowText}
+          nextLine={indicator.nextLine}
+          kind={indicator.kind}
+          countdownText={indicator.countdownText}
+          progress={indicator.progress}
+          countdownStartsAt={indicator.countdownStartsAt}
+          countdownEndsAt={indicator.countdownEndsAt}
+        />
+      )}
 
       {showPodium ? (
         <div className="flex flex-col gap-6">
