@@ -11,6 +11,8 @@ import { TeamResultCard } from "@/components/mint/team-result-card";
 import { MatchVideoSection } from "@/components/mint/match-video-list";
 import { EventNav } from "@/components/mint/event-nav";
 import { EventShell } from "@/components/mint/event-shell";
+import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
 
 export default async function TeamDetailPage({ params }: { params: { slug: string; teamId: string } }) {
   const event = await repo.getEventBySlug(params.slug);
@@ -84,32 +86,44 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
 
       {pouleMatches.length > 0 && event.status !== "finished" ? (
         <section className="flex flex-col gap-2">
-          <h2 className="font-mint text-lg font-extrabold tracking-tight text-mint-ink">Poule Schema</h2>
-          <div className="flex flex-col gap-1.5">
+          <Heading>Poulewedstrijden</Heading>
+          <div className="flex flex-col gap-2">
             {pouleMatches.map((m) => {
               const opp = m.teamAId === team.id ? m.teamBId : m.teamAId;
               const myScore = m.teamAId === team.id ? m.scoreA : m.scoreB;
               const oppScore = m.teamAId === team.id ? m.scoreB : m.scoreA;
+              const played = myScore !== null && oppScore !== null;
               const { startsAt, endsAt } = pouleRoundWindow(pouleWindow.startsAt, m.roundNumber, event.schedule.pouleChangeoverMinutes);
               return (
-                <div key={m.id} className="flex items-center justify-between rounded-[14px] bg-white px-3 py-2 text-sm shadow-card">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-xs text-mint-ink-muted">
-                      Ronde {m.roundNumber} · Baan {m.courtNumber} · {fmtTime(startsAt)}–{fmtTime(endsAt)}
-                    </span>
-                    <span className="truncate font-semibold text-mint-ink">
-                      {team.name} vs {opp ? teamNameById[opp] ?? "?" : "?"}
-                    </span>
+                <Card key={m.id} className="flex items-center gap-3 p-4">
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <div className="flex items-center gap-2 text-xs font-bold">
+                      <span className="text-mint-lime-ink">
+                        Ronde {m.roundNumber} · Baan {m.courtNumber}
+                      </span>
+                      <span className="tabular-nums text-mint-ink-muted">
+                        {fmtTime(startsAt)}–{fmtTime(endsAt)}
+                      </span>
+                    </div>
+                    <div className="truncate text-base font-bold text-mint-ink">
+                      <span className="font-semibold text-mint-ink-muted">vs</span> {opp ? teamNameById[opp] ?? "?" : "?"}
+                    </div>
                   </div>
-                  <span className="tabular-nums text-mint-ink-muted">{myScore !== null ? `${myScore}-${oppScore}` : "–"}</span>
-                </div>
+                  <span
+                    className={`flex-none font-mint text-2xl font-extrabold tabular-nums ${
+                      played && myScore! > oppScore! ? "text-mint-lime-ink" : played ? "text-mint-ink" : "text-mint-ink-muted"
+                    }`}
+                  >
+                    {played ? `${myScore}-${oppScore}` : "–"}
+                  </span>
+                </Card>
               );
             })}
           </div>
         </section>
       ) : null}
 
-      <MatchVideoSection title="Wedstrijden" rows={videoRows} />
+      <MatchVideoSection title="Video's" rows={videoRows} size="section" />
 
       <EventNav slug={event.slug} />
     </EventShell>
