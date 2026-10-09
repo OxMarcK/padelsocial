@@ -8,6 +8,7 @@ import type { NewTeamInput } from "@/lib/data/repo";
 import type { EventStatus } from "@/lib/types";
 import { normalizeSlug, assertValidSlug } from "@/lib/slug";
 import { isSlugTaken } from "@/lib/slug-registry";
+import { defaultPouleCount } from "@/lib/poule-scheduler";
 
 function path(eventId: string) {
   return `/admin/e/${eventId}`;
@@ -192,7 +193,7 @@ export async function randomizePoules(eventId: string, formData: FormData) {
   await requireAdmin();
   const teams = await repo.listTeams(eventId);
   const requested = Number(formData.get("pouleCount"));
-  const pouleCount = Math.max(1, Math.round(requested > 0 ? requested : teams.length / 5) || 1);
+  const pouleCount = requested > 0 ? Math.round(requested) : defaultPouleCount(teams.length);
   const shuffled = [...teams].sort(() => Math.random() - 0.5);
   const assignment: Record<string, string[]> = {};
   for (let i = 0; i < pouleCount; i++) assignment[labelFor(i)] = [];

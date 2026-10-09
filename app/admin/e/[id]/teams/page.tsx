@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import { getEventCached } from "@/lib/data/cached";
-import { generatePouleSchedule, hasBackToBack } from "@/lib/poule-scheduler";
+import { defaultPouleCount, generatePouleSchedule, hasBackToBack } from "@/lib/poule-scheduler";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, SaveButton } from "@/components/admin/action-form";
 import { Section } from "@/components/admin/section";
@@ -70,7 +70,7 @@ export default async function AdminEventTeamsPage({ params }: { params: { id: st
         ) : null}
       </Section>
 
-      <Section title="Poules" subtitle="Verdeel de teams over poules — 5 teams per poule, zoveel poules als je nodig hebt">
+      <Section title="Poules" subtitle="Verdeel de teams over poules: kies het aantal poules, dan worden de teams zo gelijk mogelijk verdeeld.">
         <ActionForm action={savePoulesManual.bind(null, event.id)} className="flex flex-col gap-2">
           {teams.map((t) => {
             const current = poules.find((p) => p.teamIds.includes(t.id))?.label ?? "";
@@ -104,11 +104,11 @@ export default async function AdminEventTeamsPage({ params }: { params: { id: st
               type="number"
               name="pouleCount"
               min={1}
-              defaultValue={Math.max(1, Math.round(teams.length / 5) || 1)}
+              defaultValue={defaultPouleCount(teams.length)}
               className="h-9 w-20 rounded-lg border border-mint-net/25 bg-white px-2 text-[#0E2318]"
             />
           </label>
-          <SaveButton variant="ghost" label="Willekeurig verdelen (5 per poule)" savedLabel="Verdeeld" />
+          <SaveButton variant="ghost" label="Willekeurig verdelen" savedLabel="Verdeeld" />
         </ActionForm>
       </Section>
 

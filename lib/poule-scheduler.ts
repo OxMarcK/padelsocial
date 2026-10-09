@@ -86,6 +86,16 @@ interface PouleQueueState {
 }
 
 /**
+ * Suggested number of poules for `teamCount` teams: poules of 4 when the
+ * teams divide evenly into them (16 teams -> 4 poules), otherwise poules of
+ * about 5 (20 -> 5, 15 -> 3).
+ */
+export function defaultPouleCount(teamCount: number): number {
+  if (teamCount >= 8 && teamCount % 4 === 0) return teamCount / 4;
+  return Math.max(1, Math.round(teamCount / 5));
+}
+
+/**
  * Picks the poule schedule for the event. Default is packPouleSchedule (every
  * court full every round). When that leaves teams playing back-to-back and
  * alternatingPouleSchedule fits in at most one extra round, the alternating
