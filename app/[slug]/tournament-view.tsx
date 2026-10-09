@@ -20,6 +20,7 @@ import { MatchVideoSection } from "@/components/mint/match-video-list";
 import { EventShell } from "@/components/mint/event-shell";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
+import { fmtDateLong } from "@/lib/share-metadata";
 
 /** The tournament half of the /{slug} dispatcher (see app/[slug]/page.tsx) — takes
  * the already-looked-up event rather than re-fetching by slug, since the dispatcher
@@ -272,7 +273,7 @@ async function ResultsView({
       <div>
         <Heading size="display">{event.name}</Heading>
         <p className="mt-1 text-sm font-medium text-mint-ink-muted">
-          {event.date} · {teams.length} teams
+          {fmtDateLong(event.date)} · {teams.length} teams
         </p>
       </div>
 

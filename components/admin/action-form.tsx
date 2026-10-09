@@ -26,7 +26,9 @@ export function ActionForm({
   children,
   resetOnSuccess = false,
 }: {
-  action: (formData: FormData) => Promise<void>;
+  /** May return `{ error }` instead of throwing: production builds replace a
+   *  thrown Server Action error with a generic message, a returned one survives. */
+  action: (formData: FormData) => Promise<void | { error: string }>;
   className?: string;
   children: ReactNode;
   resetOnSuccess?: boolean;
@@ -42,7 +44,11 @@ export function ActionForm({
     setError(null);
     startTransition(async () => {
       try {
-        await action(formData);
+        const result = await action(formData);
+        if (result && "error" in result) {
+          setError(result.error);
+          return;
+        }
         setSaved(true);
         setTimeout(() => setSaved(false), 2200);
         if (resetOnSuccess) formRef.current?.reset();

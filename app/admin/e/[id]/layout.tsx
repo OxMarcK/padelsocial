@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/require-admin";
 import { getEventCached } from "@/lib/data/cached";
 import { AdminNav } from "@/components/admin/admin-nav";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { fmtDateLong } from "@/lib/share-metadata";
 
 /**
  * Shared chrome for the three event-admin routes (Scores, Teams & poules, Instellingen)
@@ -26,7 +27,7 @@ export default async function AdminEventLayout({
       <div>
         <h1 className="font-mint text-4xl font-extrabold tracking-tight text-[#0E2318]">{event.name}</h1>
         <p className="text-sm text-mint-ink-muted">
-          {event.date} · {event.location} · {event.courts} banen
+          {fmtDateLong(event.date)} · {event.location} · {event.courts} banen
         </p>
       </div>
 
