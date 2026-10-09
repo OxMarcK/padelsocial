@@ -147,6 +147,7 @@ export const mockRepo: DataRepo = {
         pauzeAfterHalveFinaleMinutes: 3,
       },
       currentPouleRound: 1,
+      hidden: input.hidden ?? false,
       createdAt: new Date().toISOString(),
     };
     store.events.set(event.id, event);

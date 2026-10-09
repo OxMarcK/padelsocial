@@ -38,6 +38,7 @@ function mapEvent(row: any): PadelEvent {
       pauzeAfterHalveFinaleMinutes: row.pauze_after_halve_finale_minutes,
     },
     currentPouleRound: row.current_poule_round,
+    hidden: row.hidden ?? false,
     createdAt: row.created_at,
   };
 }
@@ -198,6 +199,9 @@ export const supabaseRepo: DataRepo = {
         location: input.location,
         courts: input.courts,
         cover_url: input.coverUrl,
+        // Only sent when set, so creating a visible event keeps working before
+        // migration 0012 has run.
+        ...(input.hidden ? { hidden: true } : {}),
       })
       .select()
       .single();
@@ -215,6 +219,7 @@ export const supabaseRepo: DataRepo = {
     if (patch.location !== undefined) update.location = patch.location;
     if (patch.courts !== undefined) update.courts = patch.courts;
     if (patch.coverUrl !== undefined) update.cover_url = patch.coverUrl;
+    if (patch.hidden !== undefined) update.hidden = patch.hidden;
     if (patch.pointsWin !== undefined) update.points_win = patch.pointsWin;
     if (patch.pointsDraw !== undefined) update.points_draw = patch.pointsDraw;
     if (patch.pointsLoss !== undefined) update.points_loss = patch.pointsLoss;

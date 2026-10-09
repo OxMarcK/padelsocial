@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { getEventCached } from "@/lib/data/cached";
-import { Field } from "@/components/ui/field";
+import { CheckboxField, Field } from "@/components/ui/field";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
 import { Section } from "@/components/admin/section";
@@ -41,6 +41,7 @@ export default async function AdminEventSettingsPage({ params }: { params: { id:
           </div>
           <Field label="Locatie" name="location" defaultValue={event.location} required />
           <Field label="Aantal banen" name="courts" type="number" defaultValue={event.courts} required />
+          <CheckboxField label="Verbergen op de agenda" name="hidden" defaultChecked={event.hidden} hint="Het event staat dan niet op de agenda, maar de link werkt wel." />
           <ActionFormError />
           <SaveButton />
         </ActionForm>

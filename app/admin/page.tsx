@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/require-admin";
 import { repo } from "@/lib/data";
 import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/field";
+import { CheckboxField, Field } from "@/components/ui/field";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { DetailsCard } from "@/components/admin/details-card";
 import { DayBadge } from "@/components/day-badge";
@@ -30,6 +30,7 @@ async function createEvent(formData: FormData) {
     location: String(formData.get("location") ?? ""),
     courts: Number(formData.get("courts") ?? 5),
     coverUrl: null,
+    hidden: formData.get("hidden") === "on",
   });
   revalidatePath("/");
   redirect(`/admin/e/${event.id}`);
@@ -55,6 +56,11 @@ function EventRow({ event }: { event: PadelEvent }) {
           {badge ? (
             <span className={`flex-none rounded-full px-2.5 py-1 font-mint text-xs font-bold ${badge.className}`}>
               {badge.label}
+            </span>
+          ) : null}
+          {event.hidden ? (
+            <span className="flex-none rounded-full bg-mint-net/15 px-2.5 py-1 font-mint text-xs font-bold text-mint-ink-muted">
+              Verborgen
             </span>
           ) : null}
         </span>
@@ -96,6 +102,7 @@ export default async function AdminHomePage() {
             </div>
             <Field label="Locatie" name="location" required placeholder="Rotterdam" />
             <Field label="Aantal banen" name="courts" type="number" defaultValue={5} required />
+            <CheckboxField label="Verbergen op de agenda" name="hidden" hint="Het event staat dan niet op de agenda, maar de link werkt wel." />
             <Button type="submit" fullWidth>
               Event aanmaken
             </Button>

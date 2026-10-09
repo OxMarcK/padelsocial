@@ -65,7 +65,7 @@ export default async function LandingPage() {
     withFallback(agendaLinksRepo.listAgendaLinks(), [], "listAgendaLinks"),
   ]);
   const upcoming = events.find(isUpcomingPublicEvent) ?? null;
-  const past = events.filter((e) => e.status === "finished");
+  const past = events.filter((e) => !e.hidden && e.status === "finished");
   const upcomingSessions = sessions.filter(isUpcomingPublicSession).sort((a, b) => a.date.localeCompare(b.date));
   const pastSessions = sessions.filter(isPastPublicSession);
   const upcomingAgendaLinks = agendaLinks.filter((l) => !isPastDate(l.date));

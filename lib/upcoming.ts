@@ -40,7 +40,7 @@ export function isPastDate(date: string): boolean {
  * people were arriving and looking for it).
  */
 export function isUpcomingPublicEvent(e: PadelEvent): boolean {
-  return e.status !== "finished";
+  return !e.hidden && e.status !== "finished";
 }
 
 /**
