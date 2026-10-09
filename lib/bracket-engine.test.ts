@@ -224,6 +224,27 @@ describe("resolveTop8 — same-poule kwartfinale avoidance (regression: two poul
   });
 });
 
+describe("resolveTop8 — same-poule teams in opposite bracket halves", () => {
+  // 4 poules of 4: natural order B1,D1,A1,C1,B2,D2,A2,C2 has no same-poule KF
+  // pair, but puts B1/B2 and C1/C2 in the KF1+KF2 half, so they could meet
+  // again in HF1.
+  const poules: PouleStandingsInput[] = [
+    { label: "A", rows: [row("A1", 9, 10), row("A2", 6, 5), row("A3", 3, -5), row("A4", 0, -10)] },
+    { label: "B", rows: [row("B1", 9, 20), row("B2", 6, 15), row("B3", 3, -15), row("B4", 0, -20)] },
+    { label: "C", rows: [row("C1", 9, 8), row("C2", 6, 3), row("C3", 3, -3), row("C4", 0, -8)] },
+    { label: "D", rows: [row("D1", 9, 18), row("D2", 6, 12), row("D3", 3, -12), row("D4", 0, -18)] },
+  ];
+
+  it("can only meet again in the finale or troostfinale", () => {
+    const { top8 } = resolveTop8(poules);
+    const halfOf = (seedSlot: number) => (KWARTFINALE_SEED_PAIRS.findIndex((pair) => pair.includes(seedSlot)) < 2 ? 0 : 1);
+    for (const label of ["A", "B", "C", "D"]) {
+      expect(halfOf(top8.seeds.indexOf(`${label}1`))).not.toBe(halfOf(top8.seeds.indexOf(`${label}2`)));
+    }
+    expect(top8.seeds[0]).toBe("B1"); // the best team keeps seed 1
+  });
+});
+
 describe("resolveTop8 — poule-count-agnostic qualification", () => {
   it("with exactly 4 poules, all 8 winners+runners-up qualify and no 3rd place is needed", () => {
     const poules: PouleStandingsInput[] = ["A", "B", "C", "D"].map((label, i) => ({

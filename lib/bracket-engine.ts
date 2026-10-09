@@ -196,8 +196,13 @@ export const KWARTFINALE_SEED_PAIRS: Array<[number, number]> = [
  * round. This isn't a preference toggle: no organizer wants a rematch that
  * poulefase already decided, so it's just correct default behavior.
  *
+ * Second priority: keep two teams from the same poule in opposite halves of
+ * the bracket (KF1+KF2 feed HF1, KF3+KF4 feed HF2), so they can't meet in a
+ * halve finale either — only in the finale or troostfinale.
+ *
  * Branch-and-bound search over the 8! slot assignments, minimizing (in
- * priority order) the number of same-poule kwartfinale pairs, then the total
+ * priority order) the number of same-poule kwartfinale pairs, then the
+ * number of same-poule pairs within one bracket half, then the total
  * displacement from the natural rank order (so the fix disturbs the fair
  * ranking as little as possible — normally just one local swap). Falls back
  * to the least-bad assignment if a fully clash-free one is impossible (e.g.
@@ -213,16 +218,27 @@ function avoidSamePouleKwartfinales(ranked: string[], pouleOfTeam: Map<string, P
     partnerOfSlot.set(b, a);
   }
 
+  const halfOfSlot = new Map<number, number>();
+  KWARTFINALE_SEED_PAIRS.forEach(([a, b], kf) => {
+    halfOfSlot.set(a, kf < 2 ? 0 : 1);
+    halfOfSlot.set(b, kf < 2 ? 0 : 1);
+  });
+
   const used = new Array<boolean>(n).fill(false);
   const assignment = new Array<string | null>(n).fill(null);
-  let best: { assignment: string[]; collisions: number; displacement: number } | null = null;
+  let best: { assignment: string[]; collisions: number; halfClashes: number; displacement: number } | null = null;
 
-  function search(slot: number, collisions: number, displacement: number) {
-    if (best && (collisions > best.collisions || (collisions === best.collisions && displacement >= best.displacement))) {
+  function search(slot: number, collisions: number, halfClashes: number, displacement: number) {
+    if (
+      best &&
+      (collisions > best.collisions ||
+        (collisions === best.collisions &&
+          (halfClashes > best.halfClashes || (halfClashes === best.halfClashes && displacement >= best.displacement))))
+    ) {
       return; // can only get worse or equal-and-no-better from here — prune
     }
     if (slot === n) {
-      best = { assignment: assignment.slice() as string[], collisions, displacement };
+      best = { assignment: assignment.slice() as string[], collisions, halfClashes, displacement };
       return;
     }
     for (let i = 0; i < n; i++) {
@@ -232,13 +248,19 @@ function avoidSamePouleKwartfinales(ranked: string[], pouleOfTeam: Map<string, P
       const partner = partnerOfSlot.get(slot);
       const clashesWithPartner =
         partner !== undefined && partner < slot && pouleOfTeam.get(assignment[partner]!) === pouleOfTeam.get(ranked[i]!);
-      search(slot + 1, collisions + (clashesWithPartner ? 1 : 0), displacement + Math.abs(slot - i));
+      let sameHalf = 0;
+      for (let earlier = 0; earlier < slot; earlier++) {
+        if (halfOfSlot.get(earlier) === halfOfSlot.get(slot) && pouleOfTeam.get(assignment[earlier]!) === pouleOfTeam.get(ranked[i]!)) {
+          sameHalf++;
+        }
+      }
+      search(slot + 1, collisions + (clashesWithPartner ? 1 : 0), halfClashes + sameHalf, displacement + Math.abs(slot - i));
       used[i] = false;
       assignment[slot] = null;
     }
   }
 
-  search(0, 0, 0);
+  search(0, 0, 0, 0);
   return best!.assignment;
 }
 
