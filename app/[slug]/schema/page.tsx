@@ -5,6 +5,7 @@ import { computeSchedule, pouleRoundWindow, fmtTime } from "@/lib/schedule";
 import { PHASE_META } from "@/lib/phases";
 import { BRACKET_DEFINITION, resolveBracketMatches, type ResolvedBracketMatch, type TeamSource } from "@/lib/bracket-engine";
 import { Logo } from "@/components/logo";
+import { fmtDateLong } from "@/lib/share-metadata";
 
 /** Before the top-8 is published/played, a slot can only describe the *rule* that decides it. */
 function describeSource(source: TeamSource): string {
@@ -66,7 +67,7 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
         <div>
           <div className="font-mint text-5xl font-extrabold leading-none tracking-tight text-mint-ink">{event.name}</div>
           <div className="mt-1.5 text-xl text-mint-ink-muted">
-            {event.date} · {event.startTime} · {event.location}
+            {fmtDateLong(event.date)} · {event.startTime} · {event.location}
           </div>
         </div>
       </header>

@@ -14,6 +14,18 @@ function path(eventId: string) {
   return `/admin/e/${eventId}`;
 }
 
+/** Runs a Server Action body and hands its error message back to ActionForm
+ * as a value, so the admin sees the real cause instead of Next's masked
+ * production message. */
+async function withVisibleError(run: () => Promise<void>): Promise<void | { error: string }> {
+  try {
+    await run();
+  } catch (err) {
+    console.error(err);
+    return { error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
 function labelFor(index: number): string {
   return String.fromCharCode(65 + index); // 0 -> A, 1 -> B, ...
 }
@@ -191,38 +203,44 @@ export async function duplicateEvent(eventId: string, formData: FormData) {
 
 export async function randomizePoules(eventId: string, formData: FormData) {
   await requireAdmin();
-  const teams = await repo.listTeams(eventId);
-  const requested = Number(formData.get("pouleCount"));
-  const pouleCount = requested > 0 ? Math.round(requested) : defaultPouleCount(teams.length);
-  const shuffled = [...teams].sort(() => Math.random() - 0.5);
-  const assignment: Record<string, string[]> = {};
-  for (let i = 0; i < pouleCount; i++) assignment[labelFor(i)] = [];
-  shuffled.forEach((team, i) => {
-    assignment[labelFor(i % pouleCount)]!.push(team.id);
+  return withVisibleError(async () => {
+    const teams = await repo.listTeams(eventId);
+    const requested = Number(formData.get("pouleCount"));
+    const pouleCount = requested > 0 ? Math.round(requested) : defaultPouleCount(teams.length);
+    const shuffled = [...teams].sort(() => Math.random() - 0.5);
+    const assignment: Record<string, string[]> = {};
+    for (let i = 0; i < pouleCount; i++) assignment[labelFor(i)] = [];
+    shuffled.forEach((team, i) => {
+      assignment[labelFor(i % pouleCount)]!.push(team.id);
+    });
+    await repo.savePoules(eventId, assignment);
+    revalidatePath(path(eventId));
   });
-  await repo.savePoules(eventId, assignment);
-  revalidatePath(path(eventId));
 }
 
 export async function savePoulesManual(eventId: string, formData: FormData) {
   await requireAdmin();
-  const teams = await repo.listTeams(eventId);
-  const assignment: Record<string, string[]> = {};
-  for (const team of teams) {
-    const value = String(formData.get(`poule_${team.id}`) ?? "");
-    if (/^[A-Z]$/.test(value)) {
-      assignment[value] = assignment[value] ?? [];
-      assignment[value]!.push(team.id);
+  return withVisibleError(async () => {
+    const teams = await repo.listTeams(eventId);
+    const assignment: Record<string, string[]> = {};
+    for (const team of teams) {
+      const value = String(formData.get(`poule_${team.id}`) ?? "");
+      if (/^[A-Z]$/.test(value)) {
+        assignment[value] = assignment[value] ?? [];
+        assignment[value]!.push(team.id);
+      }
     }
-  }
-  await repo.savePoules(eventId, assignment);
-  revalidatePath(path(eventId));
+    await repo.savePoules(eventId, assignment);
+    revalidatePath(path(eventId));
+  });
 }
 
 export async function publishPouleMatches(eventId: string) {
   await requireAdmin();
-  await repo.publishPouleMatches(eventId);
-  revalidatePath(path(eventId));
+  return withVisibleError(async () => {
+    await repo.publishPouleMatches(eventId);
+    revalidatePath(path(eventId));
+  });
 }
 
 export async function updatePoints(eventId: string, formData: FormData) {

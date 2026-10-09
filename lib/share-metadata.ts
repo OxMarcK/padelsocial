@@ -7,6 +7,16 @@ export function fmtWeekday(date: string): string {
   return weekday.charAt(0).toUpperCase() + weekday.slice(1);
 }
 
+/** Full Dutch date, e.g. "11 oktober 2026". */
+export function fmtDateLong(date: string): string {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString("nl-NL", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 /** Short date for share-card titles, e.g. "zo 30 aug, 10:30". */
 export function fmtDateShort(date: string, time: string): string {
   const short = new Date(`${date}T00:00:00`).toLocaleDateString("nl-NL", {

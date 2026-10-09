@@ -140,6 +140,7 @@ export default async function AdminEventTeamsPage({ params }: { params: { id: st
             label={pouleMatches.length > 0 ? "Opnieuw genereren" : "Genereer poulewedstrijden"}
             savedLabel="Gegenereerd"
           />
+          <ActionFormError />
         </ActionForm>
       </Section>
     </>
