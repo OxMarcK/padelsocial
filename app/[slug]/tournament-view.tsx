@@ -243,7 +243,7 @@ function RankingList({
 
 /** Header title per state: the event's name until it starts, "Live" while it runs, "Eindstand" after (passed explicitly). */
 function Shell({ children, event, headerLabel }: { children: React.ReactNode; event: PadelEvent; headerLabel?: string }) {
-  return <EventShell title={headerLabel ?? (event.status === "draft" ? event.name : "Live")}>{children}</EventShell>;
+  return <EventShell title={headerLabel ?? (event.status === "draft" ? "Toernooi" : "Live")}>{children}</EventShell>;
 }
 
 async function ResultsView({
