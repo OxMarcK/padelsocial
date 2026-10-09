@@ -8,6 +8,7 @@ export interface CreateEventInput {
   location: string;
   courts: number;
   coverUrl: string | null;
+  hidden?: boolean;
 }
 
 export interface NewTeamInput {

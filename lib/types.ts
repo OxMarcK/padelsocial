@@ -49,6 +49,9 @@ export interface PadelEvent {
   /** Wall-clock round within the poulefase (1-based). Poulefase has no break
    *  between rounds, so this advances independently of `status`. */
   currentPouleRound: number;
+  /** Verborgen op de agenda (homepage + og-image), de eigen link werkt wel.
+   *  Om een event alvast klaar te zetten voordat het aangekondigd wordt. */
+  hidden: boolean;
   createdAt: string;
 }
 

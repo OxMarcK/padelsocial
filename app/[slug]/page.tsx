@@ -32,7 +32,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const event = await repo.getEventBySlug(params.slug);
   if (event) {
     const title = `${event.name} - ${fmtDateShort(event.date, event.startTime)}`;
-    return buildShareMetadata(title, `${event.location} · Volg live de standen, je baanindeling en de knock-out.`);
+    const metadata = buildShareMetadata(title, `${event.location} · Volg live de standen, je baanindeling en de knock-out.`);
+    // Nog niet aangekondigd: de link werkt, maar zoekmachines laten het liggen.
+    return event.hidden ? { ...metadata, robots: { index: false, follow: false } } : metadata;
   }
 
   const session = await sessionsRepo.getSessionBySlug(params.slug);

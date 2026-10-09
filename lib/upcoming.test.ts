@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { isPastDate } from "./upcoming";
+import { isPastDate, isUpcomingPublicEvent } from "./upcoming";
+import type { PadelEvent } from "./types";
 
 describe("isPastDate", () => {
   afterEach(() => {
@@ -28,5 +29,22 @@ describe("isPastDate", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-09-20T12:00:00Z"));
     expect(isPastDate("2026-09-21")).toBe(false);
+  });
+});
+
+describe("isUpcomingPublicEvent", () => {
+  const event = (patch: Partial<PadelEvent>) => ({ status: "draft", hidden: false, ...patch }) as PadelEvent;
+
+  it("shows a concept event that isn't hidden", () => {
+    expect(isUpcomingPublicEvent(event({}))).toBe(true);
+  });
+
+  it("leaves a hidden event off the agenda, whatever its phase", () => {
+    expect(isUpcomingPublicEvent(event({ hidden: true }))).toBe(false);
+    expect(isUpcomingPublicEvent(event({ hidden: true, status: "poulefase" }))).toBe(false);
+  });
+
+  it("never lists a finished event as upcoming", () => {
+    expect(isUpcomingPublicEvent(event({ status: "finished" }))).toBe(false);
   });
 });

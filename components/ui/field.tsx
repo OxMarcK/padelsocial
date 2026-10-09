@@ -27,3 +27,30 @@ export function Field({
     </label>
   );
 }
+
+export function CheckboxField({
+  label,
+  hint,
+  name,
+  defaultChecked,
+}: {
+  label: string;
+  hint?: string;
+  name: string;
+  defaultChecked?: boolean;
+}) {
+  return (
+    <label className="flex items-start gap-3 rounded-[14px] border border-mint-net/25 bg-mint-bg-2 px-4 py-3">
+      <input
+        name={name}
+        type="checkbox"
+        defaultChecked={defaultChecked}
+        className="mt-0.5 h-5 w-5 flex-none accent-[#4F6E14]"
+      />
+      <span className="flex flex-col gap-0.5">
+        <span className="font-mint text-sm font-bold text-[#0E2318]">{label}</span>
+        {hint ? <span className="text-xs text-mint-ink-muted">{hint}</span> : null}
+      </span>
+    </label>
+  );
+}

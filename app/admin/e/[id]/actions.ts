@@ -56,6 +56,7 @@ export async function updateEventDetails(eventId: string, formData: FormData) {
     throw new Error(`"${requestedSlug}" is al in gebruik door een ander event.`);
   }
 
+  const hidden = formData.get("hidden") === "on";
   await repo.updateEvent(eventId, {
     slug: requestedSlug,
     name: String(formData.get("name") ?? ""),
@@ -63,6 +64,8 @@ export async function updateEventDetails(eventId: string, formData: FormData) {
     startTime: String(formData.get("startTime") ?? ""),
     location: String(formData.get("location") ?? ""),
     courts: Number(formData.get("courts") ?? 5),
+    // Only sent when it changes, so saving keeps working before migration 0012 has run.
+    ...(hidden !== event?.hidden ? { hidden } : {}),
   });
   revalidatePath(path(eventId));
   revalidatePath("/");
@@ -143,6 +146,8 @@ export async function duplicateEvent(eventId: string, formData: FormData) {
     location: source.location,
     courts: source.courts,
     coverUrl: null,
+    // Een testkopie hoort niet op de publieke agenda.
+    hidden: true,
   });
   await repo.updateEvent(copy.id, {
     pointsWin: source.points.win,
