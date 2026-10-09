@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { alternatingPouleSchedule, generatePouleSchedule, hasBackToBack, playedCourts, roundRobinRounds } from "./poule-scheduler";
+import { alternatingPouleSchedule, defaultPouleCount, generatePouleSchedule, hasBackToBack, playedCourts, roundRobinRounds } from "./poule-scheduler";
 
 function teamIds(prefix: string, n: number) {
   return Array.from({ length: n }, (_, i) => `${prefix}${i + 1}`);
@@ -196,5 +196,18 @@ describe("generatePouleSchedule keeps packing when alternating costs too much", 
     const poules = ["A", "B", "C", "D"].map((label) => ({ label, teamIds: teamIds(label, 4) }));
     expect(alternatingPouleSchedule(poules, 3)).toBeNull();
     expect(generatePouleSchedule(poules, 3).matches).toHaveLength(24);
+  });
+});
+
+describe("defaultPouleCount", () => {
+  it("prefers poules of 4 when the teams divide evenly", () => {
+    expect(defaultPouleCount(16)).toBe(4);
+    expect(defaultPouleCount(12)).toBe(3);
+  });
+
+  it("falls back to poules of about 5", () => {
+    expect(defaultPouleCount(20)).toBe(5);
+    expect(defaultPouleCount(15)).toBe(3);
+    expect(defaultPouleCount(0)).toBe(1);
   });
 });
