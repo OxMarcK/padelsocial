@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { FavoriteStarButton } from "./favorite-star";
+import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
 
 export interface TeamResultCardProps {
   slug: string;
@@ -23,7 +25,7 @@ function firstName(name: string): string {
   return name.trim().split(/\s+/)[0] ?? name;
 }
 
-/** Design 6A trial variant of components/team-result-card.tsx, restyled for the light "mint" palette. */
+/** Team card on the team detail page — same Card/Heading/eyebrow treatment as the live event page. */
 export function TeamResultCard({
   slug,
   teamId,
@@ -57,13 +59,13 @@ export function TeamResultCard({
   }
 
   return (
-    <div className="flex flex-col gap-3.5 rounded-[28px] bg-white p-4 text-mint-ink shadow-card">
+    <Card radius="lg" className="flex flex-col gap-4 p-5">
       <div>
-        <div className="font-mint text-3xl font-extrabold leading-tight tracking-tight text-mint-ink">{teamName}</div>
-        <div className="mt-0.5 text-sm text-mint-ink-muted">{subtitle}</div>
+        <Heading as="h2" size="display">{teamName}</Heading>
+        <p className="mt-1 text-sm font-medium text-mint-ink-muted">{subtitle}</p>
       </div>
       <div className="grid grid-cols-3 gap-2">
-        <Stat label="Plek" value={finalRank} suffix={`/${totalTeams}`} />
+        <Stat label="Plek" value={finalRank || "–"} suffix={finalRank ? `/${totalTeams}` : undefined} />
         <Stat label={`Poule ${pouleLabel}`} value={pouleRank} suffix="e" />
         <Stat label="W–V" value={`${wins}–${losses}`} />
       </div>
@@ -71,22 +73,22 @@ export function TeamResultCard({
         <FavoriteStarButton slug={slug} teamId={teamId} />
         <button
           onClick={handleShare}
-          className="flex h-14 flex-1 items-center justify-center rounded-full bg-mint-lime font-mint text-lg font-bold text-mint-lime-ink hover:brightness-105"
+          className="flex h-14 flex-1 items-center justify-center rounded-full bg-mint-lime font-mint text-lg font-bold text-mint-ink hover:brightness-105"
         >
           {shared ? "Link gekopieerd" : "Deel je kaart"}
         </button>
       </div>
-    </div>
+    </Card>
   );
 }
 
 function Stat({ label, value, suffix }: { label: string; value: string | number; suffix?: string }) {
   return (
-    <div className="rounded-xl bg-mint-net/10 p-2.5">
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-mint-ink-muted">{label}</div>
-      <div className="font-mint text-3xl font-extrabold leading-tight tracking-tight text-mint-ink">
+    <div className="rounded-[14px] bg-mint-lime/15 px-3 py-2.5">
+      <div className="text-xs font-bold text-mint-lime-ink">{label}</div>
+      <div className="mt-0.5 font-mint text-3xl font-extrabold leading-tight tracking-tight tabular-nums text-mint-ink">
         {value}
-        {suffix ? <span className="text-sm text-mint-ink-muted">{suffix}</span> : null}
+        {suffix ? <span className="text-sm font-bold tracking-normal text-mint-ink-muted">{suffix}</span> : null}
       </div>
     </div>
   );

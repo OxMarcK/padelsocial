@@ -1,4 +1,6 @@
 import type { MatchVideoRow } from "@/lib/match-video";
+import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
 
 const ACCENT_BORDER: Record<NonNullable<MatchVideoRow["accent"]>, string> = {
   win: "border-l-mint-lime",
@@ -16,16 +18,24 @@ const ACCENT_BADGE: Record<NonNullable<MatchVideoRow["accent"]>, { label: string
   loss: { label: "V", className: "bg-clay-orange text-white" },
 };
 
-/** Design 6A trial variant of components/match-video-list.tsx, restyled for the light "mint" palette. */
-export function MatchVideoSection({ title, rows }: { title: string; rows: MatchVideoRow[] }) {
+/** Video list for the team detail page and the results view: white Card rows on the Agenda shadow scale. */
+export function MatchVideoSection({
+  title,
+  rows,
+  size = "sub",
+}: {
+  title: string;
+  rows: MatchVideoRow[];
+  size?: "section" | "sub";
+}) {
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="font-mint text-lg font-extrabold tracking-tight text-mint-ink">{title}</h2>
-        <span className="font-mint text-xs font-bold text-mint-ink-muted">{rows.length} gespeeld</span>
+        <Heading size={size}>{title}</Heading>
+        {rows.length > 0 ? <span className="font-mint text-xs font-bold text-mint-ink-muted">{rows.length} gespeeld</span> : null}
       </div>
       {rows.length === 0 ? (
-        <p className="text-sm text-mint-ink-muted">Nog geen video&apos;s gekoppeld.</p>
+        <Card className="p-4 text-sm font-medium text-mint-ink-muted">Nog geen video&apos;s gekoppeld.</Card>
       ) : (
         <div className="flex flex-col gap-2.5">
           {rows.map((row) => (
@@ -45,7 +55,7 @@ function MatchVideoCard({ row }: { row: MatchVideoRow }) {
       rel="noreferrer"
       title={row.title}
       aria-label={row.title}
-      className={`flex items-center gap-3 rounded-[20px] border-l-4 bg-mint-surface py-2.5 pl-3 pr-4 transition-colors hover:brightness-95 ${
+      className={`flex items-center gap-3 rounded-[20px] border-l-4 bg-white py-2.5 pl-3 pr-4 shadow-card transition-colors hover:brightness-95 ${
         row.accent ? ACCENT_BORDER[row.accent] : "border-l-transparent"
       }`}
     >
