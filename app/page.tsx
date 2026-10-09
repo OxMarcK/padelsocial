@@ -107,7 +107,9 @@ export default async function LandingPage() {
     title: string;
     startTime: string;
     location: string;
-    actionLabel: string;
+    // No pill for the tournament row: its page is the companion (uitslagen,
+    // standen, teams), not a sign-up form.
+    actionLabel?: string;
     external?: boolean;
   };
   const agendaItems: AgendaItem[] = [
@@ -120,7 +122,6 @@ export default async function LandingPage() {
             title: upcoming.name,
             startTime: upcoming.startTime,
             location: upcoming.location,
-            actionLabel: "Inschrijven als duo",
           },
         ]
       : []),
@@ -270,15 +271,17 @@ export default async function LandingPage() {
                       </span>
                       <span className={`text-sm font-medium leading-snug ${item.kind === "event" ? "text-white/80" : "text-[#5C7266]"}`}>{item.location}</span>
                     </span>
-                    <span
-                      className={
-                        item.kind === "event"
-                          ? "hidden flex-none rounded-full bg-[#D2E95C] px-3.5 py-1.5 text-sm font-bold text-[#0E2318] sm:block"
-                          : "hidden flex-none rounded-full bg-[#EAF1EA] px-3.5 py-1.5 text-sm font-bold sm:block"
-                      }
-                    >
-                      {item.actionLabel}
-                    </span>
+                    {item.actionLabel ? (
+                      <span
+                        className={
+                          item.kind === "event"
+                            ? "hidden flex-none rounded-full bg-[#D2E95C] px-3.5 py-1.5 text-sm font-bold text-[#0E2318] sm:block"
+                            : "hidden flex-none rounded-full bg-[#EAF1EA] px-3.5 py-1.5 text-sm font-bold sm:block"
+                        }
+                      >
+                        {item.actionLabel}
+                      </span>
+                    ) : null}
                   </AgendaRowLink>
                 ))}
               </div>
