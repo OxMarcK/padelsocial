@@ -132,4 +132,6 @@ export interface PouleStandingRow {
  */
 export interface Top8Resolution {
   seeds: string[];
+  /** Qualifiers best-to-worst by poulefase standing; orders final ranks 5-8. Falls back to `seeds`. */
+  rankOrder?: string[];
 }

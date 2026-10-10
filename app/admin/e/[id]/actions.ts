@@ -360,6 +360,9 @@ export async function publishTop8Override(eventId: string, formData: FormData) {
     const value = String(formData.get(`placement${i}`) ?? "").trim();
     if (value) placementSeeds.push(value);
   }
-  await repo.publishTop8(eventId, { top8: { seeds }, placementSeeds });
+  // Keep the standings-based order for ranks 5-8, even if seeds were swapped by hand.
+  const { top8: suggested } = await repo.previewTop8(eventId);
+  const rankOrder = suggested.rankOrder?.filter((id) => seeds.includes(id));
+  await repo.publishTop8(eventId, { top8: { seeds, ...(rankOrder ? { rankOrder } : {}) }, placementSeeds });
   revalidatePath(path(eventId));
 }

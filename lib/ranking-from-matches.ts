@@ -1,4 +1,5 @@
-import type { Match } from "./types";
+import type { Match, Top8Resolution } from "./types";
+import { kwartfinaleLoserOrder } from "./bracket-engine";
 
 export interface RankRow {
   teamId: string;
@@ -15,13 +16,12 @@ function winnerLoser(byDefId: Map<string, Match>, defId: string): { winner: stri
  * Reads final placement 1-8 straight off the already-fetched, publicly-shaped
  * Match[] (bracketMatchId tags the synthesized bracket rows). Ranks 1-4 come
  * from the grote finale / troostfinale; 5-8 have no decisive match (see
- * lib/bracket-engine.ts) so they're ordered by `seeds` (the published top-8
- * seed order) instead, and only once every kwartfinale is decided.
+ * lib/bracket-engine.ts) so they're ordered by poulefase standing instead
+ * (kwartfinaleLoserOrder), and only once every kwartfinale is decided.
  */
-export function top8RankingFromMatches(matches: Match[], seeds: string[]): RankRow[] {
+export function top8RankingFromMatches(matches: Match[], top8: Top8Resolution): RankRow[] {
   const byDefId = new Map(matches.filter((m) => m.bracketMatchId).map((m) => [m.bracketMatchId!, m]));
-  const seedIndex = new Map(seeds.map((id, i) => [id, i]));
-  const bySeed = (a: string, b: string) => (seedIndex.get(a) ?? Infinity) - (seedIndex.get(b) ?? Infinity);
+  const bySeed = kwartfinaleLoserOrder(top8);
   const ranks: RankRow[] = [];
 
   const grand = winnerLoser(byDefId, "GRAND");

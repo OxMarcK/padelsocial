@@ -37,7 +37,7 @@ export default async function TeamDetailPage({ params }: { params: { slug: strin
   let finalRank: number | null = placements.find((p) => p.teamId === team.id)?.finalRank ?? null;
   if (finalRank === null && top8State) {
     const ranking = [
-      ...top8RankingFromMatches(matches, top8State.top8.seeds),
+      ...top8RankingFromMatches(matches, top8State.top8),
       ...top8State.placementSeeds.map((teamId, i) => ({ teamId, rank: 9 + i })),
     ];
     finalRank = ranking.find((r) => r.teamId === team.id)?.rank ?? null;

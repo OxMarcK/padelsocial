@@ -85,6 +85,20 @@ describe("computeTop8Ranking", () => {
     expect(byRank[8]).toBe("seed8"); // kwartfinale loser, worst remaining seed
   });
 
+  it("orders ranks 5-8 by rankOrder (poulefase standing) when present", () => {
+    const results = {
+      KF1: { scoreA: 9, scoreB: 6 }, // seed8 loses
+      KF2: { scoreA: 8, scoreB: 7 }, // seed5 loses
+      KF3: { scoreA: 10, scoreB: 6 }, // seed7 loses
+      KF4: { scoreA: 6, scoreB: 9 }, // seed3 loses
+    };
+    const withOrder = { ...seeds, rankOrder: ["seed7", "seed1", "seed5", "seed2", "seed8", "seed4", "seed6"] };
+    const ranking = computeTop8Ranking(resolveBracketMatches(withOrder, results), withOrder);
+    const byRank = Object.fromEntries(ranking.map((r) => [r.rank, r.teamId]));
+    // seed3 is missing from rankOrder (e.g. swapped in by hand) so it goes last
+    expect([byRank[5], byRank[6], byRank[7], byRank[8]]).toEqual(["seed7", "seed5", "seed8", "seed3"]);
+  });
+
   it("returns nothing before any tier is fully decided", () => {
     const resolved = resolveBracketMatches(seeds, {});
     expect(computeTop8Ranking(resolved, seeds)).toHaveLength(0);
@@ -248,6 +262,7 @@ describe("resolveTop8 — same-poule teams in opposite bracket halves", () => {
     const { top8 } = resolveTop8(poules);
     const kf = KWARTFINALE_SEED_PAIRS.map(([a, b]) => [top8.seeds[a], top8.seeds[b]]);
     expect(kf).toEqual([["A1", "B2"], ["D1", "C2"], ["C1", "D2"], ["B1", "A2"]]);
+    expect(top8.rankOrder).toEqual(["B1", "D1", "A1", "C1", "B2", "D2", "A2", "C2"]);
     expect(crossoverSeedLabels(["D", "C", "B", "A"])).toEqual(
       ["1e poule A", "1e poule C", "1e poule B", "1e poule D", "2e poule C", "2e poule A", "2e poule D", "2e poule B"]
     );

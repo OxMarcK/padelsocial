@@ -42,7 +42,7 @@ export default async function TvPage({ params }: { params: { slug: string } }) {
     const top8State = await repo.getTop8(event.id);
     ranking = top8State
       ? [
-          ...top8RankingFromMatches(matches, top8State.top8.seeds),
+          ...top8RankingFromMatches(matches, top8State.top8),
           ...top8State.placementSeeds.map((teamId, i) => ({ teamId, rank: 9 + i })),
         ]
       : [];
