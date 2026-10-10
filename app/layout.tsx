@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Barlow_Condensed, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { RegisterServiceWorker } from "@/components/register-sw";
 import "./globals.css";
@@ -68,6 +69,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-white font-body text-flood-white antialiased">
         <RegisterServiceWorker />
         {children}
+        {/* Vercel Web Analytics (cookieless page views; enable it in the Vercel dashboard).
+            Loaded as a plain script instead of the @vercel/analytics package. */}
+        <Script id="vercel-analytics-queue" strategy="afterInteractive">
+          {"window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };"}
+        </Script>
+        <Script src="/_vercel/insights/script.js" strategy="afterInteractive" />
       </body>
     </html>
   );
