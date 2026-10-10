@@ -4,6 +4,7 @@ import {
   freePlayCourts,
   resolveBracketMatches,
   resolveTop8,
+  crossoverSeedLabels,
   KWARTFINALE_SEED_PAIRS,
   type PouleStandingsInput,
 } from "./bracket-engine";
@@ -241,7 +242,15 @@ describe("resolveTop8 — same-poule teams in opposite bracket halves", () => {
     for (const label of ["A", "B", "C", "D"]) {
       expect(halfOf(top8.seeds.indexOf(`${label}1`))).not.toBe(halfOf(top8.seeds.indexOf(`${label}2`)));
     }
-    expect(top8.seeds[0]).toBe("B1"); // the best team keeps seed 1
+  });
+
+  it("uses the fixed cross-over: KF1 1A-2B, KF2 1D-2C, KF3 1C-2D, KF4 1B-2A", () => {
+    const { top8 } = resolveTop8(poules);
+    const kf = KWARTFINALE_SEED_PAIRS.map(([a, b]) => [top8.seeds[a], top8.seeds[b]]);
+    expect(kf).toEqual([["A1", "B2"], ["D1", "C2"], ["C1", "D2"], ["B1", "A2"]]);
+    expect(crossoverSeedLabels(["D", "C", "B", "A"])).toEqual(
+      ["1e poule A", "1e poule C", "1e poule B", "1e poule D", "2e poule C", "2e poule A", "2e poule D", "2e poule B"]
+    );
   });
 });
 

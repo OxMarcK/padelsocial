@@ -1,6 +1,7 @@
 import { repo } from "@/lib/data";
 import { ActionForm, ActionFormError, SaveButton } from "@/components/admin/action-form";
 import { publishTop8Override } from "@/app/admin/e/[id]/actions";
+import { crossoverSeedLabels } from "@/lib/bracket-engine";
 
 export async function Top8Editor({
   eventId,
@@ -11,7 +12,8 @@ export async function Top8Editor({
   teams: Array<{ id: string; name: string }>;
   published: Awaited<ReturnType<typeof repo.getTop8>>;
 }) {
-  const preview = await repo.previewTop8(eventId);
+  const [preview, poules] = await Promise.all([repo.previewTop8(eventId), repo.listPoules(eventId)]);
+  const seedLabels = crossoverSeedLabels(poules.map((p) => p.label));
   const state = published ?? preview;
   const placementTeamIds = state.placementSeeds.length > 0 ? state.placementSeeds : teams.map((t) => t.id).filter((id) => !state.top8.seeds.includes(id));
 
@@ -19,12 +21,13 @@ export async function Top8Editor({
     <ActionForm action={publishTop8Override.bind(null, eventId)} className="flex flex-col gap-4 text-sm">
       <div className="flex flex-col gap-2">
         <p className="text-xs text-mint-ink-muted">
-          Seed 1 t/m 8, beste eerst. Kwartfinales spelen 1-8, 4-5, 2-7, 3-6 (standaard bracket-seeding), zodat seed 1
-          en 2 elkaar pas in de finale kunnen treffen.
+          {seedLabels
+            ? "Kruisfinales: KF1 1A-2B, KF2 1D-2C, KF3 1C-2D, KF4 1B-2A. Teams uit dezelfde poule kunnen elkaar pas in de finale treffen."
+            : "Seed 1 t/m 8, beste eerst. Kwartfinales spelen 1-8, 4-5, 2-7, 3-6 (standaard bracket-seeding), zodat seed 1 en 2 elkaar pas in de finale kunnen treffen."}
         </p>
         {state.top8.seeds.map((teamId, i) => (
           <div key={i} className="flex items-center gap-2">
-            <span className="w-16 flex-none text-mint-ink-muted">Seed {i + 1}</span>
+            <span className="w-24 flex-none text-mint-ink-muted">{seedLabels?.[i] ?? `Seed ${i + 1}`}</span>
             <TeamSelect name={`seed${i + 1}`} teams={teams} defaultValue={teamId} />
           </div>
         ))}
