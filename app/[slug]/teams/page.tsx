@@ -25,7 +25,7 @@ export default async function TeamsPage({ params }: { params: { slug: string } }
   for (const p of placements) if (p.finalRank !== null) finalRankById.set(p.teamId, p.finalRank);
   if (top8State) {
     const ranking = [
-      ...top8RankingFromMatches(matches, top8State.top8.seeds),
+      ...top8RankingFromMatches(matches, top8State.top8),
       ...top8State.placementSeeds.map((teamId, i) => ({ teamId, rank: 9 + i })),
     ];
     for (const r of ranking) if (!finalRankById.has(r.teamId)) finalRankById.set(r.teamId, r.rank);

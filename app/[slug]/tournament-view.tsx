@@ -100,7 +100,7 @@ export async function TournamentEventPage({ event }: { event: PadelEvent }) {
 
   const showPodium = event.status === "prijsuitreiking";
   const top8State = showPodium ? await repo.getTop8(event.id) : null;
-  const top8 = top8State ? top8RankingFromMatches(matches, top8State.top8.seeds) : [];
+  const top8 = top8State ? top8RankingFromMatches(matches, top8State.top8) : [];
   const placementRanking = top8State ? top8State.placementSeeds.map((teamId, i) => ({ teamId, rank: 9 + i })) : [];
 
   return (

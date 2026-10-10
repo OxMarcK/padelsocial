@@ -143,10 +143,23 @@ export interface RankedTeam {
 }
 
 /**
+ * Orders kwartfinale losers for ranks 5-8: by poulefase standing (rankOrder)
+ * when known, else by seed slot — with the 4-poule cross-over the slots are
+ * fixed per poule placing, not a ranking.
+ */
+export function kwartfinaleLoserOrder(top8: Top8Resolution): (a: string, b: string) => number {
+  const seedIndex = new Map(top8.seeds.map((teamId, i) => [teamId, i]));
+  const rankIndex = new Map((top8.rankOrder ?? []).map((teamId, i) => [teamId, i]));
+  return (a, b) =>
+    (rankIndex.get(a) ?? Infinity) - (rankIndex.get(b) ?? Infinity) ||
+    (seedIndex.get(a) ?? Infinity) - (seedIndex.get(b) ?? Infinity);
+}
+
+/**
  * Ranks 1-2 come off the grote finale, ranks 3-4 off the troostfinale — the
  * whole podium is match-decided. Ranks 5-8 (kwartfinale losers) have no
- * decisive match, so they're ordered by each team's original top-8 seed
- * instead, once all four kwartfinales are in.
+ * decisive match, so they're ordered by poulefase standing (see
+ * kwartfinaleLoserOrder) once all four kwartfinales are in.
  */
 export function computeTop8Ranking(resolved: ResolvedBracketMatch[], seeds: Top8Resolution): RankedTeam[] {
   const byId = new Map(resolved.map((m) => [m.id, m]));
@@ -154,8 +167,7 @@ export function computeTop8Ranking(resolved: ResolvedBracketMatch[], seeds: Top8
   const bronze = byId.get("BRONZE");
   const kf = ["KF1", "KF2", "KF3", "KF4"].map((id) => byId.get(id));
 
-  const seedIndex = new Map(seeds.seeds.map((teamId, i) => [teamId, i]));
-  const bySeed = (a: string, b: string) => (seedIndex.get(a) ?? Infinity) - (seedIndex.get(b) ?? Infinity);
+  const bySeed = kwartfinaleLoserOrder(seeds);
 
   const ranks: RankedTeam[] = [];
   if (grand?.winnerId) ranks.push({ teamId: grand.winnerId, rank: 1 });
@@ -314,7 +326,8 @@ export function resolveTop8(poulesStandings: PouleStandingsInput[]): { top8: Top
     const seeds = CROSSOVER_SLOTS.map(({ poule, place }) => sortedPoules[poule]!.rows[place - 1]!.teamId);
     const usedIds = new Set(seeds);
     const placementRows = poulesStandings.flatMap((p) => p.rows).filter((r) => !usedIds.has(r.teamId));
-    return { top8: { seeds }, placementSeeds: sortStandings(placementRows).map((r) => r.teamId) };
+    const rankOrder = sortStandings(sortedPoules.flatMap((p) => p.rows.slice(0, 2))).map((r) => r.teamId);
+    return { top8: { seeds, rankOrder }, placementSeeds: sortStandings(placementRows).map((r) => r.teamId) };
   }
 
   let qualifiers: PouleStandingRow[];
