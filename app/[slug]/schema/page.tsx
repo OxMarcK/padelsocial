@@ -161,14 +161,14 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
       className="min-h-screen font-mint text-mint-ink"
       style={{ background: "linear-gradient(180deg, #CFE4D7 0%, #F5F8F5 55%, #DDEBE0 100%)" }}
     >
-      <header className="flex items-center gap-4 bg-white px-4 py-5 md:hidden">
-        <Logo variant="light" size="sm" className="shrink-0" />
-        <div className="h-11 w-0.5 shrink-0 bg-mint-net/40" />
-        <div className="min-w-0">
+      <header className="flex flex-col items-center gap-4 bg-white px-4 py-6 text-center md:hidden">
+        <Logo variant="light" size="md" />
+        <div>
           <div className="font-mint text-2xl font-extrabold leading-tight tracking-tight text-mint-ink">{event.name}</div>
           <div className="mt-1 text-sm text-mint-ink-muted">
-            {fmtDateLong(event.date)} · {event.startTime} · {event.location}
+            {fmtDateLong(event.date)} · {event.startTime}
           </div>
+          <div className="text-sm text-mint-ink-muted">{event.location}</div>
         </div>
       </header>
       <header className="hidden items-center gap-7 bg-white px-16 py-8 md:flex">
