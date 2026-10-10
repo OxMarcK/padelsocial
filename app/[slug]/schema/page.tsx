@@ -3,13 +3,13 @@ import { repo } from "@/lib/data";
 import { generatePouleSchedule, playedCourts } from "@/lib/poule-scheduler";
 import { computeSchedule, pouleRoundWindow, fmtTime, type PhaseWindow } from "@/lib/schedule";
 import { PHASE_META } from "@/lib/phases";
-import { BRACKET_DEFINITION, resolveBracketMatches, type ResolvedBracketMatch, type TeamSource } from "@/lib/bracket-engine";
+import { BRACKET_DEFINITION, crossoverSeedLabels, resolveBracketMatches, type ResolvedBracketMatch, type TeamSource } from "@/lib/bracket-engine";
 import { Logo } from "@/components/logo";
 import { fmtDateLong } from "@/lib/share-metadata";
 
 /** Before the top-8 is published/played, a slot can only describe the *rule* that decides it. */
-function describeSource(source: TeamSource): string {
-  if (source.type === "seed") return `Seed ${source.index + 1}`;
+function describeSource(source: TeamSource, seedLabels: string[] | null): string {
+  if (source.type === "seed") return seedLabels?.[source.index] ?? `Seed ${source.index + 1}`;
   if (source.type === "winnerOf") return `Winnaar ${source.matchId}`;
   return `Verliezer ${source.matchId}`;
 }
@@ -136,6 +136,7 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
   const windows = computeSchedule(event, schedule.roundsCount || 1);
   const pouleStartsAt = windows.find((w) => w.status === "poulefase")!.startsAt;
   const courtNumbers = playedCourts(schedule, event.courts);
+  const seedLabels = crossoverSeedLabels(poules.map((p) => p.label));
   const bracketDefById = Object.fromEntries(BRACKET_DEFINITION.map((d) => [d.id, d]));
 
   // Once the top-8 is published, show the actual team names instead of the
@@ -153,7 +154,7 @@ export default async function SchemaPage({ params }: { params: { slug: string } 
 
   function describeSlot(defId: string, source: TeamSource, side: "A" | "B"): string {
     const resolvedId = side === "A" ? resolvedById[defId]?.teamAId : resolvedById[defId]?.teamBId;
-    return resolvedId ? teamNameById[resolvedId] ?? "?" : describeSource(source);
+    return resolvedId ? teamNameById[resolvedId] ?? "?" : describeSource(source, seedLabels);
   }
 
   return (

@@ -265,6 +265,32 @@ function avoidSamePouleKwartfinales(ranked: string[], pouleOfTeam: Map<string, P
 }
 
 /**
+ * Fixed cross-over for exactly 4 poules: the seed slot each poule placing
+ * lands in (labels sorted A-D). KF1 1A-2B, KF2 1D-2C, KF3 1C-2D, KF4 1B-2A,
+ * so both teams of a poule sit in opposite bracket halves (they can only
+ * meet again in the finale/troostfinale) and the 1B/1D winners — usually
+ * the strongest poules — too. Known before the poulefase ends, unlike a
+ * ranking-based seeding.
+ */
+const CROSSOVER_SLOTS: Array<{ poule: number; place: 1 | 2 }> = [
+  { poule: 0, place: 1 }, // seed slot 0 — KF1 (1A)
+  { poule: 2, place: 1 }, // 1 — KF3 (1C)
+  { poule: 1, place: 1 }, // 2 — KF4 (1B)
+  { poule: 3, place: 1 }, // 3 — KF2 (1D)
+  { poule: 2, place: 2 }, // 4 — KF2 (2C)
+  { poule: 0, place: 2 }, // 5 — KF4 (2A)
+  { poule: 3, place: 2 }, // 6 — KF3 (2D)
+  { poule: 1, place: 2 }, // 7 — KF1 (2B)
+];
+
+/** "1e poule A" etc. per seed slot when the cross-over applies, else null. */
+export function crossoverSeedLabels(pouleLabels: PouleLabel[]): string[] | null {
+  if (pouleLabels.length !== 4) return null;
+  const labels = [...pouleLabels].sort();
+  return CROSSOVER_SLOTS.map(({ poule, place }) => `${place}e poule ${labels[poule]}`);
+}
+
+/**
  * Auto-suggests the top-8 seeding from poulefase standings, per the spec's
  * tie-break order (points, then saldo, then games voor — already applied by
  * sortStandings). The admin UI should show this as an editable draft, since
@@ -282,6 +308,14 @@ export function resolveTop8(poulesStandings: PouleStandingsInput[]): { top8: Top
   const winners = poulesStandings.map((p) => p.rows[0]).filter((r): r is PouleStandingRow => !!r);
   const runnersUp = poulesStandings.map((p) => p.rows[1]).filter((r): r is PouleStandingRow => !!r);
   const rest = poulesStandings.flatMap((p) => p.rows.slice(2));
+
+  const sortedPoules = [...poulesStandings].sort((a, b) => a.label.localeCompare(b.label));
+  if (sortedPoules.length === 4 && sortedPoules.every((p) => p.rows.length >= 2)) {
+    const seeds = CROSSOVER_SLOTS.map(({ poule, place }) => sortedPoules[poule]!.rows[place - 1]!.teamId);
+    const usedIds = new Set(seeds);
+    const placementRows = poulesStandings.flatMap((p) => p.rows).filter((r) => !usedIds.has(r.teamId));
+    return { top8: { seeds }, placementSeeds: sortStandings(placementRows).map((r) => r.teamId) };
+  }
 
   let qualifiers: PouleStandingRow[];
   if (winners.length >= 8) {
