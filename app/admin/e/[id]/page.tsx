@@ -59,6 +59,7 @@ export default async function AdminEventScoresPage({
   const requestedRound = Number(searchParams.round);
   const viewedRound =
     requestedRound >= 1 && requestedRound <= pouleRoundsCount ? requestedRound : event.currentPouleRound;
+  const pouleRoundsLeft = event.status === "poulefase" ? Math.max(pouleRoundsCount - event.currentPouleRound, 0) : 0;
   const viewedRoundMatches = pouleMatches.filter((m) => m.roundNumber === viewedRound);
   const bracketRound = bracketRoundForStatus(event.status);
   const bracketMatches = matches.filter((m) => m.phase !== "poule");
@@ -115,7 +116,22 @@ export default async function AdminEventScoresPage({
 
         {meta.advanceCta && next ? (
           <div className="mt-4">
-            {bracketRound && bracketMissingScores > 0 ? (
+            {pouleRoundsLeft > 0 ? (
+              // Mid-poulefase the phase advance is the wrong button 9 times out of 10 —
+              // between rounds you want "Start ronde N", which lives with the scores
+              // below. Reported live: "Naar pauze" after round 1 was read as the
+              // changeover between rounds and jumped straight to the pre-kwartfinale
+              // pauze. So it's de-emphasized here and its confirm spells out what it skips.
+              <ConfirmButton
+                key={`${event.status}-${event.currentPouleRound}`}
+                label={meta.advanceCta}
+                confirmText={`Let op: je zit pas in ronde ${event.currentPouleRound} van ${pouleRoundsCount}. Hiermee stopt de poulefase en ga je naar de pauze vóór de kwartfinales; ronde ${event.currentPouleRound + 1}${pouleRoundsLeft > 1 ? `–${pouleRoundsCount}` : ""} ${pouleRoundsLeft > 1 ? "worden" : "wordt"} overgeslagen. Wil je alleen de volgende ronde starten? Gebruik dan "Start ronde ${event.currentPouleRound + 1}" bij de scores.`}
+                action={advancePhase.bind(null, event.id, event.status)}
+                variant="ghost"
+                size="sm"
+                successMessage="Poulefase afgerond."
+              />
+            ) : bracketRound && bracketMissingScores > 0 ? (
               <ConfirmButton
                 key={event.status}
                 label={meta.advanceCta}
@@ -167,12 +183,17 @@ export default async function AdminEventScoresPage({
             ))}
           </div>
           <MatchBoard matches={viewedRoundMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
-          {viewedRound === event.currentPouleRound ? (
+          {viewedRound === event.currentPouleRound && pouleRoundsLeft === 0 ? (
+            <p className="mt-3 text-xs text-mint-ink-muted">
+              Dit is de laatste ronde. Alles gescoord? Rond dan bovenaan de poulefase af; daarna volgt de pauze vóór
+              de kwartfinales.
+            </p>
+          ) : viewedRound === event.currentPouleRound ? (
             missingScores > 0 ? (
               <div className="mt-3">
                 <ConfirmButton
                   key={event.currentPouleRound}
-                  label="Volgende ronde binnen poulefase"
+                  label={`Start ronde ${event.currentPouleRound + 1}`}
                   confirmText={`Nog ${missingScores} wedstrijd${missingScores === 1 ? "" : "en"} niet gescoord in ronde ${event.currentPouleRound}. Toch doorgaan naar de volgende ronde?`}
                   action={advancePouleRound.bind(null, event.id, event.currentPouleRound)}
                   variant="secondary"
@@ -186,8 +207,7 @@ export default async function AdminEventScoresPage({
                 className="mt-3"
               >
                 <SaveButton
-                  variant="ghost"
-                  label="Volgende ronde binnen poulefase"
+                  label={`Start ronde ${event.currentPouleRound + 1}`}
                   savedLabel="Volgende ronde gestart"
                 />
               </ActionForm>
@@ -244,6 +264,7 @@ export default async function AdminEventScoresPage({
 
 function confirmTextFor(status: string, teamCount: number) {
   if (status === "draft") return `Poulefase starten met ${teamCount} teams?`;
+  if (status === "poulefase") return "Poulefase afronden en naar de pauze vóór de kwartfinales?";
   if (status === "pauze_1") return "Kwartfinales starten met de gepubliceerde top 8?";
   if (status === "prijsuitreiking") return "Eindstand vastzetten en de resultatenpagina publiceren?";
   return "Doorgaan naar de volgende fase?";
