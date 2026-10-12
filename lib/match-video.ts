@@ -44,7 +44,7 @@ export function buildMatchVideoRows(
     pouleChangeoverMinutes: number;
     /** Full computeSchedule(event, realRoundsCount) result — needed to place bracket-round matches on the clock. */
     windows: PhaseWindow[];
-    /** Given, the score/accent/title become relative to this team instead of a neutral "A vs B". */
+    /** Given, the accent (W/V/G) is judged from this team's side. Score stays in title order ("A vs B" → "scoreA-scoreB"). */
     perspectiveTeamId?: string;
   }
 ): MatchVideoRow[] {
@@ -66,13 +66,14 @@ export function buildMatchVideoRows(
           : windows.find((w) => w.status === `finale_ronde_${m.roundNumber}`)?.startsAt ?? null;
       const subtitle = startsAt ? `Baan ${m.courtNumber} · ${fmtTime(startsAt)}` : `Baan ${m.courtNumber}`;
 
-      let score = `${m.scoreA}-${m.scoreB}`;
+      // Score follows the title's "A vs B" order; flipping it to the team's
+      // side made "De Setro's vs Dos Guzmanos 3-6" read as a Dos Guzmanos win.
+      const score = `${m.scoreA}-${m.scoreB}`;
       let accent: MatchVideoRow["accent"] = null;
       if (perspectiveTeamId) {
         const isTeamA = m.teamAId === perspectiveTeamId;
         const myScore = isTeamA ? m.scoreA : m.scoreB;
         const oppScore = isTeamA ? m.scoreB : m.scoreA;
-        score = `${myScore}-${oppScore}`;
         accent = myScore > oppScore ? "win" : myScore < oppScore ? "loss" : "draw";
       }
 
