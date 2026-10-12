@@ -5,11 +5,13 @@ import { usePathname } from "next/navigation";
 
 const TABS = [
   { href: "", label: "Scores" },
-  { href: "/teams", label: "Teams & poules" },
+  // "Teams & poules" doesn't fit next to three other tabs on a phone, so it's "Teams" there.
+  { href: "/teams", label: "Teams & poules", short: "Teams" },
   { href: "/settings", label: "Instellingen" },
+  { href: "/videos", label: "Video's" },
 ] as const;
 
-/** Real page navigation between the three event-admin routes — a client component only
+/** Real page navigation between the event-admin routes — a client component only
  * because usePathname (for the active-tab highlight) needs to run in the browser; the
  * pages themselves stay Server Components. */
 export function AdminNav({ eventId }: { eventId: string }) {
@@ -29,7 +31,14 @@ export function AdminNav({ eventId }: { eventId: string }) {
               active ? "bg-mint-lime text-[#0E2318]" : "text-mint-ink-muted"
             }`}
           >
-            {t.label}
+            {"short" in t ? (
+              <>
+                <span className="sm:hidden">{t.short}</span>
+                <span className="hidden sm:inline">{t.label}</span>
+              </>
+            ) : (
+              t.label
+            )}
           </Link>
         );
       })}

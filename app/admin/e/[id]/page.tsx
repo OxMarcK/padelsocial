@@ -13,7 +13,7 @@ import { Section } from "@/components/admin/section";
 import { Top8Editor } from "@/components/admin/top8-editor";
 import { PhaseTimeline } from "@/components/mint/phase-timeline";
 import { LiveCountdownText } from "@/components/mint/live-countdown";
-import { advancePhase, advancePouleRound, attachVideo, recomputePlacements, recordScore, regressPhase } from "./actions";
+import { advancePhase, advancePouleRound, recomputePlacements, recordScore, regressPhase } from "./actions";
 
 /** The Scores / control-room view — stepper, phase card, and whatever needs scoring
  * right now. This is the default route (/admin/e/[id]) since it's what an admin looks
@@ -84,12 +84,6 @@ export default async function AdminEventScoresPage({
 
   const recordScoreBound = recordScore.bind(null, event.id);
 
-  // Not-yet-linked matches float to the top — that's the actual to-do here, and the list
-  // only grows over the course of an event, so surfacing what's missing beats chronological order.
-  const scoredMatches = matches
-    .filter((m) => m.scoreA !== null && m.scoreB !== null)
-    .sort((a, b) => Number(!!a.videoUrl) - Number(!!b.videoUrl));
-  const videosLinkedCount = scoredMatches.filter((m) => m.videoUrl).length;
 
   return (
     <>
@@ -225,42 +219,6 @@ export default async function AdminEventScoresPage({
       {bracketRound && currentBracketMatches.length > 0 ? (
         <Section title="Scores invoeren" subtitle={meta.label}>
           <MatchBoard matches={currentBracketMatches} teamNameById={teamNameById} onSave={recordScoreBound} />
-        </Section>
-      ) : null}
-
-      {scoredMatches.length > 0 ? (
-        <Section
-          title="Video's koppelen"
-          subtitle={`${videosLinkedCount} van ${scoredMatches.length} wedstrijden gekoppeld`}
-        >
-          <div className="flex max-h-[420px] flex-col gap-2 overflow-y-auto">
-            {scoredMatches.map((m) => (
-              <ActionForm
-                key={m.id}
-                action={attachVideo.bind(null, event.id)}
-                className="flex flex-col gap-1.5 rounded-xl bg-mint-net/10 p-3 text-sm"
-              >
-                <input type="hidden" name="matchId" value={m.id} />
-                <div className="flex items-center gap-1.5">
-                  {m.videoUrl ? <span aria-hidden className="text-mint-lime-ink">✓</span> : null}
-                  <span className="truncate text-mint-ink-muted">{m.label}</span>
-                </div>
-                <span className="truncate font-semibold text-[#0E2318]">
-                  {m.teamAId ? teamNameById[m.teamAId] ?? "?" : "?"} vs {m.teamBId ? teamNameById[m.teamBId] ?? "?" : "?"}
-                </span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="url"
-                    name="videoUrl"
-                    defaultValue={m.videoUrl ?? ""}
-                    placeholder="https://youtube.com/…"
-                    className="h-9 min-w-0 flex-1 rounded-lg border border-mint-net/25 bg-white px-2 text-[#0E2318] placeholder:text-mint-ink-muted/60"
-                  />
-                  <SaveButton variant="ghost" size="sm" />
-                </div>
-              </ActionForm>
-            ))}
-          </div>
         </Section>
       ) : null}
 
