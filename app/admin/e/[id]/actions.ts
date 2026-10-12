@@ -265,7 +265,7 @@ export async function attachVideo(eventId: string, formData: FormData) {
   const matchId = String(formData.get("matchId") ?? "");
   const videoUrl = String(formData.get("videoUrl") ?? "").trim();
   await repo.attachVideo(eventId, matchId, videoUrl || null);
-  revalidatePath(path(eventId));
+  revalidatePath(`${path(eventId)}/videos`);
 }
 
 /**

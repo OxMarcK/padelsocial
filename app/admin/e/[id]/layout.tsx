@@ -6,7 +6,7 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { fmtDateLong } from "@/lib/share-metadata";
 
 /**
- * Shared chrome for the three event-admin routes (Scores, Teams & poules, Instellingen)
+ * Shared chrome for the event-admin routes (Scores, Teams & poules, Instellingen, Video's)
  * — title/date header + page nav. Each page used to be one giant accordion-stuffed
  * document; splitting into real routes means the stepper/phase card (which only Scores
  * needs) doesn't have to compete for space with setup forms nobody's touching mid-event.
