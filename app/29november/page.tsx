@@ -13,6 +13,8 @@ import { WeeztixShop } from "@/components/weeztix-shop";
  * dag een gewoon event in de admin. */
 const WEEZTIX_GUID = "c2c59ffe-7fd3-42a6-9d56-564f882db6e1";
 const DATE = "2026-11-29";
+/** Achtergrondkleur van de Weeztix-shop zelf, zodat het vlak naadloos aansluit. */
+const WEEZTIX_BG = "bg-[#EFF2F3]";
 const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Padelclub+Rotterdam+Korte+Stadionweg+109+Rotterdam";
 
 const PROGRAM: { time: string; label: string; pause?: boolean }[] = [
@@ -99,20 +101,23 @@ export default function Toernooi3Page() {
             </Card>
           </div>
 
-          <Card radius="lg" className="scroll-mt-24 p-4 sm:p-6">
-            <section id="tickets" className="flex flex-col gap-3">
-              <div className="flex items-baseline justify-between gap-3">
+          {/* Overflow-hidden card zodat het grijs van de Weeztix-shop tot de randen doorloopt. */}
+          <Card radius="lg" className="overflow-hidden">
+            <section id="tickets" className="scroll-mt-24">
+              <div className="flex items-baseline justify-between gap-3 px-4 pb-3 pt-4 sm:px-6 sm:pt-6">
                 <Heading size="section">Tickets</Heading>
                 <span className="text-[13px] font-semibold text-mint-ink-muted">via Weeztix</span>
               </div>
-              <WeeztixShop guid={WEEZTIX_GUID} />
-              <p className="text-[13px] font-medium text-mint-ink-muted">
-                Laadt de ticketshop niet?{" "}
-                <a href={`https://shop.weeztix.com/${WEEZTIX_GUID}`} target="_blank" rel="noreferrer" className="font-semibold text-mint-lime-ink hover:text-mint-ink">
-                  Open hem in een nieuw tabblad
-                </a>
-                .
-              </p>
+              <div className={`flex flex-col gap-3 pb-4 sm:pb-6 ${WEEZTIX_BG}`}>
+                <WeeztixShop guid={WEEZTIX_GUID} />
+                <p className="px-4 text-[13px] font-medium text-mint-ink-muted sm:px-6">
+                  Laadt de ticketshop niet?{" "}
+                  <a href={`https://shop.weeztix.com/${WEEZTIX_GUID}`} target="_blank" rel="noreferrer" className="font-semibold text-mint-lime-ink hover:text-mint-ink">
+                    Open hem in een nieuw tabblad
+                  </a>
+                  .
+                </p>
+              </div>
             </section>
           </Card>
 
