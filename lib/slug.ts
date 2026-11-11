@@ -4,7 +4,7 @@
 // permanently, since /sessies/* links are already shared via WhatsApp and can't be
 // recalled), so "sessies" stays reserved forever — otherwise an event or session
 // could someday claim that literal slug and collide with the redirect route.
-const RESERVED_SLUGS = new Set(["admin", "auth", "sessies"]);
+const RESERVED_SLUGS = new Set(["admin", "auth", "sessies", "downloads"]);
 
 export function normalizeSlug(input: string): string {
   return input
